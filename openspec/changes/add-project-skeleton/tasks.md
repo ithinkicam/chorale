@@ -57,6 +57,16 @@ Every behaviour task below comes in a pair: first the failing test, then the cod
 - [x] 8.2 Add `actionlint` as a Go tool pinned in `go.mod`, and run it in `make lint` on `.github/workflows/`. Verify it rejects a fixture workflow with an invalid permission and a misspelt matrix property, then passes on `.github/workflows/check.yml`
 - [x] 8.3 Remove the comments that break `docs/style.md` from the code in this change, and add any lint settings the guide calls for. Verify `make check` passes and `make golden` leaves every golden file unchanged
 
+## 9. Review fixes
+
+- [ ] 9.1 Add `-race` to `make test` and `make e2e`, run them and confirm the harness race fails them. Then stop the emulator's reply reader before closing the emulator, close the screens in snapshot tests, and send query replies through their own writer so a program that doesn't read its input can't hang a test. Verify both pass under `-race`
+- [ ] 9.2 Write screen tests that a DEC mode outside the current list, such as 2027, is reported when left on, and that a mode turned on and off within one write is still recorded. Run them and confirm they fail, then report every mode that differs from the terminal's default and record modes as they arrive
+- [ ] 9.3 Write a screen test that the cursor style is tracked, and a terminal-level test for the scenario "Cursor does not blink". Run them and confirm they fail with `cursor.Blink = false` removed, then restore it and reset the cursor style at exit, and verify both pass
+- [ ] 9.4 Write an interface snapshot test for the scenario "Message comes first in a very short window", run it and confirm it fails, then let the message take priority over the key line, and verify it passes. Fix the wrapped-message check to keep real spacing, and measure line widths on the running program instead of a fresh model
+- [ ] 9.5 Write scenario check tests for duplicate scenario names, a scenario heading inside a code block, and a relative OpenSpec path. Run them and confirm they fail, then fix the check and verify they pass
+- [ ] 9.6 Clean up the test runs and tooling: remove the temporary folders the tests create, add `--ignore-scripts` to `npm ci`, fix `scripts/check-gofmt.sh` for deleted files, add a test that the actionlint fixture still fails, and list gotestsum in the proposal. Verify `make check` passes and the temporary folder count doesn't grow
+- [ ] 9.7 Fix the docs that disagree with the code: the getting-started guide's install steps, with a pinned golangci-lint and `npm ci`, the cursor check in `docs/testing.md`, where golden files live, and the lines that say `make check` doesn't exist yet. Remove the comments that still break `docs/style.md`, and make failure messages say what was wanted. Verify each command in the getting-started guide runs as written
+
 ## Workflow follow-up
 
 - An outside agent and our own adversarial reviewer review the change, then Cami reviews it before it is applied.
