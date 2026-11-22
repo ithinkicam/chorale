@@ -20,8 +20,8 @@ Every behaviour task below comes in a pair: first the failing test, then the cod
 
 ## 3. Version flag
 
-- [ ] 3.1 Write terminal-level tests for the scenarios "Version flag" and "Development build version", building one binary with the version set to `0.0.0-test` and one with none. Run them and confirm they fail
-- [ ] 3.2 Implement `internal/version`, the `--version` flag and the `-ldflags` in `make build`, and verify the tests from 3.1 pass
+- [x] 3.1 Write terminal-level tests for the scenarios "Version flag" and "Development build version", building one binary with the version set to `0.0.0-test` and one with none. Run them and confirm they fail
+- [x] 3.2 Implement `internal/version`, the `--version` flag and the `-ldflags` in `make build`, and verify the tests from 3.1 pass
 
 ## 4. Empty session list
 

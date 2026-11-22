@@ -20,8 +20,11 @@ GOTESTSUM := go tool gotestsum --format testname
 go-version:
 	@go version
 
+VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
+
 build:
-	go build -o bin/chorale ./cmd/chorale
+	go build -ldflags "-X github.com/ithinkicam/chorale/internal/version.Version=$(VERSION)" \
+	  -o bin/chorale ./cmd/chorale
 
 # Unit, interface snapshot and interaction tests. The JSON is read by the
 # scenario check. -count=1 because some tests build programs from source,

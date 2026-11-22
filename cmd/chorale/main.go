@@ -1,4 +1,34 @@
 // Command chorale is a voice-first terminal workbench for coding agents.
 package main
 
-func main() {}
+import (
+	"flag"
+	"fmt"
+	"io"
+	"os"
+
+	"github.com/ithinkicam/chorale/internal/version"
+)
+
+func main() {
+	os.Exit(run(os.Args[1:], os.Stdout, os.Stderr))
+}
+
+// run parses the command line and does what it asks, returning the exit
+// status.
+func run(args []string, stdout, stderr io.Writer) int {
+	flags := flag.NewFlagSet("chorale", flag.ContinueOnError)
+	flags.SetOutput(stderr)
+	showVersion := flags.Bool("version", false, "print the version and exit")
+	if err := flags.Parse(args); err != nil {
+		return 2
+	}
+
+	if *showVersion {
+		if _, err := fmt.Fprintf(stdout, "chorale %s\n", version.Version); err != nil {
+			return 1
+		}
+		return 0
+	}
+	return 0
+}
