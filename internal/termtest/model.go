@@ -128,12 +128,12 @@ func (mt *ModelTerm) WaitFinished() {
 // Finish ends the program from the test side. It runs automatically when
 // the test ends.
 func (mt *ModelTerm) Finish() {
-	if mt.finished {
-		return
+	if !mt.finished {
+		mt.finished = true
+		_ = mt.tm.Quit()
+		mt.tm.WaitFinished(mt.t, teatest.WithFinalTimeout(DefaultTimeout))
 	}
-	mt.finished = true
-	_ = mt.tm.Quit()
-	mt.tm.WaitFinished(mt.t, teatest.WithFinalTimeout(DefaultTimeout))
+	_ = mt.screen.Close()
 }
 
 // RequireGolden compares the screen's plain text with the golden file

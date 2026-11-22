@@ -2,7 +2,9 @@ package termtest
 
 import (
 	"slices"
+	"strings"
 	"testing"
+	"time"
 )
 
 var modeCases = []struct {
@@ -98,7 +100,7 @@ func TestScreenCursor(t *testing.T) {
 
 func TestScreenAnswersQueriesWithoutBlocking(t *testing.T) {
 	s := NewScreen(20, 5)
-	write(t, s, "\x1b[c\x1b[c\x1b[cdone")
+	write(t, s, "\x1b[?2004$p\x1b[?2004$p\x1b[?2004$pdone")
 	if got := s.Lines()[0]; got != "done" {
 		t.Fatalf("first line = %q, want %q", got, "done")
 	}
@@ -116,5 +118,33 @@ func TestOnlcrStartsEachLineAtTheLeftEdge(t *testing.T) {
 	write(t, s, string(onlcr([]byte("first\n  second"))))
 	if got := s.Lines()[1]; got != "  second" {
 		t.Fatalf("second line = %q, want %q", got, "  second")
+	}
+}
+
+type stuckWriter struct{ release chan struct{} }
+
+func (w stuckWriter) Write(p []byte) (int, error) {
+	<-w.release
+	return len(p), nil
+}
+
+func TestAStuckReplyWriterDoesntBlockTheScreen(t *testing.T) {
+	s := NewScreen(20, 5)
+	stuck := stuckWriter{release: make(chan struct{})}
+	defer close(stuck.release)
+	s.SetReplyWriter(stuck)
+
+	written := make(chan struct{})
+	go func() {
+		_, _ = s.Write([]byte(strings.Repeat("\x1b[?2004$p", 100) + "done"))
+		close(written)
+	}()
+	select {
+	case <-written:
+	case <-time.After(DefaultTimeout):
+		t.Fatal("Write blocked while the reply writer was stuck")
+	}
+	if got := s.Lines()[0]; got != "done" {
+		t.Fatalf("first line = %q, want %q", got, "done")
 	}
 }

@@ -31,13 +31,13 @@ build:
 # and Go's test cache can't see changes to what they build.
 test:
 	@mkdir -p bin
-	$(GOTESTSUM) --jsonfile bin/test.json -- -count=1 $(UNIT_PKGS)
+	$(GOTESTSUM) --jsonfile bin/test.json -- -race -count=1 $(UNIT_PKGS)
 
 # Terminal-level tests. -count=1 because they build chorale themselves, and
 # Go's test cache can't see changes to the code they build.
 e2e:
 	@mkdir -p bin
-	$(GOTESTSUM) --jsonfile bin/e2e.json -- -count=1 ./e2e/...
+	$(GOTESTSUM) --jsonfile bin/e2e.json -- -race -count=1 ./e2e/...
 
 lint:
 	@./scripts/check-lint-version.sh $(GOLANGCI_LINT_VERSION)

@@ -49,18 +49,20 @@ type Screen struct {
 	kittyFlags      int
 	modifyOtherKeys int
 
-	replies   io.Writer
-	repliesMu sync.Mutex
+	replies    *replyQueue
+	readerDone chan struct{}
+	closeOnce  sync.Once
 }
 
 // NewScreen returns a blank screen of the given size.
 func NewScreen(width, height int) *Screen {
 	s := &Screen{
-		emu:      vt.NewEmulator(width, height),
-		parser:   ansi.NewParser(),
-		decModes: map[int]bool{},
-		everOn:   map[Mode]bool{},
-		replies:  io.Discard,
+		emu:        vt.NewEmulator(width, height),
+		parser:     ansi.NewParser(),
+		decModes:   map[int]bool{},
+		everOn:     map[Mode]bool{},
+		replies:    newReplyQueue(),
+		readerDone: make(chan struct{}),
 	}
 	s.emu.SetCallbacks(vt.Callbacks{
 		EnableMode:  func(m ansi.Mode) { s.setDECMode(m, true) },
@@ -69,26 +71,23 @@ func NewScreen(width, height int) *Screen {
 	s.parser.SetHandler(ansi.Handler{HandleCsi: s.handleKeyboardCsi})
 
 	// The emulator blocks on its reply pipe unless something drains it.
-	go s.forwardReplies()
+	go s.readReplies()
 	return s
 }
 
 // SetReplyWriter sends the emulator's answers to queries to w, which is
 // normally the program's input.
 func (s *Screen) SetReplyWriter(w io.Writer) {
-	s.repliesMu.Lock()
-	defer s.repliesMu.Unlock()
-	s.replies = w
+	s.replies.setWriter(w)
 }
 
-func (s *Screen) forwardReplies() {
+func (s *Screen) readReplies() {
+	defer close(s.readerDone)
 	buf := make([]byte, 4096)
 	for {
 		n, err := s.emu.Read(buf)
 		if n > 0 {
-			s.repliesMu.Lock()
-			_, _ = s.replies.Write(buf[:n])
-			s.repliesMu.Unlock()
+			s.replies.push(buf[:n])
 		}
 		if err != nil {
 			return
@@ -115,11 +114,20 @@ func (s *Screen) Resize(width, height int) {
 	s.emu.Resize(width, height)
 }
 
-// Close stops the screen. Further writes fail.
+// Close stops the screen. Further writes fail, and closing again does nothing.
 func (s *Screen) Close() error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.emu.Close()
+	var err error
+	s.closeOnce.Do(func() {
+		if pipe, ok := s.emu.InputPipe().(io.Closer); ok {
+			_ = pipe.Close() // ends readReplies before the emulator is closed
+		}
+		<-s.readerDone
+		s.replies.close()
+		s.mu.Lock()
+		defer s.mu.Unlock()
+		err = s.emu.Close()
+	})
+	return err
 }
 
 // ModeOn reports whether mode is on now.

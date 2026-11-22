@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var drawonce, redrawer string
+var drawonce, redrawer, noreader string
 
 func TestMain(m *testing.M) {
 	os.Exit(runWithFixtures(m))
@@ -23,9 +23,11 @@ func runWithFixtures(m *testing.M) int {
 	}
 	drawonce = filepath.Join(dir, "drawonce")
 	redrawer = filepath.Join(dir, "redrawer")
+	noreader = filepath.Join(dir, "noreader")
 	for pkg, out := range map[string]string{
 		"./testdata/drawonce": drawonce,
 		"./testdata/redrawer": redrawer,
+		"./testdata/noreader": noreader,
 	} {
 		if err := BuildBinary(pkg, out, ""); err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -114,4 +116,9 @@ func TestIdleDetectorPassesAStillProgram(t *testing.T) {
 	if n := term.IdleBytes(); n != 0 {
 		t.Fatalf("the idle detector saw %d bytes from a program that draws once", n)
 	}
+}
+
+func TestAProgramThatNeverReadsItsInputCantHangTheScreen(t *testing.T) {
+	term := Start(t, noreader, Options{Width: 60, Height: 20})
+	term.WaitForText("done")
 }

@@ -137,6 +137,10 @@ func (term *Term) stop() {
 		<-term.exited
 	}
 	_ = term.ptmx.Close()
+	select {
+	case <-term.readDone:
+	case <-time.After(DefaultTimeout):
+	}
 	_ = term.screen.Close()
 }
 

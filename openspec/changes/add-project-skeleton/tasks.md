@@ -59,7 +59,7 @@ Every behaviour task below comes in a pair: first the failing test, then the cod
 
 ## 9. Review fixes
 
-- [ ] 9.1 Add `-race` to `make test` and `make e2e`, run them and confirm the harness race fails them. Then stop the emulator's reply reader before closing the emulator, close the screens in snapshot tests, and send query replies through their own writer so a program that doesn't read its input can't hang a test. Verify both pass under `-race`
+- [x] 9.1 Add `-race` to `make test` and `make e2e`, run them and confirm the harness race fails them. Then stop the emulator's reply reader before closing the emulator, close the screens in snapshot tests, and send query replies through their own writer so a program that doesn't read its input can't hang a test. Verify both pass under `-race`
 - [ ] 9.2 Write screen tests that a DEC mode outside the current list, such as 2027, is reported when left on, and that a mode turned on and off within one write is still recorded. Run them and confirm they fail, then report every mode that differs from the terminal's default and record modes as they arrive
 - [ ] 9.3 Write a screen test that the cursor style is tracked, and a terminal-level test for the scenario "Cursor does not blink". Run them and confirm they fail with `cursor.Blink = false` removed, then restore it and reset the cursor style at exit, and verify both pass
 - [ ] 9.4 Write an interface snapshot test for the scenario "Message comes first in a very short window", run it and confirm it fails, then let the message take priority over the key line, and verify it passes. Fix the wrapped-message check to keep real spacing, and measure line widths on the running program instead of a fresh model
