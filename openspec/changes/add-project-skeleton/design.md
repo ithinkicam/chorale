@@ -71,7 +71,14 @@ The harness starts the binary in a pseudo-terminal with `creack/pty`, at a given
 
 ### Choosing the emulator library
 
-The candidates are `github.com/charmbracelet/x/vt` and `github.com/hinshun/vt10x`. The choice is made by feeding each one known escape sequences directly and checking it reports each mode correctly. The sequences cover the alternate screen, cursor visibility, mouse reporting in SGR mode, bracketed paste and the keyboard enhancement flags. That way the choice doesn't depend on Chorale producing those sequences yet. If a library tracks modes only through callbacks, the harness keeps its own record from them. Task 2.2 records the choice and the reason here.
+The candidates are `github.com/charmbracelet/x/vt` and `github.com/hinshun/vt10x`. The choice is made by feeding each one known escape sequences directly and checking it reports each mode correctly. The sequences cover the alternate screen, cursor visibility, mouse reporting in SGR mode, bracketed paste and the keyboard enhancement flags. That way the choice doesn't depend on Chorale producing those sequences yet. If a library tracks modes only through callbacks, the harness keeps its own record from them.
+
+Task 2.2 chose `github.com/charmbracelet/x/vt` at v0.1.0, on 2026-11-22. It tracks the screen, the cursor position, the alternate screen, mouse reporting, SGR mouse encoding, bracketed paste and focus events, and answers queries such as device attributes. It falls short in two places, and the wrapper in `internal/termtest` covers both:
+
+1. It keeps cursor visibility separately for the main and alternate screens. Real terminals keep it once for the whole terminal, so a program that hides the cursor on the alternate screen and quits leaves it hidden. The wrapper follows DEC mode 25 itself, so that bug is caught.
+2. It ignores the Kitty keyboard protocol and xterm's modifyOtherKeys. The wrapper parses those sequences itself.
+
+`vt10x` was not needed. It has had no release since 2022, and it doesn't track these modes either.
 
 ### Detecting motion
 
