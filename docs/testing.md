@@ -65,7 +65,7 @@ A colour code is a Select Graphic Rendition sequence with parameter 30 to 39, 40
 These tests also enforce three accessibility rules:
 
 1. **No motion.** Once the program has written nothing for half a second, it must write zero bytes over the next two seconds. Counting bytes catches a program that clears and redraws the same picture, which comparing screens would miss. The detector is itself tested against a fixture program that redraws on a timer.
-2. **Cursor placement.** After every screen update, the real cursor is visible and sits on the focused item or the insertion point.
+2. **Cursor placement.** The real cursor is visible and sits on the focused item or the insertion point. Every screen with a focused item has a test that checks where the cursor is.
 3. **A clean exit.** Every terminal mode turned on during a run is off at exit, and the cursor is visible.
 
 ### 5. End-to-end tests with a scripted agent

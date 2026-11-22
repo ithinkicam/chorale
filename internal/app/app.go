@@ -51,7 +51,7 @@ func (m Model) View() tea.View {
 	if m.width < MinWidth || m.height < MinHeight {
 		screen = toosmall.Render(m.width, m.height, MinWidth, MinHeight)
 	} else {
-		screen = sessionlist.Render(m.width, m.height)
+		screen = sessionlist.Render(m.height)
 	}
 	view.SetContent(screen.Content)
 	cursor := tea.NewCursor(screen.CursorX, screen.CursorY)

@@ -16,7 +16,7 @@ func TestTooSmallMessageWithColourOff(t *testing.T) {
 	term.WaitQuiet(200 * time.Millisecond)
 
 	if codes := termtest.ColourCodes(term.Raw()); len(codes) != 0 {
-		t.Errorf("with NO_COLOR=1, chorale sent %d colour codes, the first %q", len(codes), codes[0].Sequence)
+		t.Errorf("chorale sent %d colour codes with NO_COLOR=1, want 0; the first is %q", len(codes), codes[0].Sequence)
 	}
 }
 
@@ -31,7 +31,7 @@ func TestQuittingFromTheTooSmallScreen(t *testing.T) {
 		t.Errorf("exit status %d, want 0", code)
 	}
 	if left := screen.ModesLeftOn(); len(left) != 0 {
-		t.Errorf("modes left on after quitting: %v", left)
+		t.Errorf("modes left on after quitting: %v, want none", left)
 	}
 	if _, _, visible := screen.Cursor(); !visible {
 		t.Error("the cursor is hidden after quitting")

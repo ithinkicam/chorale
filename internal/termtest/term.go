@@ -52,8 +52,7 @@ type Term struct {
 }
 
 // Start runs binary in a pseudo-terminal of the given size, with a fixed
-// environment so results don't depend on the machine. The program is stopped
-// when the test ends.
+// environment. The program is stopped when the test ends.
 func Start(t testing.TB, binary string, opts Options) *Term {
 	t.Helper()
 	cmd := exec.Command(binary, opts.Args...)
@@ -207,8 +206,7 @@ func (term *Term) WaitQuiet(quiet time.Duration) {
 }
 
 // IdleBytes waits for the program to go quiet for IdleSettle, then counts
-// the bytes it writes over IdleWindow with no input. Counting bytes catches a
-// redraw of the same picture that comparing screens would miss.
+// the bytes it writes over IdleWindow with no input.
 func (term *Term) IdleBytes() int {
 	term.t.Helper()
 	term.WaitQuiet(IdleSettle)

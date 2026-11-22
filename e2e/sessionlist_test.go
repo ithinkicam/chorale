@@ -24,7 +24,7 @@ func TestEmptySessionListWithColourOff(t *testing.T) {
 	term := startSessionList(t, termtest.Options{Width: 60, Height: 20, NoColor: true})
 
 	if codes := termtest.ColourCodes(term.Raw()); len(codes) != 0 {
-		t.Errorf("with NO_COLOR=1, chorale sent %d colour codes, the first %q", len(codes), codes[0].Sequence)
+		t.Errorf("chorale sent %d colour codes with NO_COLOR=1, want 0; the first is %q", len(codes), codes[0].Sequence)
 	}
 }
 

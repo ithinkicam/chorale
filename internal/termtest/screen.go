@@ -222,9 +222,8 @@ func (s *Screen) modeOn(mode Mode) bool {
 	return false
 }
 
-// cursorHidden follows DEC mode 25 itself: x/vt keeps cursor visibility per
-// screen, while real terminals keep it once.
 func (s *Screen) cursorHidden() bool {
+	// x/vt keeps cursor visibility per screen, but real terminals keep it once.
 	shown, set := s.decModes[25]
 	return set && !shown
 }
@@ -299,7 +298,7 @@ func (s *Screen) CursorStyle() (style int, set bool) {
 }
 
 // CursorBlinks reports whether the current cursor style blinks. The default
-// style, 0, counts as blinking, because most terminals blink it.
+// style, 0, counts as blinking.
 func (s *Screen) CursorBlinks() bool {
 	style, _ := s.CursorStyle()
 	return style == 0 || style%2 == 1
@@ -313,11 +312,11 @@ func (s *Screen) handleCsi(cmd ansi.Cmd, params ansi.Params) {
 	case cmd.Final() == 'q' && cmd.Intermediate() == ' ':
 		s.cursorStyle, _, _ = params.Param(0, 0)
 		s.cursorStyleSet = true
-	case cmd.Final() == 'u' && cmd.Prefix() == '>': // push flags
+	case cmd.Final() == 'u' && cmd.Prefix() == '>':
 		flags, _, _ := params.Param(0, 0)
 		s.kittyStack = append(s.kittyStack, s.kittyFlags)
 		s.kittyFlags = flags
-	case cmd.Final() == 'u' && cmd.Prefix() == '<': // pop n entries
+	case cmd.Final() == 'u' && cmd.Prefix() == '<':
 		n, _, _ := params.Param(0, 1)
 		for range max(n, 1) {
 			if len(s.kittyStack) == 0 {
@@ -327,7 +326,7 @@ func (s *Screen) handleCsi(cmd ansi.Cmd, params ansi.Params) {
 			s.kittyFlags = s.kittyStack[len(s.kittyStack)-1]
 			s.kittyStack = s.kittyStack[:len(s.kittyStack)-1]
 		}
-	case cmd.Final() == 'u' && cmd.Prefix() == '=': // set flags
+	case cmd.Final() == 'u' && cmd.Prefix() == '=':
 		flags, _, _ := params.Param(0, 0)
 		how, _, _ := params.Param(1, 1)
 		switch how {
@@ -338,7 +337,7 @@ func (s *Screen) handleCsi(cmd ansi.Cmd, params ansi.Params) {
 		case 3:
 			s.kittyFlags &^= flags
 		}
-	case cmd.Final() == 'm' && cmd.Prefix() == '>': // modifyOtherKeys
+	case cmd.Final() == 'm' && cmd.Prefix() == '>':
 		resource, _, _ := params.Param(0, -1)
 		if resource == 4 {
 			level, _, _ := params.Param(1, 0)

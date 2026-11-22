@@ -15,7 +15,7 @@ func TestVersionFlag(t *testing.T) {
 	}
 	assertOneLine(t, term, "chorale "+testVersion)
 	if fromModes := term.Screen().ModesTurnedOn(); len(fromModes) != 0 {
-		t.Errorf("--version turned on terminal modes: %v", fromModes)
+		t.Errorf("--version turned on terminal modes %v, want none", fromModes)
 	}
 }
 

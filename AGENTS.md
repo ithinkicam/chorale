@@ -61,7 +61,7 @@ A task is done only when these pass:
 make check
 ```
 
-Until milestone 0 lands, `make check` doesn't exist yet. Use `openspec validate --strict --all` for spec work. Always pass `--all` or an item name: without one, OpenSpec exits with an error when there is no terminal, and asks a question when there is one.
+For spec work on its own, `openspec validate --strict --all` is quicker. Always pass `--all` or an item name: without one, OpenSpec exits with an error when there is no terminal, and asks a question when there is one.
 
 ## Writing
 

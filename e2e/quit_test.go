@@ -22,7 +22,7 @@ func TestQuittingRestoresTheTerminal(t *testing.T) {
 		t.Errorf("exit status %d, want 0", code)
 	}
 	if left := screen.ModesLeftOn(); len(left) != 0 {
-		t.Errorf("modes left on after quitting: %v (turned on during the run: %v)",
+		t.Errorf("modes left on after quitting: %v, want none (turned on during the run: %v)",
 			left, screen.ModesTurnedOn())
 	}
 	if _, _, visible := screen.Cursor(); !visible {

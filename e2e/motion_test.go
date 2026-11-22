@@ -11,7 +11,7 @@ func TestIdleScreenStaysStill(t *testing.T) {
 	term := startSessionList(t, termtest.Options{Width: 60, Height: 20})
 
 	if n := term.IdleBytes(); n != 0 {
-		t.Fatalf("with no input, chorale wrote %d bytes in %v", n, termtest.IdleWindow)
+		t.Fatalf("chorale wrote %d bytes in %v with no input, want 0", n, termtest.IdleWindow)
 	}
 }
 

@@ -25,14 +25,13 @@ const (
 	emptyColumn = 2
 )
 
-// Render draws the empty session list for a window of the given size,
-// which must be at least 60 by 20.
-func Render(width, height int) screens.Screen {
+// Render draws the empty session list for a window of the given height,
+// which must be at least 20 rows.
+func Render(height int) screens.Screen {
 	rows := make([]string, height)
 	rows[0] = titleStyle.Render(Title)
 	rows[emptyRow] = strings.Repeat(" ", emptyColumn) + Empty
 	rows[height-1] = keyStyle.Render("q") + " quit"
-	_ = width // every row is far narrower than the 60-column minimum
 	return screens.Screen{
 		Content: strings.Join(rows, "\n"),
 		CursorX: emptyColumn,

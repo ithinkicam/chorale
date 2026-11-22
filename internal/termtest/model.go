@@ -58,8 +58,8 @@ func (mt *ModelTerm) pump() {
 	}
 }
 
-// onlcr turns each line feed into a carriage return and line feed, because
-// teatest writes to a buffer with no terminal driver.
+// onlcr turns each line feed into a carriage return and line feed, as a
+// terminal driver would.
 func onlcr(data []byte) []byte {
 	return bytes.ReplaceAll(data, []byte("\n"), []byte("\r\n"))
 }
@@ -150,7 +150,7 @@ func (mt *ModelTerm) end() {
 }
 
 // RequireGolden compares the screen's plain text with the golden file
-// testdata/<test name>.golden, which `make golden` rewrites on purpose only.
+// testdata/<test name>.golden.
 func (mt *ModelTerm) RequireGolden() {
 	mt.t.Helper()
 	golden.RequireEqual(mt.t, mt.Text()+"\n")

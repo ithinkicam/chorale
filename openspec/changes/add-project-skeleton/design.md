@@ -43,7 +43,7 @@ scripts/              check-scenarios and other development scripts
 testdata/             shared fixtures
 ```
 
-Each screen package has its own `testdata/` for its golden files. Built binaries go to `bin/`, which is ignored, and `.gitignore` also ignores a stray `/chorale` at the repo root.
+Golden files live in the `testdata/` folder of the package whose tests write them. For this change that is `internal/app`, because the screens are tested through the whole app. Built binaries go to `bin/`, which is ignored, and `.gitignore` also ignores a stray `/chorale` at the repo root.
 
 ### The version
 

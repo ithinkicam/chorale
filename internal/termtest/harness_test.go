@@ -115,7 +115,7 @@ func TestIdleDetectorPassesAStillProgram(t *testing.T) {
 	term := Start(t, drawonce, Options{Width: 60, Height: 20})
 	term.WaitForText("NO_COLOR")
 	if n := term.IdleBytes(); n != 0 {
-		t.Fatalf("the idle detector saw %d bytes from a program that draws once", n)
+		t.Fatalf("the idle detector saw %d bytes from a program that draws once, want 0", n)
 	}
 }
 

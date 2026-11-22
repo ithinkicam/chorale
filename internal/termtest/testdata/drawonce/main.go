@@ -48,7 +48,7 @@ func draw() {
 	fmt.Printf("size %dx%d\r\n", ws.Col, ws.Row)
 	fmt.Printf("TERM %s\r\n", os.Getenv("TERM"))
 	fmt.Printf("NO_COLOR %s\r\n", noColor)
-	fmt.Print("\x1b[5;3H") // leave the cursor at column 2, row 4
+	fmt.Print("\x1b[5;3H")
 }
 
 func readKeys(keys chan<- byte) {

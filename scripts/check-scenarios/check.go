@@ -129,7 +129,7 @@ func scenariosIn(path string) ([]Scenario, error) {
 			scenarios = append(scenarios, Scenario{Name: name, File: path})
 			current = len(scenarios) - 1
 		case strings.HasPrefix(trimmed, "#"):
-			current = -1 // a new heading ends the scenario
+			current = -1
 		case current >= 0 && strings.HasPrefix(trimmed, byHandPrefix):
 			scenarios[current].Reason = strings.TrimSpace(strings.TrimPrefix(trimmed, byHandPrefix))
 		}
