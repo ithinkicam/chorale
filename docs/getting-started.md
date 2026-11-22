@@ -4,7 +4,7 @@ As of 2026-11-22. These steps set up a clone of Chorale on Cami's M4 Mac mini, r
 
 ## 1. Clone the repo
 
-The repo is private, so clone it with the GitHub CLI, which uses your GitHub login:
+The repo is public. Clone it with the GitHub CLI, which also sets up your login for pushing branches and opening pull requests:
 
 ```
 gh auth status
@@ -64,7 +64,7 @@ When you're happy with the change, open an agent in the repo and run the apply s
 
 In Codex, use `$openspec-apply-change add-project-skeleton`. In Antigravity CLI, use `/openspec-apply-change add-project-skeleton`.
 
-The agent works through `tasks.md` test first: it writes each test, shows it failing, then writes the code. The rules it follows are in `AGENTS.md`. Claude Code reads them through `CLAUDE.md`.
+The agent works on a branch, through `tasks.md` test first: it writes each test, shows it failing, then writes the code. It opens a pull request when it's done, because `main` only accepts pull requests. The rules it follows are in `AGENTS.md`. Claude Code reads them through `CLAUDE.md`.
 
 ## Good to know
 

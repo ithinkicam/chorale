@@ -11,8 +11,8 @@ Chorale is a voice-first terminal workbench on macOS for running coding agents s
 Chorale uses OpenSpec for spec-driven development. Behaviour is defined in specs before it is built, and no code is written without an OpenSpec change behind it.
 
 1. **Propose.** Every piece of work starts as a change in `openspec/changes/<change-name>/`, with a proposal, delta specs, a design where needed, and tasks. Use the `openspec-propose` skill.
-2. **Review.** Cami reviews the proposal and specs before any code is written.
-3. **Apply.** Work through `tasks.md` in order with the `openspec-apply-change` skill, ticking each task as it is done.
+2. **Review.** Before Cami reviews, two other reviews run. An outside agent from a different vendor reviews the change, for example `agy -p --mode plan` or `codex exec`. An adversarial reviewer from the same session reviews it too. Their findings go to Cami together, each with the proposing agent's view. Nothing a reviewer suggests goes into the change without her decision. Cami then reviews the proposal and specs, and no code is written before she approves them.
+3. **Apply.** Work on a branch named after the change, and work through `tasks.md` in order with the `openspec-apply-change` skill, ticking each task as it is done. The work reaches `main` through a pull request.
 4. **Archive.** When every task is done and `make check` passes, archive the change with the `openspec-archive-change` skill. This merges its specs into `openspec/specs/`, which describe how Chorale behaves now.
 
 A change that alters no behaviour, such as tooling or a refactor, sets `skip_specs: true` in its `.openspec.yaml`. It still needs a proposal and tasks.
@@ -44,6 +44,10 @@ These come from `docs/plan.md` and apply to every screen:
 ## Plain names
 
 The choir theme is for characters and visuals only. Keys, menus, status lines, docs and code use ordinary developer terms such as session, terminal, permission and settings. Never rename a standard thing to fit the theme.
+
+## Pull requests
+
+`main` is protected. Every change reaches it through a pull request that needs one approval and passing checks. Agents push as Cami's GitHub account, and GitHub doesn't let a pull request's author approve it. So for our own pull requests, the adversarial reviewer posts its review as a comment, and Cami merges using her admin bypass once she's satisfied. A contributor's pull request needs Cami's approval. Never force-push, and never push to `main` directly.
 
 ## Gates
 

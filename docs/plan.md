@@ -54,6 +54,8 @@ The prompt box works like a normal text box, not like terminal line editing wher
 
 Chorale turns on the terminal's mouse reporting, in its SGR mode, so it receives every click, drag and release with its position. Bubble Tea v2 delivers these as messages. The Bubbles text area doesn't handle mouse selection, so Chorale needs its own editor component. While mouse reporting is on, Option-drag still gives the terminal's own selection, which is the escape hatch for copying from the transcript.
 
+The editor arrives in two steps, decided 2026-11-22. Milestone 1 ships the keyboard editor: word moves, undo and redo, soft wrapping, bracketed paste, OSC 52 copy, and the real cursor at the insertion point. Milestone 2 adds the mouse: clicks, drags, multi-click selection and Shift-click. Mapping a click to a text position across soft wraps and wide characters is the hardest part of the editor, and it shouldn't hold up the first working session. The mouse also serves re-dictation in milestone 2, where selecting a phrase to say again is the main use.
+
 ### Session names
 
 Each session is named for its work, such as "Bearer-check tests", not for its agent. The agent, model and project sit underneath as a subheading, such as "claude · opus 5.5 · commonplace-code".
@@ -256,21 +258,21 @@ Done when `make check` passes in continuous integration, and a deliberately brok
 
 ### Milestone 1: one Claude session
 
-The service starts a single Claude Code session through `claude-agent-acp`. The terminal app shows it in one column, sends prompts and shows replies. Permission requests appear as a clear numbered choice with a sound. The default theme uses the terminal palette, and a high-contrast fixed-colour theme ships alongside. The prompt box is the full mouse-driven editor from the start, because everything else is typed or dictated into it. The session header shows Claude's chorister in its half-block version.
+The service starts a single Claude Code session through `claude-agent-acp`. The terminal app shows it in one column, sends prompts and shows replies. Permission requests appear as a clear numbered choice with a sound. The default theme uses the terminal palette, and a high-contrast fixed-colour theme ships alongside. The prompt box is the keyboard editor from the start, because everything else is typed or dictated into it. Mouse editing follows in milestone 2. The session header shows Claude's chorister in its half-block version.
 
 Done when Cami can do a real small task in Chorale at her usual font size without reaching for Claude Code directly.
 
 ### Milestone 2: dictation
 
-First the microphone permission check, then `chorale-listen` with FluidAudio and Parakeet, toggle-mode dictation into the prompt box, and the vocabulary correction step. Hold-to-talk and double-tap-to-lock follow where her terminal supports them. Apple's SpeechTranscriber is tested against her own speech as a comparison.
+First the microphone permission check, then mouse editing in the prompt box, then `chorale-listen` with FluidAudio and Parakeet, toggle-mode dictation into the prompt box, and the vocabulary correction step. Hold-to-talk and double-tap-to-lock follow where her terminal supports them. Apple's SpeechTranscriber is tested against her own speech as a comparison.
 
 Done when Cami prefers dictating into Chorale over Wispr Flow for prompts.
 
 ### Milestone 3: three agents and local models
 
-Several sessions at once, a session list that works at 60 columns, Codex and Antigravity as the second and third agents, local model sessions through OpenCode, and switching between sessions by number or by name. Inkling 2 Mini is the first local model to support. Sessions get their work-based names, all three choristers are drawn, and the Kitty graphics version of the sprites is used where the terminal supports it. Transcripts are saved and searchable by keyword.
+Several sessions at once, a session list that works at 60 columns, Codex and Antigravity as the second and third agents, local model sessions through OpenCode, and switching between sessions by number or by name. Inkling 2 Mini is the first local model to try, but it doesn't gate the milestone, because its model card asks for 32 GB and both Macs have 16 GB. The milestone is done with a local model that fits comfortably in memory, chosen in the milestone 3 design. Sessions get their work-based names, all three choristers are drawn, and the Kitty graphics version of the sprites is used where the terminal supports it. Transcripts are saved and searchable by keyword.
 
-Done when she can run Claude, Codex and Antigravity sessions on the same project and move between them without losing her place, and can start an Inkling 2 Mini session from the picker without editing any config.
+Done when she can run Claude, Codex and Antigravity sessions on the same project and move between them without losing her place, and can start a local model session from the picker without editing any config.
 
 ### Milestone 4: terminal handoff and agents handing off
 
@@ -312,7 +314,7 @@ Each milestone has a "done when" test that Cami runs on her Mac. Continuous inte
 
 ## Outward-facing steps that need separate approval
 
-1. Creating the private GitHub repo `chorale`, done by Cami.
+1. Creating the public GitHub repo `chorale`, done by Cami.
 2. Upgrading Antigravity CLI on her Mac to 1.5 or later.
 3. A `launchd` service that starts at login, installed only with her go-ahead in milestone 1.
 4. Microphone permission for her terminal or for the `chorale-listen` helper, granted by her.

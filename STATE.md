@@ -4,14 +4,17 @@ As of 2026-11-22.
 
 ## Where things stand
 
-The plan, the test standard, the agent rules and the OpenSpec setup are in place. No code exists yet. The first change, `add-project-skeleton` for milestone 0, is written and passes `openspec validate --strict`. It is waiting for Cami's review.
+The plan, the test standard, the agent rules and the OpenSpec setup are in place. No code exists yet. The repo is public on GitHub, and `main` takes changes only through pull requests.
+
+The first change, `add-project-skeleton` for milestone 0, was revised on 2026-11-22. It now has a scenario for short windows, a fuller continuous integration setup, and an ignore rule for archived changes. It passes `openspec validate --strict`, and it is waiting for the outside and adversarial reviews, then Cami's review.
 
 ## Next steps
 
-1. Cami clones the repo and sets up her Mac by following `docs/getting-started.md`.
-2. Cami reviews `openspec/changes/add-project-skeleton/proposal.md` and its spec.
-3. An agent applies the change with the `openspec-apply-change` skill, test first.
-4. Once `make check` passes in continuous integration, the change is archived and milestone 1 is proposed as the next change.
+1. An outside agent and the adversarial reviewer review `add-project-skeleton`, and their findings go to Cami.
+2. Cami reviews the change.
+3. An agent applies it on a branch, test first, and opens a pull request.
+4. Once `make check` passes in continuous integration and the pull request is merged, the change is archived.
+5. The `harden-repository` change is proposed next. It adds security scanning, Dependabot updates and auto-merge, required checks on `main`, `CODEOWNERS` and `SECURITY.md`. Then milestone 1 is proposed.
 
 ## Open decisions
 

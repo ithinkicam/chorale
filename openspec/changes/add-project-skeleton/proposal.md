@@ -15,7 +15,8 @@ This is milestone 0 in `docs/plan.md`.
 - Test harness for unit tests, interface snapshot tests, interaction tests and terminal-level tests, with golden files under `testdata/`.
 - `scripts/check-scenarios`, which fails if any OpenSpec scenario has no matching test.
 - A `Makefile` with `test`, `e2e`, `lint`, `golden` and `check` targets.
-- GitHub Actions running `make check` on every push.
+- GitHub Actions running `make check` on every push to any branch and on every pull request, with actions pinned to commit hashes and a read-only token.
+- `openspec/changes/archive/` is ignored by git. An archived change stays in git history up to the commit that archives it, and the current behaviour lives in `openspec/specs/`.
 
 ## Capabilities
 
@@ -31,6 +32,8 @@ None.
 
 Themes beyond the terminal's own palette, the background service, agents, the prompt editor, sprites and dictation. Those belong to milestones 1 to 4. The end-to-end layer with a scripted agent needs the service, so it arrives in milestone 1. This change only creates the empty `make e2e` target and the terminal-level tests.
 
+Repository hardening is a separate change, `harden-repository`, which follows this one because it needs continuous integration to exist. It covers security scanning, Dependabot updates and auto-merge, the required checks on `main`, `CODEOWNERS` and `SECURITY.md`.
+
 ## Impact
 
-New repository content only: `go.mod`, `cmd/chorale/`, `internal/`, `scripts/`, `testdata/` directories, `Makefile`, `.golangci.yml` and `.github/workflows/check.yml`. New dependencies: Bubble Tea v2, Lip Gloss v2, Charm's `teatest` v2, a pseudo-terminal library and a terminal emulator library for tests.
+New repository content only: `go.mod`, `cmd/chorale/`, `internal/`, `scripts/`, `testdata/` directories, `Makefile`, `.golangci.yml` and `.github/workflows/check.yml`, plus one rule in `.gitignore`. New dependencies: Bubble Tea v2, Lip Gloss v2, Charm's `teatest` v2, a pseudo-terminal library and a terminal emulator library for tests.

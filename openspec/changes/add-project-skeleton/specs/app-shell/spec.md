@@ -85,3 +85,10 @@ When the window is narrower than 60 columns or shorter than 20 rows, Chorale SHA
 - **GIVEN** Chorale is showing the window-too-narrow message
 - **WHEN** the window is resized to 60 columns by 20 rows
 - **THEN** the empty session list is shown
+
+#### Scenario: Started at 15 rows
+
+- **GIVEN** a terminal 80 columns wide and 15 rows tall
+- **WHEN** Chorale starts
+- **THEN** the screen shows "Chorale needs at least 60 by 20." with no line wider than 80 columns
+- **AND** still shows "q quit"
