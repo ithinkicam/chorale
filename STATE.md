@@ -2,13 +2,13 @@
 
 ## Where things stand
 
-Milestone 0 is built on the branch `add-project-skeleton`, in pull request 2. That covers the Go project, test layers 1 to 4, the empty session list and the too-small screen, `scripts/check-scenarios`, `make check`, continuous integration on macOS and Linux, and the code style guide in `docs/style.md`. Every task in the change is done, and `make check` passes locally and in CI. The repo is public, and `main` takes changes only through pull requests.
+Milestone 0 is built and archived, in pull request 2. That covers the Go project, test layers 1 to 4, the empty session list and the too-small screen, `scripts/check-scenarios`, `make check`, continuous integration on macOS and Linux, and the code style guide in `docs/style.md`. The behaviour it built is in `openspec/specs/app-shell/spec.md`. The repo is public, and `main` takes changes only through pull requests.
 
 ## Next steps
 
-1. The outside and adversarial reviews of pull request 2 go to Cami, with any fixes she agrees to.
-2. The change is archived as the last commit on its branch, and Cami merges the pull request.
-3. The `harden-repository` change is proposed next. It adds security scanning, Dependabot updates and auto-merge, required checks on `main` in a ruleset nobody can bypass, `CODEOWNERS` and `SECURITY.md`. Then milestone 1 is proposed.
+1. Cami merges pull request 2.
+2. The `harden-repository` change is proposed next. It adds security scanning, Dependabot updates and auto-merge, required checks on `main` in a ruleset nobody can bypass, `CODEOWNERS` and `SECURITY.md`.
+3. Then milestone 1 is proposed: one Claude session, with the keyboard editor.
 
 ## Open decisions
 
