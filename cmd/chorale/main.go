@@ -35,7 +35,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	}
 
 	if _, err := tea.NewProgram(app.New()).Run(); err != nil {
-		fmt.Fprintf(stderr, "chorale: %v\n", err) //nolint:errcheck // nowhere left to report it
+		_, _ = fmt.Fprintf(stderr, "chorale: %v\n", err)
 		return 1
 	}
 	return 0

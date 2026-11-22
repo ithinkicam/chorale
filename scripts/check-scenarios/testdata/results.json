@@ -1,0 +1,14 @@
+{"Action":"run","Package":"example/x","Test":"TestPassingTest"}
+{"Action":"output","Package":"example/x","Test":"TestPassingTest","Output":"=== RUN   TestPassingTest\n"}
+{"Action":"pass","Package":"example/x","Test":"TestPassingTest","Elapsed":0}
+{"Action":"run","Package":"example/x","Test":"TestStartedAt40Columns"}
+{"Action":"pass","Package":"example/x","Test":"TestStartedAt40Columns","Elapsed":0}
+{"Action":"run","Package":"example/x","Test":"TestGroup"}
+{"Action":"run","Package":"example/x","Test":"TestGroup/Matching_subtest"}
+{"Action":"pass","Package":"example/x","Test":"TestGroup/Matching_subtest","Elapsed":0}
+{"Action":"pass","Package":"example/x","Test":"TestGroup","Elapsed":0}
+{"Action":"run","Package":"example/x","Test":"TestSkippedTest"}
+{"Action":"skip","Package":"example/x","Test":"TestSkippedTest","Elapsed":0}
+{"Action":"run","Package":"example/x","Test":"TestFailedTest"}
+{"Action":"fail","Package":"example/x","Test":"TestFailedTest","Elapsed":0}
+{"Action":"pass","Package":"example/x","Elapsed":0}
