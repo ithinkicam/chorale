@@ -1,6 +1,6 @@
 # Chorale: plan
 
-As of 2026-11-22. Draft for Cami's review, revised after a first research pass. Nothing has been built yet. The findings and sources behind this plan are in `docs/research/2026-11-22.md`.
+As of 2026-11-22. Draft for Cami's review, revised after a first research pass and the first interface sketches. Nothing has been built yet. The findings and sources behind this plan are in `docs/research/2026-11-22.md`.
 
 ## Outcome
 
@@ -28,10 +28,41 @@ These are requirements, not preferences. A feature that breaks one of them isn't
 2. **Transcription is local.** Audio never leaves the Mac.
 3. **Custom vocabulary.** Chorale knows the project names, file names and agent names in play, and corrects the transcript towards them. "Chorale" is the first entry, because a speech model will hear it as "corral".
 4. **Dictation should cope with natural speech:** pauses, restarts and self-corrections.
+5. **Say it again.** With text selected in the prompt box, the talk key replaces just the selection with new dictation, so one misheard phrase can be fixed without retyping the prompt.
 
 ### Speed
 
 The terminal app starts in well under a second and never blocks on an agent. The point of building it natively is that it feels instant.
+
+## Interface
+
+The first sketches are on a private design canvas: https://claude.ai/artifact/CYQdsBMrHpnmQ3xfrJQRRQ. They show one session, a permission prompt, dictation, the session list, a wide two-pane window and the prompt editor, each at 60 columns and in three themes.
+
+### A real editor in the prompt box
+
+The prompt box works like a normal text box, not like terminal line editing where the cursor only moves with the arrow keys. This is a requirement.
+
+1. Click to place the cursor. Drag to select. Double-click selects a word, triple-click a line, and Shift-click extends the selection.
+2. Option with the arrow keys moves by word. Undo and redo work across the whole prompt.
+3. Long prompts wrap softly, and clicks map to the right place across the wraps.
+4. Copy goes to the Mac clipboard through OSC 52, the terminal escape code for setting the clipboard. Paste arrives as one block through bracketed paste.
+5. Selected text uses the theme's accent colour, and the real terminal cursor stays at the insertion point, so macOS Zoom follows it.
+
+Chorale turns on the terminal's mouse reporting, in its SGR mode, so it receives every click, drag and release with its position. Bubble Tea v2 delivers these as messages. The Bubbles text area doesn't handle mouse selection, so Chorale needs its own editor component. While mouse reporting is on, Option-drag still gives the terminal's own selection, which is the escape hatch for copying from the transcript.
+
+### Session names
+
+Each session is named for its work, such as "Bearer-check tests", not for its agent. The agent, model and project sit underneath as a subheading, such as "claude · opus 5.5 · commonplace-code".
+
+The service asks a small, inexpensive model for a name from the first prompt, and may rename the session once if the work clearly changes. Cami has the last word: the `r` key renames a session, and a name she sets is never replaced.
+
+### Choristers
+
+Each session has a small chorister sprite in choir robes, with a white ruff collar and a hymnal. The agents differ in shape as well as robe colour, so they can be told apart without relying on colour: Claude has plain hair and a pink robe, Codex a dark choir cap with a gold tassel and a blue robe, Antigravity a gold halo and a green robe.
+
+The pose follows the session's state and never animates. Singing with the hymnal open means working. A raised hand means it needs her. Eyes closed with the hymnal put away means done. The state is always written in words beside the sprite as well.
+
+Sprites are 12 by 12 pixels. In terminals that support the Kitty graphics protocol, such as Ghostty and Kitty, they are drawn as real images scaled to fit 3 rows beside the session header. Other terminals get an 8 by 8 version drawn with half-block characters, two pixels per character cell. Both versions come from the same sprite source in the repo.
 
 ## Architecture
 
@@ -112,7 +143,7 @@ Done when `make test` passes in continuous integration.
 
 ### Milestone 1: one Claude session
 
-The service starts a single Claude Code session through `claude-agent-acp`. The terminal app shows it in one column, sends prompts and shows replies. Permission requests appear as a clear numbered choice with a sound. The default theme uses the terminal palette, and a high-contrast fixed-colour theme ships alongside.
+The service starts a single Claude Code session through `claude-agent-acp`. The terminal app shows it in one column, sends prompts and shows replies. Permission requests appear as a clear numbered choice with a sound. The default theme uses the terminal palette, and a high-contrast fixed-colour theme ships alongside. The prompt box is the full mouse-driven editor from the start, because everything else is typed or dictated into it. The session header shows Claude's chorister in its half-block version.
 
 Done when Cami can do a real small task in Chorale at her usual font size without reaching for Claude Code directly.
 
@@ -124,7 +155,7 @@ Done when Cami prefers dictating into Chorale over Wispr Flow for prompts.
 
 ### Milestone 3: three agents
 
-Several sessions at once, a session list that works at 60 columns, Codex and Antigravity as the second and third agents, and switching between sessions by number or by name. Transcripts are saved and searchable by keyword.
+Several sessions at once, a session list that works at 60 columns, Codex and Antigravity as the second and third agents, and switching between sessions by number or by name. Sessions get their work-based names, all three choristers are drawn, and the Kitty graphics version of the sprites is used where the terminal supports it. Transcripts are saved and searchable by keyword.
 
 Done when she can run Claude, Codex and Antigravity sessions on the same project and move between them without losing her place.
 
@@ -156,7 +187,7 @@ Load balancing across subscriptions, semantic search over transcripts, editor in
 
 The proposal is option 1 for milestones 1 to 4, and the decision is revisited before milestone 5.
 
-**Which terminal Cami uses.** Ghostty, Kitty or iTerm2 make true hold-to-talk possible, and Terminal.app limits it to toggle mode. It also decides the microphone permission question. Not urgent.
+**Which terminal Cami uses.** Ghostty, Kitty or iTerm2 make true hold-to-talk possible, and Terminal.app limits it to toggle mode. It also decides the microphone permission question, whether the 12-pixel sprites can be drawn as images, and whether Cmd shortcuts such as Cmd-Z reach Chorale. Many terminals keep Cmd keys for themselves, so every editor shortcut also has a Ctrl or Option form that works everywhere. Not urgent.
 
 **The speech engine.** Parakeet through FluidAudio is the proposal. The final choice comes from testing accuracy on her own speech, and speed on her Mac. There are no published benchmarks for an M1. Decided in milestone 2.
 
