@@ -49,7 +49,7 @@ Every behaviour task below comes in a pair: first the failing test, then the cod
 
 - [ ] 7.1 Add `.github/workflows/check.yml` as described under "Continuous integration" in `design.md`. Verify both jobs pass on the pull request for this change, and that they are named `check (macos)` and `check (linux)`
 - [ ] 7.2 On a throwaway branch named `ci-canary`, commit a change that breaks one golden file, and open it as a draft pull request. Verify both jobs fail on it, then close the pull request and give Cami the command to delete the branch, because agents can't delete branches
-- [ ] 7.3 Update `docs/testing.md` so its commands, the layers this change built, the colour code definition and the "Checked by hand" line match what was built. Verify each command runs as written
+- [x] 7.3 Update `docs/testing.md` so its commands, the layers this change built, the colour code definition and the "Checked by hand" line match what was built. Verify each command runs as written
 
 ## Workflow follow-up
 
