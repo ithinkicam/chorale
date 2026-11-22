@@ -7,6 +7,7 @@ toolchain go1.27.4
 require (
 	github.com/charmbracelet/x/ansi v0.11.9
 	github.com/charmbracelet/x/vt v0.1.0
+	github.com/creack/pty v1.1.24
 )
 
 require (
@@ -32,7 +33,7 @@ require (
 	github.com/xo/terminfo v1.0.0 // indirect
 	golang.org/x/mod v0.27.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
-	golang.org/x/sys v0.47.0 // indirect
+	golang.org/x/sys v0.50.0 // indirect
 	golang.org/x/term v0.35.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
 	golang.org/x/tools v0.36.0 // indirect

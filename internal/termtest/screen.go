@@ -118,6 +118,13 @@ func (s *Screen) Write(p []byte) (int, error) {
 	return n, err
 }
 
+// Resize changes the screen's size, as a terminal window would.
+func (s *Screen) Resize(width, height int) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.emu.Resize(width, height)
+}
+
 // Close stops the screen. Further writes fail.
 func (s *Screen) Close() error {
 	s.mu.Lock()

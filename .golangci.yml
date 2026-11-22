@@ -17,14 +17,17 @@ linters:
   settings:
     misspell:
       locale: UK
+      # NO_COLOR and Go's own APIs, such as color.Color, are spelt the US way.
+      ignore-rules:
+        - color
     revive:
       rules:
         - name: exported
           disabled: true
   exclusions:
     rules:
-      # Tests start subprocesses and write fixtures on purpose.
-      - path: _test\.go
+      # Tests and the test harness start subprocesses on purpose.
+      - path: (_test\.go|internal/termtest/)
         linters:
           - gosec
 
