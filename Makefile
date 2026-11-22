@@ -15,7 +15,7 @@ UNIT_PKGS := $(shell go list ./... | grep -v '/e2e$$')
 
 GOTESTSUM := go tool gotestsum --format testname
 
-.PHONY: go-version build test e2e lint golden check
+.PHONY: go-version build test e2e lint golden scenarios specs check
 
 go-version:
 	@go version
@@ -49,4 +49,17 @@ lint:
 golden:
 	@./scripts/update-golden.sh
 
-check: lint test e2e
+# Every OpenSpec scenario must have a matching test that passed in the
+# results make test and make e2e just wrote.
+scenarios: test e2e
+	go run ./scripts/check-scenarios bin/test.json bin/e2e.json
+
+# OpenSpec comes from package-lock.json, so it is the pinned version.
+# --all matters: without it, validate fails when there is no terminal.
+node_modules/.package-lock.json: package-lock.json
+	npm ci --no-fund --no-audit
+
+specs: node_modules/.package-lock.json
+	npx --no-install openspec validate --strict --all
+
+check: lint test e2e scenarios specs

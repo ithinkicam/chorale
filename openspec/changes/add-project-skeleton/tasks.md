@@ -43,7 +43,7 @@ Every behaviour task below comes in a pair: first the failing test, then the cod
 
 - [x] 6.1 Write unit tests for `scripts/check-scenarios`, with fixture specs and fixture `go test -json` output covering these cases: a scenario with a passing test, one with no test, one under `changes/archive/` that must be ignored, a name with digits, a matching subtest, a skipped test, a failed test, a golden file with no test, and a scenario marked "Checked by hand". Run them and confirm they fail
 - [x] 6.2 Implement the scenario check and verify its tests pass. Then run it on the real repo, and verify it reports all 17 scenarios in this change as covered
-- [ ] 6.3 Add the scenario check and `openspec validate --strict --all` to `make check`. Verify `make check` passes from a terminal, and from a shell with `CI=1` and no terminal
+- [x] 6.3 Add the scenario check and `openspec validate --strict --all` to `make check`. Verify `make check` passes from a terminal, and from a shell with `CI=1` and no terminal
 
 ## 7. Continuous integration
 
