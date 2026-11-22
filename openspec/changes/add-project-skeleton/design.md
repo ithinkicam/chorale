@@ -133,7 +133,7 @@ Bypassing a ruleset skips every rule in it. So `harden-repository` adds the requ
 
 `docs/style.md` is the code style for every agent, and `AGENTS.md` points to it. Its first rule is that code explains itself through names, small functions and types, while the reasons live in specs, design documents and `AGENTS.md`. A comment is kept only for what the code can't say. The guide builds on existing guides rather than starting from nothing, and where a rule can be checked by a linter, golangci-lint checks it.
 
-`actionlint` checks the workflow files as part of `make lint`. It understands GitHub Actions, so it catches wrong action inputs, bad expressions and shell mistakes in `run` steps, which a general YAML linter would miss.
+`actionlint` checks the workflow files as part of `make lint`. It is a Go tool pinned in `go.mod`, so the version is the same everywhere with no separate check. It understands GitHub Actions, so it catches invalid permissions, misspelt matrix and step references, and malformed values, which a general YAML linter would miss. It runs `shellcheck` on `run` steps where `shellcheck` is installed. It can't check the inputs of actions pinned by commit hash, so a misspelt input to a pinned action is only caught when the workflow runs.
 
 ### Archiving
 

@@ -1,0 +1,14 @@
+# actionlint must reject this: an invalid permission and a misspelt matrix property.
+name: broken
+on: push
+permissions:
+  contents: raed
+jobs:
+  check:
+    name: check (${{ matrix.lable }})
+    strategy:
+      matrix:
+        label: [linux]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo checked

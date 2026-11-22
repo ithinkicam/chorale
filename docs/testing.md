@@ -88,7 +88,7 @@ This check arrives with the first fixed-colour theme in milestone 1. Every fixed
 make build      # build bin/chorale, stamped with the git version
 make test       # unit, snapshot and interaction tests
 make e2e        # terminal-level tests
-make lint       # golangci-lint version check, gofmt, go vet and golangci-lint
+make lint       # golangci-lint version check, gofmt, go vet, golangci-lint and actionlint
 make golden     # rewrite golden files, on purpose only
 make scenarios  # make test and make e2e, then the scenario check
 make specs      # openspec validate --strict --all, with OpenSpec from package-lock.json

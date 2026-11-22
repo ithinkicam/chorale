@@ -44,6 +44,7 @@ lint:
 	@./scripts/check-gofmt.sh
 	go vet ./...
 	golangci-lint run ./...
+	go tool actionlint
 
 # Rewrites golden files. Use on purpose only, and read every change in the diff.
 golden:
