@@ -31,6 +31,10 @@ Every behaviour is test first, including the interface. Write the test, run it, 
 
 Never skip, disable or loosen a test to get work through. Never regenerate a golden file just to make a test pass. When a golden file changes on purpose, say in the commit what changed on screen and why.
 
+## Code style
+
+Follow `docs/style.md`. Code explains itself, and the reasons live in the specs, the designs and commit messages, not in comments. Doc comments are short, because they become published documentation.
+
 ## Accessibility rules
 
 These come from `docs/plan.md` and apply to every screen:
