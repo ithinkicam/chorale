@@ -131,15 +131,46 @@ macOS charges microphone access to the app that launched the program, which for 
 
 The first task in milestone 2 is to check whether her terminal shows the microphone prompt. If it doesn't, `chorale-listen` becomes a tiny background app bundle with its own permission, which the terminal app talks to over a local socket.
 
+## The vestry: commands an agent can't run
+
+Agents run inside a sandbox, so they can't run `sudo`, type a password, or complete an interactive login such as `gh auth login`. Today they print "paste this into a new terminal" and wait. Chorale removes that step.
+
+The vestry is a terminal pane inside Chorale, named after the room where the choir robes up. It runs as Cami, outside the agent's sandbox, with her theme, font size and focus rules.
+
+### How a command gets there
+
+1. **The main route is a tool.** Chorale's built-in MCP server offers each agent a `run_in_terminal` tool, taking the command and a reason. Every agent is told to use it for anything that needs `sudo`, a password, an interactive login or a real keyboard. This works the same for all three agents.
+2. **The fallback is a pattern match.** If a reply still contains a command with "run this in your terminal" or a `sudo` line, Chorale offers a key under it to send it to the vestry.
+3. **A possible bonus.** ACP lets an agent ask the client to run terminal commands. If an adapter routes its commands through Chorale this way, some hand-offs could happen inside the protocol. This is unverified, so the tool is the plan.
+
+### Safety rules
+
+The vestry crosses the sandbox, so these rules are requirements:
+
+1. Every hand-off asks for approval, every time. There is no "allow for this session" option.
+2. The approval shows the exact command in large text, with `sudo` and destructive commands highlighted.
+3. The command is typed into the vestry but never run until Cami presses Enter. She can edit it first.
+4. What she types goes straight to the command. A password never reaches the agent, and because it isn't echoed, it isn't in the transcript either.
+5. Afterwards, the agent gets back the exit code and the last part of the output, so it can carry on without Cami relaying anything.
+6. On the phone, a hand-off shows as "waiting for you at the Mac". The phone never types into the vestry.
+
+Opening a tab in Cami's own terminal app instead is a later option, if she wants it. It depends on which terminal she uses, and the output is harder to read back.
+
+## Process
+
+Chorale is built with OpenSpec, a spec-driven development tool, and is test first throughout, including the interface. Every piece of work is an OpenSpec change: a proposal, delta specs with testable scenarios, a design, and tasks, all under `openspec/changes/`. Cami reviews the proposal and specs before code is written. When a change is done, archiving it merges its specs into `openspec/specs/`, which then describe how Chorale behaves.
+
+Each milestone below becomes one or more OpenSpec changes. The working rules are in `AGENTS.md`, and the test layers, including interface snapshot tests and mouse interaction tests, are in `docs/testing.md`.
+
 ## Milestones
 
 Each milestone ends with something Cami can use, and nothing moves on until its checks pass.
 
 ### Milestone 0: skeleton
 
-The repo layout, a Go module, a `Makefile`, continuous integration that runs the tests, the linter and the theme contrast check, and an `AGENTS.md` for agents working in the repo.
+The repo layout, a Go module, the test harness for every layer in `docs/testing.md`, a `Makefile` with `make check`, the scenario check script, and continuous integration that runs `make check` on every push. The harness is proved by one deliberately tiny screen, tested first like everything else. The OpenSpec change for this is `openspec/changes/add-project-skeleton/`.
 
-Done when `make test` passes in continuous integration.
+Done when `make check` passes in continuous integration, and a deliberately broken snapshot makes it fail.
 
 ### Milestone 1: one Claude session
 
@@ -159,11 +190,11 @@ Several sessions at once, a session list that works at 60 columns, Codex and Ant
 
 Done when she can run Claude, Codex and Antigravity sessions on the same project and move between them without losing her place.
 
-### Milestone 4: agents handing off
+### Milestone 4: the vestry and agents handing off
 
-One agent can hand a task to another, as Petal does, through a small built-in MCP server the service offers to each agent.
+The service offers each agent a small built-in MCP server. Its first tool is `run_in_terminal`, which sends commands to the vestry. Then one agent can hand a task to another, as Petal does.
 
-Done when Claude can ask Codex for a second opinion on a change and Cami sees both sessions in the list.
+Done when Claude can get a `sudo` command run through the vestry without Cami copying anything, and when Claude can ask Codex for a second opinion and Cami sees both sessions in the list.
 
 ### Milestone 5: iOS companion
 
@@ -193,7 +224,7 @@ The proposal is option 1 for milestones 1 to 4, and the decision is revisited be
 
 ## How the plan will be checked
 
-Each milestone has a "done when" test that Cami runs on her Mac. Continuous integration runs the Go tests, the linter and the theme contrast check on every push. Transcription accuracy is measured against a small set of her own recordings, which stay on her machine and are never committed.
+Each milestone has a "done when" test that Cami runs on her Mac. Continuous integration runs `make check` on every push: all automated test layers, the linter, the theme contrast check, `openspec validate --strict`, and the check that every spec scenario has a test. Transcription accuracy is measured against a small set of her own recordings, which stay on her machine and are never committed.
 
 ## Outward-facing steps that need separate approval
 

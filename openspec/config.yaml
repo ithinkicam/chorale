@@ -1,0 +1,41 @@
+schema: spec-driven
+
+context: |
+  Chorale is a voice-first terminal workbench on macOS for running Claude Code, Codex and
+  Antigravity CLI sessions through the Agent Client Protocol. Its only user has severe low
+  vision and works at large font sizes; she does not use a screen reader.
+  Accessibility constraints apply to every change: the interface works at 60 columns by
+  20 rows, nothing is shown by colour alone, nothing animates, and focus is always visible
+  with the real terminal cursor on it.
+  Development is test first, without exception, including user interface work: a failing
+  test is written and seen to fail before the code that makes it pass.
+  docs/plan.md is the roadmap, docs/testing.md defines the test layers, and AGENTS.md holds
+  the working rules.
+  Write in plain, complete sentences with short paragraphs; the documents are often read
+  aloud by text-to-speech.
+
+rules:
+  proposal:
+    - Name the docs/plan.md milestone the change belongs to.
+    - State what is out of scope.
+  specs:
+    - Every scenario must be checkable by an automated test. Say so explicitly if a scenario can only be checked by hand, and why.
+    - Scenarios about the terminal interface state the terminal size, the theme, and whether colour is on.
+    - Scenarios state observable output (text on screen, files, protocol messages, exit codes), never internal structure.
+  design:
+    - Include a "Test strategy" section that names, for each requirement, the test layer from docs/testing.md that will cover it.
+  tasks:
+    - Order work test first. For each behaviour, the task that writes the failing test comes before the task that implements it, and says the test must be run and seen to fail.
+    - Every scenario in the change's specs maps to at least one test task, and the task names the scenario.
+    - Interface work includes golden snapshot tests at 60 by 20 in every shipped theme, and a no-colour snapshot that shows every state in words.
+    - Never plan to skip, disable or loosen a test to make progress.
+
+operations:
+  apply:
+    guidance:
+      - Work red, green, refactor. Run each new test and confirm it fails for the expected reason before writing the code that makes it pass.
+      - Never change a golden file just to make a test pass. When a golden file changes on purpose, say what changed on screen and why.
+      - Run make test and make lint before marking a task done.
+  archive:
+    guidance:
+      - Archive only when every task is checked, make check passes, and openspec validate --strict passes.
