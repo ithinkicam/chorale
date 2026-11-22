@@ -10,7 +10,8 @@ import (
 // foreground or background colour.
 type ColourCode struct {
 	Sequence string
-	Palette  bool
+	// Palette reports whether every colour it sets is one of the terminal's 16 palette colours.
+	Palette bool
 }
 
 var sgrPattern = regexp.MustCompile(`\x1b\[([0-9;:]*)m`)

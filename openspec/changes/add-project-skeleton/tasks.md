@@ -55,7 +55,7 @@ Every behaviour task below comes in a pair: first the failing test, then the cod
 
 - [x] 8.1 Write `docs/style.md` from the research into existing style guides for agents and for Go, and point to it from `AGENTS.md`. Cami reviews it before task 8.3 starts
 - [x] 8.2 Add `actionlint` as a Go tool pinned in `go.mod`, and run it in `make lint` on `.github/workflows/`. Verify it rejects a fixture workflow with an invalid permission and a misspelt matrix property, then passes on `.github/workflows/check.yml`
-- [ ] 8.3 Remove the comments that break `docs/style.md` from the code in this change, and add any lint settings the guide calls for. Verify `make check` passes and `make golden` leaves every golden file unchanged
+- [x] 8.3 Remove the comments that break `docs/style.md` from the code in this change, and add any lint settings the guide calls for. Verify `make check` passes and `make golden` leaves every golden file unchanged
 
 ## Workflow follow-up
 
