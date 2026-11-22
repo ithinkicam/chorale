@@ -4,7 +4,16 @@ package app
 import (
 	tea "charm.land/bubbletea/v2"
 
+	"github.com/ithinkicam/chorale/internal/screens"
 	"github.com/ithinkicam/chorale/internal/screens/sessionlist"
+	"github.com/ithinkicam/chorale/internal/screens/toosmall"
+)
+
+// The smallest window Chorale draws its screens in. Below it, Chorale
+// shows a message saying the size it needs.
+const (
+	MinWidth  = 60
+	MinHeight = 20
 )
 
 // Model is Chorale's top-level Bubble Tea model.
@@ -40,7 +49,12 @@ func (m Model) View() tea.View {
 		return view
 	}
 
-	screen := sessionlist.Render(m.width, m.height)
+	var screen screens.Screen
+	if m.width < MinWidth || m.height < MinHeight {
+		screen = toosmall.Render(m.width, m.height, MinWidth, MinHeight)
+	} else {
+		screen = sessionlist.Render(m.width, m.height)
+	}
 	view.SetContent(screen.Content)
 	cursor := tea.NewCursor(screen.CursorX, screen.CursorY)
 	cursor.Blink = false // nothing animates
