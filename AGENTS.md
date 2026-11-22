@@ -65,7 +65,7 @@ Until milestone 0 lands, `make check` doesn't exist yet. Use `openspec validate 
 
 ## Writing
 
-Cami often listens to documents through text-to-speech. Write full sentences in short paragraphs. Put code, paths and commands in backticks. Avoid tables, arrows and symbol chains in prose. Use absolute dates such as 2026-11-22, never "today" or "recently".
+Cami often listens to documents through text-to-speech. Write full sentences in short paragraphs. Put code, paths and commands in backticks. Avoid tables, arrows and symbol chains in prose. Never stamp a document with a date, such as "As of" lines or when something was decided. Git history holds that. When a fact about the outside world needs a date, such as a release date, write it as an absolute date, never "today" or "recently".
 
 ## Things never to do
 

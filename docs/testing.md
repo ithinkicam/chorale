@@ -1,6 +1,6 @@
 # Chorale: testing
 
-As of 2026-11-22. This is the standard every change follows. Milestone 0 built layers 1 to 4, the scenario check and `make check`. Layers 5 and 6 arrive with the service in milestone 1 and with `chorale-listen` in milestone 2.
+This is the standard every change follows. Layers 1 to 4, the scenario check and `make check` exist. Layers 5 and 6 arrive with the service in milestone 1 and with `chorale-listen` in milestone 2.
 
 ## The rule
 

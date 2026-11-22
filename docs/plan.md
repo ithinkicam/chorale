@@ -1,6 +1,6 @@
 # Chorale: plan
 
-As of 2026-11-22. Draft for Cami's review, revised after a first research pass and the first interface sketches. Nothing has been built yet. The findings and sources behind this plan are in `docs/research/2026-11-22.md`.
+The findings and sources behind this plan are in `docs/research/2026-11-22.md`.
 
 ## Outcome
 
@@ -54,7 +54,7 @@ The prompt box works like a normal text box, not like terminal line editing wher
 
 Chorale turns on the terminal's mouse reporting, in its SGR mode, so it receives every click, drag and release with its position. Bubble Tea v2 delivers these as messages. The Bubbles text area doesn't handle mouse selection, so Chorale needs its own editor component. While mouse reporting is on, Option-drag still gives the terminal's own selection, which is the escape hatch for copying from the transcript.
 
-The editor arrives in two steps, decided 2026-11-22. Milestone 1 ships the keyboard editor: word moves, undo and redo, soft wrapping, bracketed paste, OSC 52 copy, and the real cursor at the insertion point. Milestone 2 adds the mouse: clicks, drags, multi-click selection and Shift-click. Mapping a click to a text position across soft wraps and wide characters is the hardest part of the editor, and it shouldn't hold up the first working session. The mouse also serves re-dictation in milestone 2, where selecting a phrase to say again is the main use.
+The editor arrives in two steps. Milestone 1 ships the keyboard editor: word moves, undo and redo, soft wrapping, bracketed paste, OSC 52 copy, and the real cursor at the insertion point. Milestone 2 adds the mouse: clicks, drags, multi-click selection and Shift-click. Mapping a click to a text position across soft wraps and wide characters is the hardest part of the editor, and it shouldn't hold up the first working session. The mouse also serves re-dictation in milestone 2, where selecting a phrase to say again is the main use.
 
 ### Session names
 
@@ -94,7 +94,7 @@ All three agents speak ACP:
 
 1. **Claude Code** through `claude-agent-acp`, from the `agentclientprotocol` GitHub organisation. It is built on the Claude Agent SDK and uses Cami's existing `claude` login. Chorale points it at her installed CLI with `CLAUDE_CODE_EXECUTABLE`.
 2. **Codex** through `codex-acp`, from the same organisation. It drives the Codex App Server. Chorale points it at her installed CLI with `CODEX_PATH`.
-3. **Antigravity CLI** natively, with `agy acp`, from version 1.5.0 onwards. Her Mac had 1.2.16 as of 2026-10-03, so it needs upgrading first.
+3. **Antigravity CLI** natively, with `agy acp`, from version 1.5.0 onwards. Her Mac needs upgrading to it first.
 
 Two rules follow from the research. First, Chorale never wraps or screen-scrapes an agent's terminal interface. Omnara tried that with Claude Code and called it "unfeasible to maintain". Second, the service removes `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` from the environment it gives the adapters, because either one silently switches billing from her subscription to paid API use.
 
@@ -149,7 +149,7 @@ The first task in milestone 2 is to check whether her terminal shows the microph
 
 ## Local and open-weight models
 
-Chorale makes a session on a local or open-weight model as easy to start as a Claude session. The first model to try is Inkling 2 Mini from Thinking Machines, released on 2026-11-20 under the Apache 2.0 licence. It has 26.4 billion parameters, 3.4 billion of them active per token, and its download is about 20 GB. Its model card says it needs a Mac with at least 32 GB of memory. As of 2026-11-22, it runs through Ollama, LM Studio and recent builds of llama.cpp. These details come from the launch post and early guides, not from testing.
+Chorale makes a session on a local or open-weight model as easy to start as a Claude session. The first model to try is Inkling 2 Mini from Thinking Machines, released on 2026-11-20 under the Apache 2.0 licence. It has 26.4 billion parameters, 3.4 billion of them active per token, and its download is about 20 GB. Its model card says it needs a Mac with at least 32 GB of memory. It runs through Ollama, LM Studio and recent builds of llama.cpp. These details come from the launch post and early guides, not from testing.
 
 ### How it works
 
@@ -169,7 +169,7 @@ A model on its own can't act as a coding agent. It needs a harness, the program 
 
 ### Where models run
 
-Both of Cami's Macs have 16 GB of memory, as of 2026-11-22: her own M4 Mac mini and plex-server, the M1 Mac mini. Inkling 2 Mini's model card asks for 32 GB, so neither can hold it all in memory. There are three ways round that:
+Both of Cami's Macs have 16 GB of memory: her own M4 Mac mini and plex-server, the M1 Mac mini. Inkling 2 Mini's model card asks for 32 GB, so neither can hold it all in memory. There are three ways round that:
 
 1. **Stream the weights from the SSD.** A runtime can map the model file into memory instead of loading it, and macOS then reads the parts it needs from the SSD as it goes. That works with a model bigger than memory, much more slowly. It suits a mixture-of-experts model like Inkling 2 Mini, which uses only 3.4 billion of its 26.4 billion parameters for each token, so each token reads only part of the file. Apple published research on this approach as "LLM in a flash". Reading doesn't wear the SSD; swapping, which writes, does, so the runtime must map the file read-only rather than load it into swap. How fast this is on a 16 GB M4 is untested. It's the first thing to try.
 2. **A hosted open-weight endpoint.** Chorale treats any OpenAI-compatible endpoint like a local runtime, labelled "hosted" instead of "local". Thinking Machines offers Inkling 2 through its Tinker service; whether that works as a plain chat endpoint for a harness is unverified.
@@ -300,7 +300,7 @@ Running models inside Chorale itself, load balancing across subscriptions, seman
 
 ## Open decisions
 
-**Whether the M4 sleeps.** The service runs on both Macs, decided 2026-11-22, and remote pairing joins them in milestone 5. Until then it runs only on the M4. A sleeping Mac can't be woken reliably over Tailscale, so whether the M4 is set to sleep decides how often its sessions show as unreachable from elsewhere. Not urgent.
+**Whether the M4 sleeps.** The service runs on both Macs, and remote pairing joins them in milestone 5. Until then it runs only on the M4. A sleeping Mac can't be woken reliably over Tailscale, so whether the M4 is set to sleep decides how often its sessions show as unreachable from elsewhere. Not urgent.
 
 **Which terminal Cami uses.** Ghostty, Kitty or iTerm2 make true hold-to-talk possible, and Terminal.app limits it to toggle mode. It also decides the microphone permission question, whether the 12-pixel sprites can be drawn as images, and whether Cmd shortcuts such as Cmd-Z reach Chorale. Many terminals keep Cmd keys for themselves, so every editor shortcut also has a Ctrl or Option form that works everywhere. Not urgent.
 

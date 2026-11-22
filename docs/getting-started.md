@@ -1,6 +1,6 @@
 # Chorale: getting started on your Mac
 
-As of 2026-11-22. These steps set up a clone of Chorale on Cami's M4 Mac mini, ready for the first OpenSpec change. Nothing is built yet, so there is no app to run.
+These steps set up a clone of Chorale on Cami's M4 Mac mini.
 
 ## 1. Clone the repo
 

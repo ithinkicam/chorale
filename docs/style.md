@@ -1,6 +1,6 @@
 # Chorale: code style
 
-As of 2026-11-22. Every agent follows this guide, and `AGENTS.md` points here. It builds on Google's Go Style Guide, https://google.github.io/styleguide/go/, which applies wherever this guide says nothing.
+Every agent follows this guide, and `AGENTS.md` points here. It builds on Google's Go Style Guide, https://google.github.io/styleguide/go/, which applies wherever this guide says nothing.
 
 ## The principle
 
