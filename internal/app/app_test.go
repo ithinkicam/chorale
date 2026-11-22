@@ -4,7 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	tea "charm.land/bubbletea/v2"
 	"github.com/charmbracelet/x/ansi"
 
 	"github.com/ithinkicam/chorale/internal/app"
@@ -28,8 +27,8 @@ func TestEmptySessionListAt60By20WithColour(t *testing.T) {
 	if last := lines[len(lines)-1]; !strings.Contains(last, keyWords) {
 		t.Errorf("last line is %q, want it to show %q", last, keyWords)
 	}
-	assertViewFits(t, 60, 20)
 	mt.RequireGolden()
+	assertViewFits(t, mt, 60, 20)
 }
 
 func TestEmptySessionListAt120By30WithColour(t *testing.T) {
@@ -46,8 +45,8 @@ func TestEmptySessionListAt120By30WithColour(t *testing.T) {
 	if !strings.Contains(lines[29], keyWords) {
 		t.Errorf("row 30 is %q, want it to show %q", lines[29], keyWords)
 	}
-	assertViewFits(t, 120, 30)
 	mt.RequireGolden()
+	assertViewFits(t, mt, 120, 30)
 }
 
 func TestEmptySessionListSnapshotWithColourOff(t *testing.T) {
@@ -56,11 +55,9 @@ func TestEmptySessionListSnapshotWithColourOff(t *testing.T) {
 	mt.RequireGolden()
 }
 
-func assertViewFits(t *testing.T, width, height int) {
+func assertViewFits(t *testing.T, mt *termtest.ModelTerm, width, height int) {
 	t.Helper()
-	var m tea.Model = app.New()
-	m, _ = m.Update(tea.WindowSizeMsg{Width: width, Height: height})
-	rows := strings.Split(m.View().Content, "\n")
+	rows := strings.Split(mt.FinalView(), "\n")
 	if len(rows) > height {
 		t.Errorf("the view has %d rows, more than the window's %d", len(rows), height)
 	}

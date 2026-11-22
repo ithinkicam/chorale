@@ -14,16 +14,16 @@ func TestStartedAt40Columns(t *testing.T) {
 	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 40, Height: 20})
 	mt.WaitForText(tooSmallWords)
 	mt.WaitForText(keyWords)
-	assertViewFits(t, 40, 20)
 	mt.RequireGolden()
+	assertViewFits(t, mt, 40, 20)
 }
 
 func TestStartedAt15Rows(t *testing.T) {
 	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 80, Height: 15})
 	mt.WaitForText(tooSmallWords)
 	mt.WaitForText(keyWords)
-	assertViewFits(t, 80, 15)
 	mt.RequireGolden()
+	assertViewFits(t, mt, 80, 15)
 }
 
 func TestMessageWrapsInATinyWindow(t *testing.T) {
@@ -32,8 +32,8 @@ func TestMessageWrapsInATinyWindow(t *testing.T) {
 		return strings.Contains(joinWithSpaces(screen), tooSmallWords)
 	})
 	mt.WaitForText(keyWords)
-	assertViewFits(t, 20, 10)
 	mt.RequireGolden()
+	assertViewFits(t, mt, 20, 10)
 }
 
 func TestTooSmallSnapshotWithColourOff(t *testing.T) {
@@ -66,9 +66,23 @@ func TestWindowNarrowedWhileRunning(t *testing.T) {
 			strings.Contains(screen, keyWords) &&
 			!strings.Contains(screen, emptyWords)
 	})
-	assertViewFits(t, 40, 20)
+	assertViewFits(t, mt, 40, 20)
 }
 
 func joinWithSpaces(screen string) string {
-	return strings.Join(strings.Fields(screen), " ")
+	var lines []string
+	for _, line := range strings.Split(screen, "\n") {
+		if line = strings.TrimSpace(line); line != "" {
+			lines = append(lines, line)
+		}
+	}
+	return strings.Join(lines, " ")
+}
+
+func TestMessageComesFirstInAVeryShortWindow(t *testing.T) {
+	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 20, Height: 2})
+	mt.WaitFor("the whole message", func(screen string) bool {
+		return strings.Contains(joinWithSpaces(screen), tooSmallWords)
+	})
+	assertViewFits(t, mt, 20, 2)
 }

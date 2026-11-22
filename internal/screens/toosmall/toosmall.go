@@ -21,14 +21,10 @@ func Render(width, height, minWidth, minHeight int) screens.Screen {
 	for i, line := range wrapped {
 		wrapped[i] = strings.TrimRight(line, " ")
 	}
-	keys := keyStyle.Render("q") + " quit"
-
 	rows := make([]string, max(height, 1))
-	last := len(rows) - 1
-	copy(rows[:last], wrapped)
-	rows[last] = keys
-	if last == 0 {
-		rows[0] = keys
+	copy(rows, wrapped)
+	if len(wrapped) < len(rows) {
+		rows[len(rows)-1] = keyStyle.Render("q") + " quit"
 	}
 	return screens.Screen{Content: strings.Join(rows, "\n")}
 }

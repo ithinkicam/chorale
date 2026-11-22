@@ -128,12 +128,25 @@ func (mt *ModelTerm) WaitFinished() {
 // Finish ends the program from the test side. It runs automatically when
 // the test ends.
 func (mt *ModelTerm) Finish() {
+	mt.end()
+	_ = mt.screen.Close()
+}
+
+// FinalView ends the program and returns the content of the view the
+// running model last drew. Read the screen before calling it, because
+// ending the program leaves the alternate screen.
+func (mt *ModelTerm) FinalView() string {
+	mt.t.Helper()
+	mt.end()
+	return mt.tm.FinalModel(mt.t, teatest.WithFinalTimeout(DefaultTimeout)).View().Content
+}
+
+func (mt *ModelTerm) end() {
 	if !mt.finished {
 		mt.finished = true
 		_ = mt.tm.Quit()
 		mt.tm.WaitFinished(mt.t, teatest.WithFinalTimeout(DefaultTimeout))
 	}
-	_ = mt.screen.Close()
 }
 
 // RequireGolden compares the screen's plain text with the golden file
