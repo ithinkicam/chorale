@@ -16,6 +16,7 @@ func TestStartedAt40Columns(t *testing.T) {
 	mt.WaitForText(tooSmallWords)
 	mt.WaitForText(keyWords)
 	assertViewFits(t, 40, 20)
+	mt.RequireGolden()
 }
 
 // Scenario: Started at 15 rows.
@@ -24,6 +25,7 @@ func TestStartedAt15Rows(t *testing.T) {
 	mt.WaitForText(tooSmallWords)
 	mt.WaitForText(keyWords)
 	assertViewFits(t, 80, 15)
+	mt.RequireGolden()
 }
 
 // Scenario: Message wraps in a tiny window.
@@ -34,6 +36,16 @@ func TestMessageWrapsInATinyWindow(t *testing.T) {
 	})
 	mt.WaitForText(keyWords)
 	assertViewFits(t, 20, 10)
+	mt.RequireGolden()
+}
+
+// A record of the too-small message with colour off, which must show the
+// same words. The colour codes themselves are checked in e2e.
+func TestTooSmallSnapshotWithColourOff(t *testing.T) {
+	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 40, Height: 20, NoColor: true})
+	mt.WaitForText(tooSmallWords)
+	mt.WaitForText(keyWords)
+	mt.RequireGolden()
 }
 
 // Scenario: Window widened to 60 columns.

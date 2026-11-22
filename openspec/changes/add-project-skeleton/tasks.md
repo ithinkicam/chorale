@@ -37,7 +37,7 @@ Every behaviour task below comes in a pair: first the failing test, then the cod
 
 - [x] 5.1 Write interface snapshot tests for the scenarios "Started at 40 columns", "Started at 15 rows" and "Message wraps in a tiny window", and interaction tests for "Window widened to 60 columns" and "Window narrowed while running". Write terminal-level tests for "Too-small message with colour off" and "Quitting from the too-small screen". Run them all and confirm they fail
 - [x] 5.2 Implement the too-small message and the switch on resize, and verify all seven tests from 5.1 pass
-- [ ] 5.3 Add golden comparisons for the too-small screens at 40 by 20, 80 by 15 and 20 by 10, plus one with colour off, written with `make golden` and read in the diff before committing
+- [x] 5.3 Add golden comparisons for the too-small screens at 40 by 20, 80 by 15 and 20 by 10, plus one with colour off, written with `make golden` and read in the diff before committing
 
 ## 6. Scenario check
 
