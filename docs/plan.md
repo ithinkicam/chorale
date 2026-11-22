@@ -131,6 +131,30 @@ macOS charges microphone access to the app that launched the program, which for 
 
 The first task in milestone 2 is to check whether her terminal shows the microphone prompt. If it doesn't, `chorale-listen` becomes a tiny background app bundle with its own permission, which the terminal app talks to over a local socket.
 
+## Local and open-weight models
+
+Chorale makes a session on a local or open-weight model as easy to start as a Claude session. The first model to try is Inkling 2 Mini from Thinking Machines, released on 2026-11-20 under the Apache 2.0 licence. It has 26.4 billion parameters, 3.4 billion of them active per token, and its download is about 20 GB. Its model card says it needs a Mac with at least 32 GB of memory. As of 2026-11-22, it runs through Ollama, LM Studio and recent builds of llama.cpp. These details come from the launch post and early guides, not from testing.
+
+### How it works
+
+A model on its own can't act as a coding agent. It needs a harness, the program that gives it tools to read files, edit and run commands. So a local session is a harness plus a model:
+
+1. **The runtime** serves the model on the Mac: Ollama, LM Studio or `llama-server`. Chorale doesn't run models itself. It finds the runtimes that are running, lists their installed models, and talks to them over their local API.
+2. **The harness** is an agent that speaks ACP and can use any model endpoint. OpenCode is the default, through `opencode acp`, because it is built to work with any provider. Codex, with its open-source model mode, is the alternative. Whether Claude Code can be pointed at a local model through a compatible endpoint is unverified.
+3. **The session** then looks and behaves exactly like any other: the same permission prompts, editor, dictation, vestry and themes.
+
+### What Chorale adds
+
+1. **A picker.** Starting a new session offers subscription agents and local models in one list, with each local model's size and the runtime serving it.
+2. **A memory check.** Before starting a local model, Chorale compares its size with the Mac's free memory, and warns in words if it won't fit, instead of letting the Mac grind to a halt.
+3. **Runtime status.** If no runtime is running, Chorale says so and names the command to start one, such as `ollama serve`.
+4. **Labels that say where the work happens.** A local session's subheading says "local" and names the runtime, such as "opencode · inkling-2-mini · local, ollama". Nothing in a local session leaves the Mac, which matters for private projects.
+5. **A guest chorister.** Local models get their own sprite, a guest singer in a plain cream robe, so they can be told apart from the three subscription agents at a glance.
+
+### Where models run
+
+Cami's own Mac is an M4 Mac mini, and plex-server is an M1 Mac mini. Which one can run Inkling 2 Mini depends on how much memory each has, which isn't recorded yet. A runtime on one Mac can also serve a session on the other over Tailscale, so the model can live on whichever has the memory.
+
 ## The vestry: commands an agent can't run
 
 Agents run inside a sandbox, so they can't run `sudo`, type a password, or complete an interactive login such as `gh auth login`. Today they print "paste this into a new terminal" and wait. Chorale removes that step.
@@ -184,11 +208,11 @@ First the microphone permission check, then `chorale-listen` with FluidAudio and
 
 Done when Cami prefers dictating into Chorale over Wispr Flow for prompts.
 
-### Milestone 3: three agents
+### Milestone 3: three agents and local models
 
-Several sessions at once, a session list that works at 60 columns, Codex and Antigravity as the second and third agents, and switching between sessions by number or by name. Sessions get their work-based names, all three choristers are drawn, and the Kitty graphics version of the sprites is used where the terminal supports it. Transcripts are saved and searchable by keyword.
+Several sessions at once, a session list that works at 60 columns, Codex and Antigravity as the second and third agents, local model sessions through OpenCode, and switching between sessions by number or by name. Inkling 2 Mini is the first local model to support. Sessions get their work-based names, all three choristers are drawn, and the Kitty graphics version of the sprites is used where the terminal supports it. Transcripts are saved and searchable by keyword.
 
-Done when she can run Claude, Codex and Antigravity sessions on the same project and move between them without losing her place.
+Done when she can run Claude, Codex and Antigravity sessions on the same project and move between them without losing her place, and can start an Inkling 2 Mini session from the picker without editing any config.
 
 ### Milestone 4: the vestry and agents handing off
 
@@ -206,7 +230,7 @@ Done when she can approve an agent's request from her phone without walking to t
 
 ## Not in scope for now
 
-Load balancing across subscriptions, semantic search over transcripts, editor integration, and a web front end. Petal does the first three. Any of them can come back later.
+Running models inside Chorale itself, load balancing across subscriptions, semantic search over transcripts, editor integration, and a web front end. Petal does the first three. Any of them can come back later.
 
 ## Open decisions
 
@@ -219,6 +243,8 @@ Load balancing across subscriptions, semantic search over transcripts, editor in
 The proposal is option 1 for milestones 1 to 4, and the decision is revisited before milestone 5.
 
 **Which terminal Cami uses.** Ghostty, Kitty or iTerm2 make true hold-to-talk possible, and Terminal.app limits it to toggle mode. It also decides the microphone permission question, whether the 12-pixel sprites can be drawn as images, and whether Cmd shortcuts such as Cmd-Z reach Chorale. Many terminals keep Cmd keys for themselves, so every editor shortcut also has a Ctrl or Option form that works everywhere. Not urgent.
+
+**Which Mac runs local models.** Inkling 2 Mini needs at least 32 GB of memory. Cami's M4 Mac mini is the natural home if it has enough, otherwise plex-server, serving her Mac over Tailscale. Cami checks how much memory each has. Decided in milestone 3.
 
 **The speech engine.** Parakeet through FluidAudio is the proposal. The final choice comes from testing accuracy on her own speech, and speed on her Mac. There are no published benchmarks for an M1. Decided in milestone 2.
 
