@@ -55,7 +55,7 @@ These tests also enforce two accessibility rules:
 
 ### 5. End-to-end tests with a scripted agent
 
-Real agents are slow and unpredictable, so tests use a fake one: a small program that speaks ACP and follows a script, such as "reply with this text, then ask permission to run this command". End-to-end tests start the real service and the real terminal app against the fake agent, and check the whole path: prompts, streamed replies, permission prompts, the vestry hand-off, and reconnects.
+Real agents are slow and unpredictable, so tests use a fake one: a small program that speaks ACP and follows a script, such as "reply with this text, then ask permission to run this command". End-to-end tests start the real service and the real terminal app against the fake agent, and check the whole path: prompts, streamed replies, permission prompts, terminal handoff, and reconnects.
 
 A small number of smoke tests run against the real Claude Code, Codex and Antigravity adapters. They are run by hand, not in continuous integration, because they need Cami's logins.
 

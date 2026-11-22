@@ -30,6 +30,10 @@ These are requirements, not preferences. A feature that breaks one of them isn't
 4. **Dictation should cope with natural speech:** pauses, restarts and self-corrections.
 5. **Say it again.** With text selected in the prompt box, the talk key replaces just the selection with new dictation, so one misheard phrase can be fixed without retyping the prompt.
 
+### Plain names
+
+The choir is the look, not the vocabulary. Characters, sprites, colours and the name Chorale carry the theme. Everything Cami operates uses the ordinary developer term: sessions, terminals, permissions, prompts, settings. Keys, menus, status lines, docs and code never rename a standard thing to fit the theme.
+
 ### Speed
 
 The terminal app starts in well under a second and never blocks on an agent. The point of building it natively is that it feels instant.
@@ -151,7 +155,7 @@ A model on its own can't act as a coding agent. It needs a harness, the program 
 
 1. **The runtime** serves the model on the Mac: Ollama, LM Studio or `llama-server`. Chorale doesn't run models itself. It finds the runtimes that are running, lists their installed models, and talks to them over their local API.
 2. **The harness** is an agent that speaks ACP and can use any model endpoint. OpenCode is the default, through `opencode acp`, because it is built to work with any provider. Codex, with its open-source model mode, is the alternative. Whether Claude Code can be pointed at a local model through a compatible endpoint is unverified.
-3. **The session** then looks and behaves exactly like any other: the same permission prompts, editor, dictation, vestry and themes.
+3. **The session** then looks and behaves exactly like any other: the same permission prompts, editor, dictation, terminal handoff and themes.
 
 ### What Chorale adds
 
@@ -163,36 +167,35 @@ A model on its own can't act as a coding agent. It needs a harness, the program 
 
 ### Where models run
 
-Cami's own Mac is an M4 Mac mini with 16 GB of memory, and plex-server is an M1 Mac mini whose memory isn't recorded yet. Inkling 2 Mini's model card asks for 32 GB, so it most likely won't run well on her Mac. There are three ways round that:
+Both of Cami's Macs have 16 GB of memory, as of 2026-11-22: her own M4 Mac mini and plex-server, the M1 Mac mini. Inkling 2 Mini's model card asks for 32 GB, so neither can run it well. There are two ways round that:
 
-1. **plex-server,** if it has 32 GB or more. A runtime there can serve a session on her Mac over Tailscale.
-2. **A hosted open-weight endpoint.** Chorale treats any OpenAI-compatible endpoint like a local runtime, labelled "hosted" instead of "local". Thinking Machines offers Inkling 2 through its Tinker service; whether that works as a plain chat endpoint for a harness is unverified.
-3. **A smaller model locally.** Models that fit in 16 GB with room to spare run on her Mac, and the memory check tells her which ones fit.
+1. **A hosted open-weight endpoint.** Chorale treats any OpenAI-compatible endpoint like a local runtime, labelled "hosted" instead of "local". Thinking Machines offers Inkling 2 through its Tinker service; whether that works as a plain chat endpoint for a harness is unverified.
+2. **A smaller model locally.** Models that fit in 16 GB with room to spare run on her Mac, and the memory check tells her which ones fit.
 
 Because a hosted endpoint sends her code to someone else's servers, its sessions are labelled "hosted", never "local".
 
-## The vestry: commands an agent can't run
+## Terminal handoff: commands an agent can't run
 
 Agents run inside a sandbox, so they can't run `sudo`, type a password, or complete an interactive login such as `gh auth login`. Today they print "paste this into a new terminal" and wait. Chorale removes that step.
 
-The vestry is a terminal pane inside Chorale, named after the room where the choir robes up. It runs as Cami, outside the agent's sandbox, with her theme, font size and focus rules.
+Chorale opens a terminal pane for the command. It runs as Cami, outside the agent's sandbox, with her theme, font size and focus rules.
 
 ### How a command gets there
 
 1. **The main route is a tool.** Chorale's built-in MCP server offers each agent a `run_in_terminal` tool, taking the command and a reason. Every agent is told to use it for anything that needs `sudo`, a password, an interactive login or a real keyboard. This works the same for all three agents.
-2. **The fallback is a pattern match.** If a reply still contains a command with "run this in your terminal" or a `sudo` line, Chorale offers a key under it to send it to the vestry.
+2. **The fallback is a pattern match.** If a reply still contains a command with "run this in your terminal" or a `sudo` line, Chorale offers a key under it to open it in a terminal pane.
 3. **A possible bonus.** ACP lets an agent ask the client to run terminal commands. If an adapter routes its commands through Chorale this way, some hand-offs could happen inside the protocol. This is unverified, so the tool is the plan.
 
 ### Safety rules
 
-The vestry crosses the sandbox, so these rules are requirements:
+Terminal handoff crosses the sandbox, so these rules are requirements:
 
 1. Every hand-off asks for approval, every time. There is no "allow for this session" option.
 2. The approval shows the exact command in large text, with `sudo` and destructive commands highlighted.
-3. The command is typed into the vestry but never run until Cami presses Enter. She can edit it first.
+3. The command is typed into the terminal pane but never run until Cami presses Enter. She can edit it first.
 4. What she types goes straight to the command. A password never reaches the agent, and because it isn't echoed, it isn't in the transcript either.
 5. Afterwards, the agent gets back the exit code and the last part of the output, so it can carry on without Cami relaying anything.
-6. On the phone, a hand-off shows as "waiting for you at the Mac". The phone never types into the vestry.
+6. On the phone, a hand-off shows as "waiting for you at the Mac". The phone never types into the terminal pane.
 
 Opening a tab in Cami's own terminal app instead is a later option, if she wants it. It depends on which terminal she uses, and the output is harder to read back.
 
@@ -230,11 +233,11 @@ Several sessions at once, a session list that works at 60 columns, Codex and Ant
 
 Done when she can run Claude, Codex and Antigravity sessions on the same project and move between them without losing her place, and can start an Inkling 2 Mini session from the picker without editing any config.
 
-### Milestone 4: the vestry and agents handing off
+### Milestone 4: terminal handoff and agents handing off
 
-The service offers each agent a small built-in MCP server. Its first tool is `run_in_terminal`, which sends commands to the vestry. Then one agent can hand a task to another, as Petal does.
+The service offers each agent a small built-in MCP server. Its first tool is `run_in_terminal`, which sends commands to a terminal pane. Then one agent can hand a task to another, as Petal does.
 
-Done when Claude can get a `sudo` command run through the vestry without Cami copying anything, and when Claude can ask Codex for a second opinion and Cami sees both sessions in the list.
+Done when Claude can get a `sudo` command run through terminal handoff without Cami copying anything, and when Claude can ask Codex for a second opinion and Cami sees both sessions in the list.
 
 ### Milestone 5: iOS companion
 
@@ -260,7 +263,7 @@ The proposal is option 1 for milestones 1 to 4, and the decision is revisited be
 
 **Which terminal Cami uses.** Ghostty, Kitty or iTerm2 make true hold-to-talk possible, and Terminal.app limits it to toggle mode. It also decides the microphone permission question, whether the 12-pixel sprites can be drawn as images, and whether Cmd shortcuts such as Cmd-Z reach Chorale. Many terminals keep Cmd keys for themselves, so every editor shortcut also has a Ctrl or Option form that works everywhere. Not urgent.
 
-**Where Inkling 2 Mini runs.** It needs at least 32 GB of memory and Cami's Mac has 16 GB. The choice is plex-server if it has the memory, or a hosted endpoint. Cami checks plex-server's memory. Decided in milestone 3.
+**Where Inkling 2 Mini runs.** It needs at least 32 GB of memory and both of Cami's Macs have 16 GB, so it runs on a hosted endpoint, which provider is decided in milestone 3. A heavily compressed build might squeeze into 16 GB, but that is untested and would leave little room for anything else.
 
 **The speech engine.** Parakeet through FluidAudio is the proposal. The final choice comes from testing accuracy on her own speech, and speed on her Mac. There are no published benchmarks for an M1. Decided in milestone 2.
 

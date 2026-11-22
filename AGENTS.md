@@ -41,6 +41,10 @@ These come from `docs/plan.md` and apply to every screen:
 4. The focused item has a marker and the real terminal cursor, so macOS Zoom can follow it.
 5. Fixed-colour themes reach a contrast ratio of 7 to 1 for body text.
 
+## Plain names
+
+The choir theme is for characters and visuals only. Keys, menus, status lines, docs and code use ordinary developer terms such as session, terminal, permission and settings. Never rename a standard thing to fit the theme.
+
 ## Gates
 
 A task is done only when these pass:
