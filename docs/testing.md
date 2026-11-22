@@ -76,7 +76,7 @@ make test     # unit, snapshot and interaction tests
 make e2e      # terminal-level and end-to-end tests
 make lint     # gofmt, go vet and golangci-lint
 make golden   # regenerate golden files, on purpose only
-make check    # everything above, plus openspec validate --strict and the scenario check
+make check    # everything above, plus openspec validate --strict --all and the scenario check
 ```
 
 Continuous integration runs `make check` on every push.

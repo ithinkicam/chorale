@@ -38,4 +38,4 @@ operations:
       - Run make test and make lint before marking a task done.
   archive:
     guidance:
-      - Archive only when every task is checked, make check passes, and openspec validate --strict passes.
+      - Archive only when every task is checked, make check passes, and openspec validate --strict --all passes.

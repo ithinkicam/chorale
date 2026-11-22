@@ -11,7 +11,7 @@ Chorale is a voice-first terminal workbench on macOS for running coding agents s
 Chorale uses OpenSpec for spec-driven development. Behaviour is defined in specs before it is built, and no code is written without an OpenSpec change behind it.
 
 1. **Propose.** Every piece of work starts as a change in `openspec/changes/<change-name>/`, with a proposal, delta specs, a design where needed, and tasks. Use the `openspec-propose` skill.
-2. **Review.** Before Cami reviews, two other reviews run. An outside agent from a different vendor reviews the change, for example `agy -p --mode plan` or `codex exec`. An adversarial reviewer from the same session reviews it too. Their findings go to Cami together, each with the proposing agent's view. Nothing a reviewer suggests goes into the change without her decision. Cami then reviews the proposal and specs, and no code is written before she approves them.
+2. **Review.** Before Cami reviews, two other reviews run. An outside agent from a different vendor reviews the change, for example `agy --mode plan -p "<prompt>"` or `codex exec`. With `agy`, `-p` must come last, because it takes the next word as its prompt. Headless `agy` can't ask for permission to read files, so put the change's files into the prompt. An adversarial reviewer from the same session reviews it too. Their findings go to Cami together, each with the proposing agent's view. Nothing a reviewer suggests goes into the change without her decision. Cami then reviews the proposal and specs, and no code is written before she approves them.
 3. **Apply.** Work on a branch named after the change, and work through `tasks.md` in order with the `openspec-apply-change` skill, ticking each task as it is done. The work reaches `main` through a pull request.
 4. **Archive.** When every task is done and `make check` passes, archive the change with the `openspec-archive-change` skill. This merges its specs into `openspec/specs/`, which describe how Chorale behaves now.
 
@@ -22,7 +22,7 @@ Check the state of things with these commands:
 ```
 openspec list
 openspec list --specs
-openspec validate --strict
+openspec validate --strict --all
 ```
 
 ## Test first, always
@@ -47,7 +47,7 @@ The choir theme is for characters and visuals only. Keys, menus, status lines, d
 
 ## Pull requests
 
-`main` is protected. Every change reaches it through a pull request that needs one approval and passing checks. Agents push as Cami's GitHub account, and GitHub doesn't let a pull request's author approve it. So for our own pull requests, the adversarial reviewer posts its review as a comment, and Cami merges using her admin bypass once she's satisfied. A contributor's pull request needs Cami's approval. Never force-push, and never push to `main` directly.
+`main` is protected. Every change reaches it through a pull request that needs one approval and passing checks. Agents push as Cami's GitHub account, and GitHub doesn't let a pull request's author approve it. So for our own pull requests, the adversarial reviewer posts its review as a comment, and Cami merges using her admin bypass once she's satisfied. Bypassing skips every rule in the ruleset, so until the required checks sit in a ruleset of their own, Cami confirms both continuous integration jobs are green before merging. A contributor's pull request needs Cami's approval. Never force-push, and never push to `main` directly.
 
 ## Gates
 
@@ -57,7 +57,7 @@ A task is done only when these pass:
 make check
 ```
 
-Until milestone 0 lands, `make check` doesn't exist yet. Use `openspec validate --strict` for spec work.
+Until milestone 0 lands, `make check` doesn't exist yet. Use `openspec validate --strict --all` for spec work. Always pass `--all` or an item name: without one, OpenSpec exits with an error when there is no terminal, and asks a question when there is one.
 
 ## Writing
 
