@@ -1,6 +1,5 @@
-// Command drawonce is a fixture for the termtest harness. It draws one
-// screen describing its terminal, then writes nothing until it gets input:
-// a resize redraws, "c" writes coloured text, and "q" exits with status 3.
+// Command drawonce is a fixture for the termtest harness that draws one screen
+// describing its terminal.
 package main
 
 import (

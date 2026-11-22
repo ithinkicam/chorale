@@ -5,8 +5,6 @@ import (
 	"testing"
 )
 
-// Each case feeds the escape sequence that turns a mode on, then the one
-// that turns it off, and checks the screen reports both.
 var modeCases = []struct {
 	mode Mode
 	on   string
@@ -99,8 +97,6 @@ func TestScreenCursor(t *testing.T) {
 }
 
 func TestScreenAnswersQueriesWithoutBlocking(t *testing.T) {
-	// A program that asks the terminal a question, such as the primary
-	// device attributes, must not stall the screen.
 	s := NewScreen(20, 5)
 	write(t, s, "\x1b[c\x1b[c\x1b[cdone")
 	if got := s.Lines()[0]; got != "done" {

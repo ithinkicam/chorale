@@ -7,7 +7,6 @@ import (
 	"github.com/ithinkicam/chorale/internal/termtest"
 )
 
-// Scenario: Version flag.
 func TestVersionFlag(t *testing.T) {
 	term := termtest.Start(t, chorale, termtest.Options{Width: 60, Height: 20, Args: []string{"--version"}})
 
@@ -20,7 +19,6 @@ func TestVersionFlag(t *testing.T) {
 	}
 }
 
-// Scenario: Development build version.
 func TestDevelopmentBuildVersion(t *testing.T) {
 	term := termtest.Start(t, choraleDev, termtest.Options{Width: 60, Height: 20, Args: []string{"--version"}})
 
@@ -30,7 +28,6 @@ func TestDevelopmentBuildVersion(t *testing.T) {
 	assertOneLine(t, term, "chorale dev")
 }
 
-// assertOneLine checks the program printed exactly want and a line ending.
 func assertOneLine(t *testing.T, term *termtest.Term, want string) {
 	t.Helper()
 	// The terminal turns "\n" into "\r\n".

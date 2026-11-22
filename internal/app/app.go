@@ -9,8 +9,7 @@ import (
 	"github.com/ithinkicam/chorale/internal/screens/toosmall"
 )
 
-// The smallest window Chorale draws its screens in. Below it, Chorale
-// shows a message saying the size it needs.
+// MinWidth and MinHeight are the smallest window Chorale draws its screens in.
 const (
 	MinWidth  = 60
 	MinHeight = 20
@@ -40,8 +39,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-// View implements tea.Model. Nothing is drawn until the window size is
-// known, so Chorale never shows a screen meant for another size.
+// View implements tea.Model.
 func (m Model) View() tea.View {
 	view := tea.NewView("")
 	view.AltScreen = true

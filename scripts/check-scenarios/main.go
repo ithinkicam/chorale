@@ -1,6 +1,6 @@
 // Command check-scenarios fails if any OpenSpec scenario has no matching
 // test that passed. It reads the go test -json output that make test and
-// make e2e write. See docs/testing.md.
+// make e2e write.
 //
 // Usage:
 //

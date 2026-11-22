@@ -9,7 +9,6 @@ import (
 
 const tooSmallWords = "Chorale needs at least 60 by 20."
 
-// Scenario: Too-small message with colour off.
 func TestTooSmallMessageWithColourOff(t *testing.T) {
 	term := termtest.Start(t, chorale, termtest.Options{Width: 40, Height: 20, NoColor: true})
 	term.WaitForText(tooSmallWords)
@@ -21,7 +20,6 @@ func TestTooSmallMessageWithColourOff(t *testing.T) {
 	}
 }
 
-// Scenario: Quitting from the too-small screen.
 func TestQuittingFromTheTooSmallScreen(t *testing.T) {
 	term := termtest.Start(t, chorale, termtest.Options{Width: 40, Height: 20})
 	screen := term.Screen()

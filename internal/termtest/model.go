@@ -13,10 +13,8 @@ import (
 	"github.com/charmbracelet/x/exp/teatest/v2"
 )
 
-// ModelTerm runs a Bubble Tea model in the real program loop through
-// teatest, and feeds everything it draws to a Screen. Interface tests read
-// the final screen as plain text, the same way terminal-level tests do,
-// instead of comparing teatest's raw byte stream.
+// ModelTerm runs a Bubble Tea model through teatest and reads back its
+// screen as plain text.
 type ModelTerm struct {
 	t      testing.TB
 	tm     *teatest.TestModel
@@ -25,9 +23,8 @@ type ModelTerm struct {
 	finished bool
 }
 
-// StartModel runs m at the given size. With opts.NoColor the program
-// renders without colour, and otherwise with the terminal's 16-colour
-// palette available. Only Width, Height and NoColor are used.
+// StartModel runs m at the given size. Only opts.Width, Height and NoColor
+// are used.
 func StartModel(t testing.TB, m tea.Model, opts Options) *ModelTerm {
 	t.Helper()
 	profile := colorprofile.ANSI
@@ -51,7 +48,6 @@ func StartModel(t testing.TB, m tea.Model, opts Options) *ModelTerm {
 	return mt
 }
 
-// pump moves whatever the program has drawn so far onto the screen.
 func (mt *ModelTerm) pump() {
 	data, err := io.ReadAll(mt.tm.Output())
 	if err != nil {
@@ -62,9 +58,8 @@ func (mt *ModelTerm) pump() {
 	}
 }
 
-// onlcr turns each line feed into a carriage return and line feed, as a
-// terminal driver does by default. teatest writes to a plain buffer with no
-// driver, so without this every line would start where the last one ended.
+// onlcr turns each line feed into a carriage return and line feed, because
+// teatest writes to a buffer with no terminal driver.
 func onlcr(data []byte) []byte {
 	return bytes.ReplaceAll(data, []byte("\n"), []byte("\r\n"))
 }
@@ -130,8 +125,8 @@ func (mt *ModelTerm) WaitFinished() {
 	mt.finished = true
 }
 
-// Finish ends the program from the test side, so tests don't depend on
-// the program's own quit key. It runs automatically when the test ends.
+// Finish ends the program from the test side. It runs automatically when
+// the test ends.
 func (mt *ModelTerm) Finish() {
 	if mt.finished {
 		return
@@ -142,7 +137,7 @@ func (mt *ModelTerm) Finish() {
 }
 
 // RequireGolden compares the screen's plain text with the golden file
-// testdata/<test name>.golden. make golden rewrites it, on purpose only.
+// testdata/<test name>.golden, which `make golden` rewrites on purpose only.
 func (mt *ModelTerm) RequireGolden() {
 	mt.t.Helper()
 	golden.RequireEqual(mt.t, mt.Text()+"\n")

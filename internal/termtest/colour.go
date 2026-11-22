@@ -10,18 +10,12 @@ import (
 // foreground or background colour.
 type ColourCode struct {
 	Sequence string
-	// Palette is true when every colour the sequence sets is one of the
-	// terminal's 16 palette colours or its default colour, with no
-	// 256-colour or 24-bit form.
-	Palette bool
+	Palette  bool
 }
 
 var sgrPattern = regexp.MustCompile(`\x1b\[([0-9;:]*)m`)
 
-// ColourCodes returns every colour code in raw, in order. A colour code is
-// an SGR sequence with parameter 30 to 39, 40 to 49, 90 to 97 or 100 to
-// 107, or an extended form starting with 38 or 48. Other SGR sequences,
-// such as bold or reset, are not colour codes.
+// ColourCodes returns every colour code in raw, in order.
 func ColourCodes(raw []byte) []ColourCode {
 	var out []ColourCode
 	for _, m := range sgrPattern.FindAllSubmatch(raw, -1) {
@@ -33,8 +27,6 @@ func ColourCodes(raw []byte) []ColourCode {
 	return out
 }
 
-// classifySGR reports whether an SGR parameter string sets a colour, and
-// whether all the colours it sets are palette colours.
 func classifySGR(params string) (hasColour, palette bool) {
 	palette = true
 	fields := strings.Split(params, ";")

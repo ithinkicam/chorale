@@ -12,8 +12,7 @@ const ChoralePackage = "github.com/ithinkicam/chorale/cmd/chorale"
 const VersionVariable = "github.com/ithinkicam/chorale/internal/version.Version"
 
 // BuildBinary builds the Go package pkg into the file out, passing ldflags
-// to the linker when it isn't empty. Tests call it so they always run the
-// current code, never a binary left over from an earlier build.
+// to the linker when it isn't empty.
 func BuildBinary(pkg, out, ldflags string) error {
 	args := []string{"build", "-o", out}
 	if ldflags != "" {

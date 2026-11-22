@@ -1,5 +1,4 @@
-// Package sessionlist is the screen that lists sessions. Until sessions
-// exist, it shows the empty state.
+// Package sessionlist is the screen that lists sessions.
 package sessionlist
 
 import (
@@ -10,21 +9,17 @@ import (
 	"github.com/ithinkicam/chorale/internal/screens"
 )
 
-// The words on the empty session list.
+// Title and Empty are the words on the empty session list.
 const (
 	Title = "♪ chorale"
 	Empty = "No sessions yet."
 )
 
-// The default theme uses the terminal's own palette, so the user's
-// terminal colours apply. Colour is never the only signal: every state is
-// in words.
 var (
 	titleStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Magenta)
 	keyStyle   = lipgloss.NewStyle().Bold(true)
 )
 
-// emptyRow and emptyColumn place the empty message, and the cursor on it.
 const (
 	emptyRow    = 2
 	emptyColumn = 2

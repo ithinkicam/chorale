@@ -17,7 +17,7 @@ import (
 type Scenario struct {
 	Name   string
 	File   string
-	Reason string // why it is checked by hand, if it is
+	Reason string
 }
 
 // Report sorts every scenario into covered, uncovered and checked by hand.
@@ -46,10 +46,7 @@ const (
 )
 
 // Check reads the scenarios in openspecDir/specs and in each open change
-// under openspecDir/changes, skipping openspecDir/changes/archive, whose
-// scenarios already live in specs. A scenario is covered when a test or
-// subtest with a matching name passed, and none with that name failed or
-// was skipped.
+// under openspecDir/changes, and reports which the test results cover.
 func Check(openspecDir string, results ...io.Reader) (Report, error) {
 	scenarios, err := readScenarios(openspecDir)
 	if err != nil {
@@ -134,7 +131,6 @@ const (
 	notPassed
 )
 
-// event is the part of a go test -json line the check needs.
 type event struct {
 	Action string
 	Test   string
@@ -183,10 +179,7 @@ func readOutcomes(results []io.Reader) (map[string]outcome, error) {
 }
 
 // normalise turns a scenario or test name into the form names are matched
-// in: a leading Go "Test" removed, only letters and digits kept, all in
-// lower case. "Empty session list at 60 by 20 with colour" and
-// TestEmptySessionListAt60By20WithColour both become
-// emptysessionlistat60by20withcolour.
+// in: a leading Go "Test" removed, only letters and digits kept, all in lower case.
 func normalise(name string) string {
 	if rest, ok := strings.CutPrefix(name, "Test"); ok {
 		if rest == "" || unicode.IsUpper(rune(rest[0])) || unicode.IsDigit(rune(rest[0])) || rest[0] == '_' {

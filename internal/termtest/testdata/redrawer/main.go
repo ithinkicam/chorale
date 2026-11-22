@@ -1,5 +1,5 @@
-// Command redrawer is a fixture for the termtest harness. It redraws the
-// same text on a timer, which is the flicker the idle detector must catch.
+// Command redrawer is a fixture for the termtest harness that redraws the
+// same text on a timer.
 package main
 
 import (

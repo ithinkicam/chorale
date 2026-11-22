@@ -11,14 +11,12 @@ import (
 	"github.com/ithinkicam/chorale/internal/termtest"
 )
 
-// The words on the empty session list, from the app-shell spec.
 const (
 	titleWords = "♪ chorale"
 	emptyWords = "No sessions yet."
 	keyWords   = "q quit"
 )
 
-// Scenario: Empty session list at 60 by 20 with colour.
 func TestEmptySessionListAt60By20WithColour(t *testing.T) {
 	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20})
 	mt.WaitForText(emptyWords)
@@ -34,7 +32,6 @@ func TestEmptySessionListAt60By20WithColour(t *testing.T) {
 	mt.RequireGolden()
 }
 
-// Scenario: Empty session list at 120 by 30 with colour.
 func TestEmptySessionListAt120By30WithColour(t *testing.T) {
 	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 120, Height: 30})
 	mt.WaitForText(emptyWords)
@@ -53,16 +50,12 @@ func TestEmptySessionListAt120By30WithColour(t *testing.T) {
 	mt.RequireGolden()
 }
 
-// A record of the empty session list with colour off, which must show the
-// same words. The colour codes themselves are checked in e2e.
 func TestEmptySessionListSnapshotWithColourOff(t *testing.T) {
 	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20, NoColor: true})
 	mt.WaitForText(emptyWords)
 	mt.RequireGolden()
 }
 
-// assertViewFits checks the model's own view, before any renderer could
-// clip it, has no line wider than the window and no more rows than it has.
 func assertViewFits(t *testing.T, width, height int) {
 	t.Helper()
 	var m tea.Model = app.New()

@@ -13,8 +13,7 @@ import (
 // again before it exits.
 type Mode string
 
-// The modes the screen tracks. Each is "on" when it differs from how a
-// terminal starts.
+// The modes the screen tracks.
 const (
 	ModeAltScreen            Mode = "alternate screen"
 	ModeCursorHidden         Mode = "cursor hidden"
@@ -25,7 +24,6 @@ const (
 	ModeKeyboardEnhancements Mode = "keyboard enhancements"
 )
 
-// allModes lists every mode in the order reports use.
 var allModes = []Mode{
 	ModeAltScreen,
 	ModeBracketedPaste,
@@ -38,12 +36,6 @@ var allModes = []Mode{
 
 // Screen is a terminal emulator for tests. Write a program's output to it,
 // then read back the text on screen, the cursor and the terminal modes.
-//
-// The emulator, github.com/charmbracelet/x/vt, tracks the screen, the
-// cursor position and the DEC private modes. Screen tracks two things
-// itself: cursor visibility, which the emulator keeps per screen rather
-// than per terminal, and keyboard enhancements, through the Kitty keyboard
-// protocol and xterm's modifyOtherKeys, which the emulator ignores.
 type Screen struct {
 	mu sync.Mutex
 
@@ -53,16 +45,15 @@ type Screen struct {
 	decModes map[int]bool
 	everOn   map[Mode]bool
 
-	kittyStack      []int // flags pushed with CSI > flags u
-	kittyFlags      int   // the current flags
-	modifyOtherKeys int   // the level set with CSI > 4 ; level m
+	kittyStack      []int
+	kittyFlags      int
+	modifyOtherKeys int
 
 	replies   io.Writer
 	repliesMu sync.Mutex
 }
 
-// NewScreen returns a blank screen of the given size. Replies the
-// emulator makes to queries are thrown away until SetReplyWriter is called.
+// NewScreen returns a blank screen of the given size.
 func NewScreen(width, height int) *Screen {
 	s := &Screen{
 		emu:      vt.NewEmulator(width, height),
@@ -77,8 +68,7 @@ func NewScreen(width, height int) *Screen {
 	})
 	s.parser.SetHandler(ansi.Handler{HandleCsi: s.handleKeyboardCsi})
 
-	// The emulator answers queries, such as device attributes, by writing
-	// to a pipe. Something must read that pipe or the emulator blocks.
+	// The emulator blocks on its reply pipe unless something drains it.
 	go s.forwardReplies()
 	return s
 }
@@ -226,10 +216,8 @@ func (s *Screen) modeOn(mode Mode) bool {
 	return false
 }
 
-// cursorHidden follows DEC mode 25 directly. The emulator keeps cursor
-// visibility separately for each screen, but real terminals keep it once
-// for the whole terminal: a program that hides the cursor on the alternate
-// screen and never shows it again leaves the cursor hidden after it exits.
+// cursorHidden follows DEC mode 25 itself: x/vt keeps cursor visibility per
+// screen, while real terminals keep it once.
 func (s *Screen) cursorHidden() bool {
 	shown, set := s.decModes[25]
 	return set && !shown
@@ -249,8 +237,7 @@ func (s *Screen) setDECMode(m ansi.Mode, on bool) {
 	}
 }
 
-// handleKeyboardCsi follows the Kitty keyboard protocol and xterm's
-// modifyOtherKeys, which the emulator ignores.
+// handleKeyboardCsi follows the Kitty keyboard protocol and modifyOtherKeys.
 func (s *Screen) handleKeyboardCsi(cmd ansi.Cmd, params ansi.Params) {
 	switch {
 	case cmd.Final() == 'u' && cmd.Prefix() == '>': // push flags

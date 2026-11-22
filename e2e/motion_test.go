@@ -7,7 +7,6 @@ import (
 	"github.com/ithinkicam/chorale/internal/termtest"
 )
 
-// Scenario: Idle screen stays still.
 func TestIdleScreenStaysStill(t *testing.T) {
 	term := startSessionList(t, termtest.Options{Width: 60, Height: 20})
 
@@ -16,14 +15,10 @@ func TestIdleScreenStaysStill(t *testing.T) {
 	}
 }
 
-// Scenario: Startup draws the session list directly.
 func TestStartupDrawsTheSessionListDirectly(t *testing.T) {
 	term := startSessionList(t, termtest.Options{Width: 60, Height: 20})
 
-	// The session list never contains "needs", so finding the word
-	// anywhere in the output means the too-small message was drawn. A
-	// single word is checked because a renderer may move the cursor
-	// between words instead of writing spaces.
+	// Check one word, because a renderer may move the cursor between words instead of writing spaces.
 	if strings.Contains(string(term.Raw()), "needs") {
 		t.Fatalf("chorale drew the too-small message before the session list: %q", term.Raw())
 	}

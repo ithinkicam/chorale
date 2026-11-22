@@ -10,7 +10,6 @@ import (
 
 const tooSmallWords = "Chorale needs at least 60 by 20."
 
-// Scenario: Started at 40 columns.
 func TestStartedAt40Columns(t *testing.T) {
 	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 40, Height: 20})
 	mt.WaitForText(tooSmallWords)
@@ -19,7 +18,6 @@ func TestStartedAt40Columns(t *testing.T) {
 	mt.RequireGolden()
 }
 
-// Scenario: Started at 15 rows.
 func TestStartedAt15Rows(t *testing.T) {
 	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 80, Height: 15})
 	mt.WaitForText(tooSmallWords)
@@ -28,7 +26,6 @@ func TestStartedAt15Rows(t *testing.T) {
 	mt.RequireGolden()
 }
 
-// Scenario: Message wraps in a tiny window.
 func TestMessageWrapsInATinyWindow(t *testing.T) {
 	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 20, Height: 10})
 	mt.WaitFor("the wrapped message", func(screen string) bool {
@@ -39,8 +36,6 @@ func TestMessageWrapsInATinyWindow(t *testing.T) {
 	mt.RequireGolden()
 }
 
-// A record of the too-small message with colour off, which must show the
-// same words. The colour codes themselves are checked in e2e.
 func TestTooSmallSnapshotWithColourOff(t *testing.T) {
 	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 40, Height: 20, NoColor: true})
 	mt.WaitForText(tooSmallWords)
@@ -48,7 +43,6 @@ func TestTooSmallSnapshotWithColourOff(t *testing.T) {
 	mt.RequireGolden()
 }
 
-// Scenario: Window widened to 60 columns.
 func TestWindowWidenedTo60Columns(t *testing.T) {
 	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 40, Height: 20})
 	mt.WaitForText(tooSmallWords)
@@ -62,7 +56,6 @@ func TestWindowWidenedTo60Columns(t *testing.T) {
 	})
 }
 
-// Scenario: Window narrowed while running.
 func TestWindowNarrowedWhileRunning(t *testing.T) {
 	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20})
 	mt.WaitForText(emptyWords)
@@ -76,8 +69,6 @@ func TestWindowNarrowedWhileRunning(t *testing.T) {
 	assertViewFits(t, 40, 20)
 }
 
-// joinWithSpaces joins the screen's lines with single spaces, so a
-// message wrapped across lines reads as one sentence.
 func joinWithSpaces(screen string) string {
 	return strings.Join(strings.Fields(screen), " ")
 }

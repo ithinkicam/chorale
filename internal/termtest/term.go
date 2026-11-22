@@ -12,8 +12,7 @@ import (
 	"github.com/creack/pty"
 )
 
-// Timing used by the helpers. Waits poll rather than sleep a fixed time,
-// and give up after DefaultTimeout.
+// Timing used by the helpers.
 const (
 	DefaultTimeout = 5 * time.Second
 	pollInterval   = 10 * time.Millisecond
@@ -53,9 +52,8 @@ type Term struct {
 }
 
 // Start runs binary in a pseudo-terminal of the given size, with a fixed
-// environment so results don't depend on the machine: TERM=xterm-256color,
-// a UTF-8 locale, a temporary HOME, and NO_COLOR only if opts.NoColor is
-// set. The program is stopped when the test ends.
+// environment so results don't depend on the machine. The program is stopped
+// when the test ends.
 func Start(t testing.TB, binary string, opts Options) *Term {
 	t.Helper()
 	cmd := exec.Command(binary, opts.Args...)
@@ -205,9 +203,8 @@ func (term *Term) WaitQuiet(quiet time.Duration) {
 }
 
 // IdleBytes waits for the program to go quiet for IdleSettle, then counts
-// the bytes it writes over IdleWindow with no input. A still program
-// writes none. Comparing screens instead would miss a program that clears
-// and redraws the same picture, which is flicker.
+// the bytes it writes over IdleWindow with no input. Counting bytes catches a
+// redraw of the same picture that comparing screens would miss.
 func (term *Term) IdleBytes() int {
 	term.t.Helper()
 	term.WaitQuiet(IdleSettle)

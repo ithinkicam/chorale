@@ -13,9 +13,8 @@ import (
 
 var keyStyle = lipgloss.NewStyle().Bold(true)
 
-// Render draws the message for a window of the given size, saying the
-// size Chorale needs. The message wraps to the window's width, and the
-// key line stays on the last row.
+// Render draws the message for a window of the given size, saying the size
+// Chorale needs.
 func Render(width, height, minWidth, minHeight int) screens.Screen {
 	message := fmt.Sprintf("Chorale needs at least %d by %d.", minWidth, minHeight)
 	wrapped := strings.Split(lipgloss.NewStyle().Width(width).Render(message), "\n")
@@ -26,7 +25,6 @@ func Render(width, height, minWidth, minHeight int) screens.Screen {
 
 	rows := make([]string, max(height, 1))
 	last := len(rows) - 1
-	// Keep the key line visible even when the message doesn't fit.
 	copy(rows[:last], wrapped)
 	rows[last] = keys
 	if last == 0 {

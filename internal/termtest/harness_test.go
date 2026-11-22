@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-// Fixture binaries, built once in TestMain.
 var drawonce, redrawer string
 
 func TestMain(m *testing.M) {

@@ -6,12 +6,10 @@ import (
 	"github.com/ithinkicam/chorale/internal/termtest"
 )
 
-// Scenario: Quitting restores the terminal.
 func TestQuittingRestoresTheTerminal(t *testing.T) {
 	term := termtest.Start(t, chorale, termtest.Options{Width: 60, Height: 20})
 	screen := term.Screen()
 
-	// GIVEN Chorale is showing the empty session list on the alternate screen.
 	term.WaitForText("No sessions yet.")
 	if !screen.ModeOn(termtest.ModeAltScreen) {
 		t.Fatal("the session list is showing, but not on the alternate screen")

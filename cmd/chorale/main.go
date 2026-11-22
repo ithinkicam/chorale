@@ -17,8 +17,6 @@ func main() {
 	os.Exit(run(os.Args[1:], os.Stdout, os.Stderr))
 }
 
-// run parses the command line and does what it asks, returning the exit
-// status.
 func run(args []string, stdout, stderr io.Writer) int {
 	flags := flag.NewFlagSet("chorale", flag.ContinueOnError)
 	flags.SetOutput(stderr)
