@@ -25,9 +25,9 @@ Every behaviour task below comes in a pair: first the failing test, then the cod
 
 ## 4. Empty session list
 
-- [ ] 4.1 Write the plain-text screen helper for teatest, then interface snapshot tests for the scenarios "Empty session list at 60 by 20 with colour" and "Empty session list at 120 by 30 with colour", asserting each THEN clause. Run them and confirm they fail
-- [ ] 4.2 Write terminal-level tests for the scenarios "Empty session list with colour off" and "Colour on uses the terminal palette", checking the raw bytes. Run them and confirm they fail
-- [ ] 4.3 Write a terminal-level test for the scenario "Cursor on the empty message". Run it and confirm it fails
+- [x] 4.1 Write the plain-text screen helper for teatest, then interface snapshot tests for the scenarios "Empty session list at 60 by 20 with colour" and "Empty session list at 120 by 30 with colour", asserting each THEN clause. Run them and confirm they fail
+- [x] 4.2 Write terminal-level tests for the scenarios "Empty session list with colour off" and "Colour on uses the terminal palette", checking the raw bytes. Run them and confirm they fail
+- [x] 4.3 Write a terminal-level test for the scenario "Cursor on the empty message". Run it and confirm it fails
 - [ ] 4.4 Implement the `sessionlist` screen and the app model, and verify the tests from 4.1 to 4.3 pass
 - [ ] 4.5 Add golden comparisons of the plain-text screen to the tests from 4.1, plus one with colour off at 60 by 20. Write the golden files with `make golden` and read each one in the diff before committing. Then change one character in a golden file, confirm the test fails, and restore it
 - [ ] 4.6 Write an interaction test that `q` on the session list ends the program. Run it and confirm it fails. Implement quitting, and verify both it and the test from 2.5 pass
