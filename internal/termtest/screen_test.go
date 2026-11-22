@@ -174,3 +174,35 @@ func TestAModeOnAndOffInOneWriteIsRecorded(t *testing.T) {
 		}
 	}
 }
+
+func TestCursorStyle(t *testing.T) {
+	s := NewScreen(20, 5)
+	if style, set := s.CursorStyle(); set || style != 0 {
+		t.Fatalf("CursorStyle() = %d, %v before anything was written, want 0, false", style, set)
+	}
+	cases := []struct {
+		seq    string
+		style  int
+		blinks bool
+	}{
+		{"\x1b[2 q", 2, false},
+		{"\x1b[5 q", 5, true},
+		{"\x1b[6 q", 6, false},
+		{"\x1b[1 q", 1, true},
+	}
+	for _, c := range cases {
+		write(t, s, c.seq)
+		style, set := s.CursorStyle()
+		if style != c.style || !set || s.CursorBlinks() != c.blinks {
+			t.Errorf("after %s: CursorStyle() = %d, %v and CursorBlinks() = %v; want %d, true, %v",
+				quote(c.seq), style, set, s.CursorBlinks(), c.style, c.blinks)
+		}
+	}
+	if !slices.Contains(s.ModesLeftOn(), ModeCursorStyle) {
+		t.Errorf("ModesLeftOn() = %v, want it to include %q", s.ModesLeftOn(), ModeCursorStyle)
+	}
+	write(t, s, "\x1b[0 q")
+	if slices.Contains(s.ModesLeftOn(), ModeCursorStyle) {
+		t.Errorf("ModesLeftOn() = %v after the default style, want no %q", s.ModesLeftOn(), ModeCursorStyle)
+	}
+}

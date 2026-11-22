@@ -22,6 +22,7 @@ type Mode string
 const (
 	ModeAltScreen            Mode = "alternate screen"
 	ModeCursorHidden         Mode = "cursor hidden"
+	ModeCursorStyle          Mode = "cursor style"
 	ModeMouse                Mode = "mouse reporting"
 	ModeMouseSGR             Mode = "SGR mouse encoding"
 	ModeBracketedPaste       Mode = "bracketed paste"
@@ -33,6 +34,7 @@ var allModes = []Mode{
 	ModeAltScreen,
 	ModeBracketedPaste,
 	ModeCursorHidden,
+	ModeCursorStyle,
 	ModeFocusEvents,
 	ModeKeyboardEnhancements,
 	ModeMouse,
@@ -53,6 +55,8 @@ type Screen struct {
 	kittyStack      []int
 	kittyFlags      int
 	modifyOtherKeys int
+	cursorStyle     int
+	cursorStyleSet  bool
 
 	replies    *replyQueue
 	readerDone chan struct{}
@@ -73,7 +77,7 @@ func NewScreen(width, height int) *Screen {
 		EnableMode:  func(m ansi.Mode) { s.setDECMode(m, true) },
 		DisableMode: func(m ansi.Mode) { s.setDECMode(m, false) },
 	})
-	s.parser.SetHandler(ansi.Handler{HandleCsi: s.handleKeyboardCsi})
+	s.parser.SetHandler(ansi.Handler{HandleCsi: s.handleCsi})
 
 	// The emulator blocks on its reply pipe unless something drains it.
 	go s.readReplies()
@@ -212,6 +216,8 @@ func (s *Screen) modeOn(mode Mode) bool {
 		return s.decModes[1004]
 	case ModeKeyboardEnhancements:
 		return s.kittyFlags != 0 || s.modifyOtherKeys != 0
+	case ModeCursorStyle:
+		return s.cursorStyle != 0
 	}
 	return false
 }
@@ -284,10 +290,29 @@ func sortModes(modes iter.Seq[Mode]) []Mode {
 	return out
 }
 
-// handleKeyboardCsi follows the Kitty keyboard protocol and modifyOtherKeys.
-func (s *Screen) handleKeyboardCsi(cmd ansi.Cmd, params ansi.Params) {
+// CursorStyle returns the cursor style last set with DECSCUSR, where 0 is
+// the terminal's default, and whether a program ever set one.
+func (s *Screen) CursorStyle() (style int, set bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.cursorStyle, s.cursorStyleSet
+}
+
+// CursorBlinks reports whether the current cursor style blinks. The default
+// style, 0, counts as blinking, because most terminals blink it.
+func (s *Screen) CursorBlinks() bool {
+	style, _ := s.CursorStyle()
+	return style == 0 || style%2 == 1
+}
+
+// handleCsi follows what the emulator ignores: the cursor style, the Kitty
+// keyboard protocol and modifyOtherKeys.
+func (s *Screen) handleCsi(cmd ansi.Cmd, params ansi.Params) {
 	defer s.noteModes()
 	switch {
+	case cmd.Final() == 'q' && cmd.Intermediate() == ' ':
+		s.cursorStyle, _, _ = params.Param(0, 0)
+		s.cursorStyleSet = true
 	case cmd.Final() == 'u' && cmd.Prefix() == '>': // push flags
 		flags, _, _ := params.Param(0, 0)
 		s.kittyStack = append(s.kittyStack, s.kittyFlags)
