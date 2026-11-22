@@ -23,6 +23,7 @@ func run(m *testing.M) int {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
 	}
+	defer func() { _ = os.RemoveAll(dir) }()
 	chorale = filepath.Join(dir, "chorale")
 	choraleDev = filepath.Join(dir, "chorale-dev")
 	if err := termtest.BuildChorale(chorale, testVersion); err != nil {

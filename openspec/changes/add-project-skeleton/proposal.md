@@ -37,4 +37,4 @@ Repository hardening is a separate change, `harden-repository`, which follows th
 
 ## Impact
 
-New repository content only: `go.mod`, the `cmd/chorale/`, `internal/`, `e2e/`, `scripts/` and `testdata/` directories, `Makefile`, `.golangci.yml`, `package.json`, `package-lock.json`, `.nvmrc` and `.github/workflows/check.yml`, plus one rule in `.gitignore`. New dependencies: Bubble Tea v2, Lip Gloss v2, Charm's `teatest` v2, a pseudo-terminal library and a terminal emulator library for tests, and OpenSpec as a development tool.
+New repository content only: `go.mod`, the `cmd/chorale/`, `internal/`, `e2e/`, `scripts/` and `testdata/` directories, `Makefile`, `.golangci.yml`, `package.json`, `package-lock.json`, `.nvmrc` and `.github/workflows/check.yml`, plus one rule in `.gitignore`. New dependencies: Bubble Tea v2, Lip Gloss v2, Charm's `teatest` v2, a pseudo-terminal library and a terminal emulator library for tests. The development tools are OpenSpec, through npm, and gotestsum and actionlint, as Go tools pinned in `go.mod`.

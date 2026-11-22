@@ -45,6 +45,7 @@ lint:
 	go vet ./...
 	golangci-lint run ./...
 	go tool actionlint
+	@./scripts/check-actionlint-fixture.sh
 
 # Rewrites golden files. Use on purpose only, and read every change in the diff.
 golden:
@@ -58,7 +59,7 @@ scenarios: test e2e
 # OpenSpec comes from package-lock.json, so it is the pinned version.
 # --all matters: without it, validate fails when there is no terminal.
 node_modules/.package-lock.json: package-lock.json
-	npm ci --no-fund --no-audit
+	npm ci --ignore-scripts --no-fund --no-audit
 
 specs: node_modules/.package-lock.json
 	npx --no-install openspec validate --strict --all
