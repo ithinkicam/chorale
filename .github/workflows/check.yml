@@ -1,0 +1,61 @@
+# Runs make check, the one gate, on macOS and Linux. See docs/testing.md.
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Read-only. This workflow never uses pull_request_target, so a
+# contributor's pull request never runs with write access or secrets.
+permissions:
+  contents: read
+
+# One run per pull request, or per push to main. A newer run cancels the
+# older one in its group.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    # These names are what the required checks on main refer to.
+    name: check (${{ matrix.label }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: macos
+            os: macos-latest
+          - label: linux
+            os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    env:
+      OPENSPEC_TELEMETRY: "0"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Read the golangci-lint version from the Makefile
+        id: lint-version
+        run: echo "version=v$(sed -n 's/^GOLANGCI_LINT_VERSION := //p' Makefile)" >> "$GITHUB_OUTPUT"
+
+      - uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        with:
+          version: ${{ steps.lint-version.outputs.version }}
+          install-only: true
+
+      - name: make check
+        run: make check
