@@ -7,6 +7,9 @@ import (
 	"io"
 	"os"
 
+	tea "charm.land/bubbletea/v2"
+
+	"github.com/ithinkicam/chorale/internal/app"
 	"github.com/ithinkicam/chorale/internal/version"
 )
 
@@ -29,6 +32,11 @@ func run(args []string, stdout, stderr io.Writer) int {
 			return 1
 		}
 		return 0
+	}
+
+	if _, err := tea.NewProgram(app.New()).Run(); err != nil {
+		fmt.Fprintf(stderr, "chorale: %v\n", err) //nolint:errcheck // nowhere left to report it
+		return 1
 	}
 	return 0
 }
