@@ -129,6 +129,12 @@ The workflow in `.github/workflows/check.yml` is set up as follows:
 
 Bypassing a ruleset skips every rule in it. So `harden-repository` adds the required checks in a second ruleset that nobody can bypass. Until then, Cami confirms both jobs are green before she merges.
 
+### Code style
+
+`docs/style.md` is the code style for every agent, and `AGENTS.md` points to it. Its first rule is that code explains itself through names, small functions and types, while the reasons live in specs, design documents and `AGENTS.md`. A comment is kept only for what the code can't say. The guide builds on existing guides rather than starting from nothing, and where a rule can be checked by a linter, golangci-lint checks it.
+
+`actionlint` checks the workflow files as part of `make lint`. It understands GitHub Actions, so it catches wrong action inputs, bad expressions and shell mistakes in `run` steps, which a general YAML linter would miss.
+
 ### Archiving
 
 Archived changes stay tracked in git, so their design decisions stay readable in the tree. Archiving is the last commit on the change's branch, before the pull request merges, so the merged pull request includes the updated `openspec/specs/`.

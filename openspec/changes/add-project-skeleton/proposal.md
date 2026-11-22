@@ -16,6 +16,8 @@ This is milestone 0 in `docs/plan.md`.
 - `scripts/check-scenarios`, which fails if any OpenSpec scenario has no matching test that passed.
 - A `Makefile` with `build`, `test`, `e2e`, `lint`, `golden` and `check` targets, and OpenSpec pinned through `package.json` and its lockfile.
 - GitHub Actions running `make check` on pushes to `main` and on every pull request, with actions pinned to commit hashes and a read-only token.
+- `actionlint` in `make lint`, so mistakes in workflow files fail the gate.
+- `docs/style.md`, the code style every agent follows. Code explains itself, and the reasons live in specs and design documents rather than in comments.
 
 ## Capabilities
 

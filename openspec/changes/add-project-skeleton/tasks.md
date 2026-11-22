@@ -51,6 +51,12 @@ Every behaviour task below comes in a pair: first the failing test, then the cod
 - [x] 7.2 On a throwaway branch named `ci-canary`, commit a change that breaks one golden file, and open it as a draft pull request. Verify both jobs fail on it, then close the pull request and give Cami the command to delete the branch, because agents can't delete branches
 - [x] 7.3 Update `docs/testing.md` so its commands, the layers this change built, the colour code definition and the "Checked by hand" line match what was built. Verify each command runs as written
 
+## 8. Style guide and workflow checks
+
+- [ ] 8.1 Write `docs/style.md` from the research into existing style guides for agents and for Go, and point to it from `AGENTS.md`. Cami reviews it before task 8.3 starts
+- [ ] 8.2 Add `actionlint` at a pinned version to the `Brewfile`, to `make lint` with a version check, and to continuous integration. Verify it reports a fixture workflow with a wrong action input, then passes on `.github/workflows/check.yml`
+- [ ] 8.3 Remove the comments that break `docs/style.md` from the code in this change, and add any lint settings the guide calls for. Verify `make check` passes and `make golden` leaves every golden file unchanged
+
 ## Workflow follow-up
 
 - An outside agent and our own adversarial reviewer review the change, then Cami reviews it before it is applied.
