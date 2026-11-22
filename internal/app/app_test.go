@@ -31,6 +31,7 @@ func TestEmptySessionListAt60By20WithColour(t *testing.T) {
 		t.Errorf("last line is %q, want it to show %q", last, keyWords)
 	}
 	assertViewFits(t, 60, 20)
+	mt.RequireGolden()
 }
 
 // Scenario: Empty session list at 120 by 30 with colour.
@@ -49,6 +50,15 @@ func TestEmptySessionListAt120By30WithColour(t *testing.T) {
 		t.Errorf("row 30 is %q, want it to show %q", lines[29], keyWords)
 	}
 	assertViewFits(t, 120, 30)
+	mt.RequireGolden()
+}
+
+// A record of the empty session list with colour off, which must show the
+// same words. The colour codes themselves are checked in e2e.
+func TestEmptySessionListSnapshotWithColourOff(t *testing.T) {
+	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20, NoColor: true})
+	mt.WaitForText(emptyWords)
+	mt.RequireGolden()
 }
 
 // assertViewFits checks the model's own view, before any renderer could

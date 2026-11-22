@@ -114,3 +114,11 @@ func write(t *testing.T, s *Screen, text string) {
 		t.Fatalf("Write(%s): %v", quote(text), err)
 	}
 }
+
+func TestOnlcrStartsEachLineAtTheLeftEdge(t *testing.T) {
+	s := NewScreen(20, 3)
+	write(t, s, string(onlcr([]byte("first\n  second"))))
+	if got := s.Lines()[1]; got != "  second" {
+		t.Fatalf("second line = %q, want %q", got, "  second")
+	}
+}

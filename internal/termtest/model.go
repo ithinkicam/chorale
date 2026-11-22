@@ -1,6 +1,7 @@
 package termtest
 
 import (
+	"bytes"
 	"io"
 	"strings"
 	"testing"
@@ -57,8 +58,15 @@ func (mt *ModelTerm) pump() {
 		mt.t.Fatalf("reading the program's output: %v", err)
 	}
 	if len(data) > 0 {
-		_, _ = mt.screen.Write(data)
+		_, _ = mt.screen.Write(onlcr(data))
 	}
+}
+
+// onlcr turns each line feed into a carriage return and line feed, as a
+// terminal driver does by default. teatest writes to a plain buffer with no
+// driver, so without this every line would start where the last one ended.
+func onlcr(data []byte) []byte {
+	return bytes.ReplaceAll(data, []byte("\n"), []byte("\r\n"))
 }
 
 // Screen returns the screen, up to date with everything drawn so far.
