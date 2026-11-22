@@ -58,7 +58,17 @@ The service asks a small, inexpensive model for a name from the first prompt, an
 
 ### Choristers
 
-Each session has a small chorister sprite in choir robes, with a white ruff collar and a hymnal. The agents differ in shape as well as robe colour, so they can be told apart without relying on colour: Claude has plain hair and a pink robe, Codex a dark choir cap with a gold tassel and a blue robe, Antigravity a gold halo and a green robe.
+Each session has a small chorister sprite in choir robes, with a white ruff collar and a hymnal. The agents differ by headwear, so they can be told apart without relying on colour: Claude has plain hair, Codex a dark choir cap with a gold tassel, and Antigravity a gold halo.
+
+### Liturgical colours
+
+The whole choir robes in the liturgical colour of the day. The default is the Episcopal Church's calendar with its common colour customs, which the Book of Common Prayer itself doesn't prescribe: blue in Advent, rose on Gaudete and Laetare Sundays, white for Christmas, Easter and feasts such as Christ the King, green after Epiphany and after Pentecost, violet in Lent, and red for Holy Week, Pentecost and martyrs. In white seasons the robe gets a gold hem, so it doesn't read as blank.
+
+A Byzantine calendar, with Pascha reckoned the Orthodox way, is a later option. Its colour customs vary by jurisdiction, so it would need Cami to choose a usage.
+
+The season is worked out on the Mac from the date, with no network lookup. That includes the Easter date, from which Lent, Holy Week, Pentecost and the Sundays after Pentecost follow. This is pure date logic, so it gets thorough unit tests across many years, checked against published calendars.
+
+The season is always named in words in the session list header, such as "Christ the King, in white", so the colour is never the only way to know it. Each sprite stands in a small, dark, arched niche, so white robes stay visible against the light theme. A setting turns the liturgical colours off, and the choir then wears a single fixed colour.
 
 The pose follows the session's state and never animates. Singing with the hymnal open means working. A raised hand means it needs her. Eyes closed with the hymnal put away means done. The state is always written in words beside the sprite as well.
 
@@ -149,11 +159,17 @@ A model on its own can't act as a coding agent. It needs a harness, the program 
 2. **A memory check.** Before starting a local model, Chorale compares its size with the Mac's free memory, and warns in words if it won't fit, instead of letting the Mac grind to a halt.
 3. **Runtime status.** If no runtime is running, Chorale says so and names the command to start one, such as `ollama serve`.
 4. **Labels that say where the work happens.** A local session's subheading says "local" and names the runtime, such as "opencode · inkling-2-mini · local, ollama". Nothing in a local session leaves the Mac, which matters for private projects.
-5. **A guest chorister.** Local models get their own sprite, a guest singer in a plain cream robe, so they can be told apart from the three subscription agents at a glance.
+5. **A guest chorister.** Local models get their own sprite, a visiting singer with a hood, so they can be told apart from the three subscription agents by shape.
 
 ### Where models run
 
-Cami's own Mac is an M4 Mac mini, and plex-server is an M1 Mac mini. Which one can run Inkling 2 Mini depends on how much memory each has, which isn't recorded yet. A runtime on one Mac can also serve a session on the other over Tailscale, so the model can live on whichever has the memory.
+Cami's own Mac is an M4 Mac mini with 16 GB of memory, and plex-server is an M1 Mac mini whose memory isn't recorded yet. Inkling 2 Mini's model card asks for 32 GB, so it most likely won't run well on her Mac. There are three ways round that:
+
+1. **plex-server,** if it has 32 GB or more. A runtime there can serve a session on her Mac over Tailscale.
+2. **A hosted open-weight endpoint.** Chorale treats any OpenAI-compatible endpoint like a local runtime, labelled "hosted" instead of "local". Thinking Machines offers Inkling 2 through its Tinker service; whether that works as a plain chat endpoint for a harness is unverified.
+3. **A smaller model locally.** Models that fit in 16 GB with room to spare run on her Mac, and the memory check tells her which ones fit.
+
+Because a hosted endpoint sends her code to someone else's servers, its sessions are labelled "hosted", never "local".
 
 ## The vestry: commands an agent can't run
 
@@ -244,7 +260,7 @@ The proposal is option 1 for milestones 1 to 4, and the decision is revisited be
 
 **Which terminal Cami uses.** Ghostty, Kitty or iTerm2 make true hold-to-talk possible, and Terminal.app limits it to toggle mode. It also decides the microphone permission question, whether the 12-pixel sprites can be drawn as images, and whether Cmd shortcuts such as Cmd-Z reach Chorale. Many terminals keep Cmd keys for themselves, so every editor shortcut also has a Ctrl or Option form that works everywhere. Not urgent.
 
-**Which Mac runs local models.** Inkling 2 Mini needs at least 32 GB of memory. Cami's M4 Mac mini is the natural home if it has enough, otherwise plex-server, serving her Mac over Tailscale. Cami checks how much memory each has. Decided in milestone 3.
+**Where Inkling 2 Mini runs.** It needs at least 32 GB of memory and Cami's Mac has 16 GB. The choice is plex-server if it has the memory, or a hosted endpoint. Cami checks plex-server's memory. Decided in milestone 3.
 
 **The speech engine.** Parakeet through FluidAudio is the proposal. The final choice comes from testing accuracy on her own speech, and speed on her Mac. There are no published benchmarks for an M1. Decided in milestone 2.
 
