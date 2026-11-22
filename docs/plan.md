@@ -160,17 +160,18 @@ A model on its own can't act as a coding agent. It needs a harness, the program 
 ### What Chorale adds
 
 1. **A picker.** Starting a new session offers subscription agents and local models in one list, with each local model's size and the runtime serving it.
-2. **A memory check.** Before starting a local model, Chorale compares its size with the Mac's free memory, and warns in words if it won't fit, instead of letting the Mac grind to a halt.
+2. **A memory check.** Before starting a local model, Chorale compares its size with the Mac's free memory and says in words what to expect: fits, or too big for memory and will stream from the SSD, much more slowly. It never refuses to start one.
 3. **Runtime status.** If no runtime is running, Chorale says so and names the command to start one, such as `ollama serve`.
 4. **Labels that say where the work happens.** A local session's subheading says "local" and names the runtime, such as "opencode · inkling-2-mini · local, ollama". Nothing in a local session leaves the Mac, which matters for private projects.
 5. **A guest chorister.** Local models get their own sprite, a visiting singer with a hood, so they can be told apart from the three subscription agents by shape.
 
 ### Where models run
 
-Both of Cami's Macs have 16 GB of memory, as of 2026-11-22: her own M4 Mac mini and plex-server, the M1 Mac mini. Inkling 2 Mini's model card asks for 32 GB, so neither can run it well. There are two ways round that:
+Both of Cami's Macs have 16 GB of memory, as of 2026-11-22: her own M4 Mac mini and plex-server, the M1 Mac mini. Inkling 2 Mini's model card asks for 32 GB, so neither can hold it all in memory. There are three ways round that:
 
-1. **A hosted open-weight endpoint.** Chorale treats any OpenAI-compatible endpoint like a local runtime, labelled "hosted" instead of "local". Thinking Machines offers Inkling 2 through its Tinker service; whether that works as a plain chat endpoint for a harness is unverified.
-2. **A smaller model locally.** Models that fit in 16 GB with room to spare run on her Mac, and the memory check tells her which ones fit.
+1. **Stream the weights from the SSD.** A runtime can map the model file into memory instead of loading it, and macOS then reads the parts it needs from the SSD as it goes. That works with a model bigger than memory, much more slowly. It suits a mixture-of-experts model like Inkling 2 Mini, which uses only 3.4 billion of its 26.4 billion parameters for each token, so each token reads only part of the file. Apple published research on this approach as "LLM in a flash". Reading doesn't wear the SSD; swapping, which writes, does, so the runtime must map the file read-only rather than load it into swap. How fast this is on a 16 GB M4 is untested. It's the first thing to try.
+2. **A hosted open-weight endpoint.** Chorale treats any OpenAI-compatible endpoint like a local runtime, labelled "hosted" instead of "local". Thinking Machines offers Inkling 2 through its Tinker service; whether that works as a plain chat endpoint for a harness is unverified.
+3. **A smaller model locally.** Models that fit in 16 GB with room to spare run on her Mac, and the memory check tells her which ones fit.
 
 Because a hosted endpoint sends her code to someone else's servers, its sessions are labelled "hosted", never "local".
 
@@ -198,6 +199,44 @@ Terminal handoff crosses the sandbox, so these rules are requirements:
 6. On the phone, a hand-off shows as "waiting for you at the Mac". The phone never types into the terminal pane.
 
 Opening a tab in Cami's own terminal app instead is a later option, if she wants it. It depends on which terminal she uses, and the output is harder to read back.
+
+## Remote pairing: sessions across both Macs
+
+Cami has two Macs, both Mac minis with 16 GB of memory, joined by Tailscale. Her M4 is where she sits and where `~/Dev` lives. plex-server, the M1, is always on and holds the household services and their repos in `~/code`. Chorale treats them as one workbench.
+
+### The model
+
+Each Mac runs its own `chorale serve`, which owns the sessions on that Mac. A session always runs on one host: its agent, its files and its terminal handoffs all live there. A client, whether the terminal app or later the phone, connects to every service it is paired with and shows all their sessions in one list.
+
+### Pairing
+
+Two services, or a service and a phone, are paired once:
+
+1. Pairing only happens over Tailscale. The service checks the other side's Tailscale identity, so only Cami's own devices on her tailnet can ever pair.
+2. On top of that, the first pairing shows a short code on one screen, in large text, to type or read on the other. For the phone, the code is also a QR code.
+3. Each side then keeps a key for the other, so later connections need no code. Any pairing can be removed from either side, and the list of paired devices is shown in plain words.
+
+### What Cami can do across hosts
+
+1. **One list.** The session list shows sessions from both Macs together. Each row names its host, such as "plex-server", in words.
+2. **Start anywhere.** A new session asks which host and which project, and offers that host's own folders, `~/Dev` on the M4 and `~/code` on plex-server. Work on the household services happens on plex-server, where their repos and running processes are, without ssh.
+3. **Long jobs on the always-on Mac.** A session started on plex-server keeps running when the M4 sleeps or Chorale is closed, and reports back when it finishes.
+4. **Continue elsewhere.** A live session can't move between Macs, because its agent's state lives on its host. Instead, "continue on the other Mac" starts a new session there with a summary of the old one, and names the git branch to pull. Chorale never pushes or pulls code on Cami's behalf without asking.
+5. **Agents across hosts.** Agent handoff from milestone 4 works across Macs, so Claude on the M4 can ask Codex on plex-server for a second opinion.
+6. **Models across hosts.** A model runtime on either Mac can serve a session on the other.
+
+### Rules that follow from it
+
+1. **Speech stays local.** Dictation always happens on the device in front of Cami. Only the finished text goes to a session on the other Mac, never the audio.
+2. **Terminal handoff runs where the session runs.** A `sudo` command for a plex-server session runs on plex-server. The terminal pane streams to Cami's screen, and what she types, including a password, goes over Tailscale's encrypted connection straight to that pane. The approval names the host in words: "run on plex-server".
+3. **Logins stay on their host.** Each Mac has its own Claude, Codex and Antigravity logins. Chorale shows which accounts each host has, and never copies credentials between Macs.
+4. **Offline hosts are said plainly.** If a Mac goes to sleep or offline, its sessions stay in the list, marked "plex-server unreachable since 14:02", and come back when it does.
+5. **The service runs in Cami's login session.** On plex-server, programs started over plain ssh can't read some folders, such as the external drive, because of macOS privacy permissions. So `chorale serve` runs as a launch agent in her logged-in session, never as an ssh command, and gets the permissions she has granted there.
+6. **plex-server has limits.** It also runs Plex, the household bots and other services in 16 GB of memory. Chorale caps how many agent sessions it starts there at once, and the cap is a setting.
+
+### What this means for the phone
+
+The phone pairs the same way and sees sessions on both Macs. When the M4 is asleep, plex-server is still there, so the phone always has somewhere to connect, and notifications come from whichever Mac the session runs on.
 
 ## Process
 
@@ -239,9 +278,15 @@ The service offers each agent a small built-in MCP server. Its first tool is `ru
 
 Done when Claude can get a `sudo` command run through terminal handoff without Cami copying anything, and when Claude can ask Codex for a second opinion and Cami sees both sessions in the list.
 
-### Milestone 5: iOS companion
+### Milestone 5: remote pairing across both Macs
 
-A SwiftUI app that connects to the service through Tailscale Serve. First version: see sessions, read the latest output at a large Dynamic Type size, approve or decline permission prompts, and dictate a prompt with the shared speech code. Approvals are shown on the session list itself, a pattern borrowed from the CC Pocket app.
+Pairing between services, the combined session list, starting sessions on either host, terminal handoff and agent handoff across hosts, "continue on the other Mac", and the offline and resource rules from the remote pairing section.
+
+Done when Cami can start a session on plex-server from her M4, close Chorale, open it again the next morning and find the finished work waiting, with no ssh involved.
+
+### Milestone 6: iOS companion
+
+A SwiftUI app that pairs with both Macs, using the same pairing as milestone 5, and connects through Tailscale Serve. First version: see sessions, read the latest output at a large Dynamic Type size, approve or decline permission prompts, and dictate a prompt with the shared speech code. Approvals are shown on the session list itself, a pattern borrowed from the CC Pocket app.
 
 The phone can't keep a connection open in the background, so notifications have to come from the service. Pushover is the first route: a one-off $4.99, with no Apple account needed. Apple's own push service comes later, sent directly from the service, once there is a paid developer account. Happy, an open-source mobile companion for Claude Code and Codex, is the main project to study for pairing and the approval screen.
 
@@ -253,17 +298,11 @@ Running models inside Chorale itself, load balancing across subscriptions, seman
 
 ## Open decisions
 
-**Where the service runs.** This is the biggest one, and Cami decides. Her projects live in `~/Dev` on her Mac. The phone can only reach an always-on machine, and a sleeping Mac laptop can't be woken reliably over Tailscale. So there are three options:
-
-1. Run the service on her Mac and accept that the phone works only while the Mac is awake.
-2. Run it on plex-server, the always-on Mac mini, with project repos cloned there and synced through git.
-3. Run it on both, with the phone talking to whichever is up.
-
-The proposal is option 1 for milestones 1 to 4, and the decision is revisited before milestone 5.
+**Whether the M4 sleeps.** The service runs on both Macs, decided 2026-11-22, and remote pairing joins them in milestone 5. Until then it runs only on the M4. A sleeping Mac can't be woken reliably over Tailscale, so whether the M4 is set to sleep decides how often its sessions show as unreachable from elsewhere. Not urgent.
 
 **Which terminal Cami uses.** Ghostty, Kitty or iTerm2 make true hold-to-talk possible, and Terminal.app limits it to toggle mode. It also decides the microphone permission question, whether the 12-pixel sprites can be drawn as images, and whether Cmd shortcuts such as Cmd-Z reach Chorale. Many terminals keep Cmd keys for themselves, so every editor shortcut also has a Ctrl or Option form that works everywhere. Not urgent.
 
-**Where Inkling 2 Mini runs.** It needs at least 32 GB of memory and both of Cami's Macs have 16 GB, so it runs on a hosted endpoint, which provider is decided in milestone 3. A heavily compressed build might squeeze into 16 GB, but that is untested and would leave little room for anything else.
+**Where Inkling 2 Mini runs.** Its model card asks for 32 GB and both of Cami's Macs have 16 GB. The first try is streaming its weights from the SSD on the M4, measured in tokens per second. If that's too slow to be useful, it runs on a hosted endpoint. Decided in milestone 3.
 
 **The speech engine.** Parakeet through FluidAudio is the proposal. The final choice comes from testing accuracy on her own speech, and speed on her Mac. There are no published benchmarks for an M1. Decided in milestone 2.
 
@@ -277,8 +316,9 @@ Each milestone has a "done when" test that Cami runs on her Mac. Continuous inte
 2. Upgrading Antigravity CLI on her Mac to 1.5 or later.
 3. A `launchd` service that starts at login, installed only with her go-ahead in milestone 1.
 4. Microphone permission for her terminal or for the `chorale-listen` helper, granted by her.
-5. Pushover, a one-off $4.99, in milestone 5.
-6. The paid Apple Developer Program, $99 a year, needed for TestFlight and Apple push notifications. A free account can install the app on her phone, but it expires after seven days.
+5. Pushover, a one-off $4.99, in milestone 6.
+6. Running `chorale serve` on plex-server as a launch agent in Cami's login session, in milestone 5.
+7. The paid Apple Developer Program, $99 a year, needed for TestFlight and Apple push notifications. A free account can install the app on her phone, but it expires after seven days.
 
 ## Policy note
 
