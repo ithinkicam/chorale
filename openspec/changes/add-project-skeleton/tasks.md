@@ -4,9 +4,9 @@ Every behaviour task below comes in a pair: first the failing test, then the cod
 
 ## 1. Project setup
 
-- [ ] 1.1 Create `go.mod` for `github.com/ithinkicam/chorale` with `go 1.27` and a `toolchain` line naming the installed Go release, and have the `Makefile` export `GOTOOLCHAIN` from that line. Verify that `make` reports that toolchain through `go version`
-- [ ] 1.2 Add `charm.land/bubbletea/v2`, `charm.land/lipgloss/v2`, teatest v2, `creack/pty` and both emulator candidates at pinned versions. Confirm teatest v2 imports the `charm.land` Bubble Tea path, then verify `go mod tidy` and `go build ./...` succeed
-- [ ] 1.3 Create the package layout from `design.md` with a `cmd/chorale/main.go` that does nothing yet, add `/chorale` to `.gitignore`, and verify `make build` writes `bin/chorale`
+- [x] 1.1 Create `go.mod` for `github.com/ithinkicam/chorale` with `go 1.27` and a `toolchain` line naming the installed Go release, and have the `Makefile` export `GOTOOLCHAIN` from that line. Verify that `make` reports that toolchain through `go version`
+- [x] 1.2 Add `charm.land/bubbletea/v2`, `charm.land/lipgloss/v2`, teatest v2, `creack/pty` and both emulator candidates at pinned versions. Confirm teatest v2 imports the `charm.land` Bubble Tea path, then verify `go mod tidy` and `go build ./...` succeed
+- [x] 1.3 Create the package layout from `design.md` with a `cmd/chorale/main.go` that does nothing yet, add `/chorale` to `.gitignore`, and verify `make build` writes `bin/chorale`
 - [ ] 1.4 Add `package.json` with OpenSpec 2.1.1 as a development dependency, commit `package-lock.json`, and add `.nvmrc`. Verify `npm ci` succeeds, and that `npx --no-install openspec validate --strict --all` exits 0 when run with `CI=1` and no terminal
 - [ ] 1.5 Add `.golangci.yml` and a `Makefile` with `build`, `test`, `e2e`, `lint`, `golden` and `check` targets, where `lint` checks the golangci-lint version. Verify `make lint` and `make test` run and pass on the empty project
 
