@@ -30,7 +30,7 @@ Every behaviour task below comes in a pair: first the failing test, then the cod
 - [x] 4.3 Write a terminal-level test for the scenario "Cursor on the empty message". Run it and confirm it fails
 - [x] 4.4 Implement the `sessionlist` screen and the app model, and verify the tests from 4.1 to 4.3 pass
 - [x] 4.5 Add golden comparisons of the plain-text screen to the tests from 4.1, plus one with colour off at 60 by 20. Write the golden files with `make golden` and read each one in the diff before committing. Then change one character in a golden file, confirm the test fails, and restore it
-- [ ] 4.6 Write an interaction test that `q` on the session list ends the program. Run it and confirm it fails. Implement quitting, and verify both it and the test from 2.5 pass
+- [x] 4.6 Write an interaction test that `q` on the session list ends the program. Run it and confirm it fails. Implement quitting, and verify both it and the test from 2.5 pass
 - [ ] 4.7 Write terminal-level tests for the scenarios "Idle screen stays still" and "Startup draws the session list directly" and run them. If one fails, fix the stray redraw and verify it passes. If one passes on its first run, say in the commit that it is a regression guard, whose detector was seen to fail in task 2.3. Never add a redraw just to see it fail
 
 ## 5. Window too small

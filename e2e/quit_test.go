@@ -18,6 +18,7 @@ func TestQuittingRestoresTheTerminal(t *testing.T) {
 	}
 
 	term.Send("q")
+	defer func() { t.Logf("modes turned on during the run: %v", screen.ModesTurnedOn()) }()
 
 	if code := term.Wait(); code != 0 {
 		t.Errorf("exit status %d, want 0", code)

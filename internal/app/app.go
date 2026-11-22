@@ -20,8 +20,13 @@ func (m Model) Init() tea.Cmd { return nil }
 
 // Update implements tea.Model.
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if size, ok := msg.(tea.WindowSizeMsg); ok {
-		m.width, m.height = size.Width, size.Height
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.width, m.height = msg.Width, msg.Height
+	case tea.KeyPressMsg:
+		if msg.String() == "q" {
+			return m, tea.Quit
+		}
 	}
 	return m, nil
 }
