@@ -1,0 +1,12 @@
+{
+  "name": "chorale-dev-tools",
+  "private": true,
+  "description": "Development tools for Chorale. The app itself is Go; this only pins OpenSpec.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.20.0"
+  },
+  "devDependencies": {
+    "@fission-ai/openspec": "2.1.1"
+  }
+}
