@@ -148,3 +148,29 @@ func TestAStuckReplyWriterDoesntBlockTheScreen(t *testing.T) {
 		t.Fatalf("first line = %q, want %q", got, "done")
 	}
 }
+
+func TestAnyDECModeLeftOnIsReported(t *testing.T) {
+	s := NewScreen(60, 20)
+	write(t, s, "\x1b[?2027h\x1b[?7l")
+
+	want := []Mode{"DEC mode 2027 on", "DEC mode 7 off"}
+	if got := s.ModesLeftOn(); !slices.Equal(got, want) {
+		t.Fatalf("ModesLeftOn() = %v, want %v", got, want)
+	}
+	write(t, s, "\x1b[?2027l\x1b[?7h")
+	if got := s.ModesLeftOn(); len(got) != 0 {
+		t.Fatalf("ModesLeftOn() = %v after restoring both, want none", got)
+	}
+}
+
+func TestAModeOnAndOffInOneWriteIsRecorded(t *testing.T) {
+	s := NewScreen(60, 20)
+	write(t, s, "\x1b[?25l\x1b[?2026hframe\x1b[?2026l\x1b[?25h")
+
+	got := s.ModesTurnedOn()
+	for _, want := range []Mode{ModeCursorHidden, "DEC mode 2026 on"} {
+		if !slices.Contains(got, want) {
+			t.Errorf("ModesTurnedOn() = %v, want it to include %q", got, want)
+		}
+	}
+}

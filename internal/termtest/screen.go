@@ -1,7 +1,12 @@
 package termtest
 
 import (
+	"cmp"
+	"fmt"
 	"io"
+	"iter"
+	"maps"
+	"slices"
 	"strings"
 	"sync"
 
@@ -102,9 +107,7 @@ func (s *Screen) Write(p []byte) (int, error) {
 	for _, b := range p {
 		s.parser.Advance(b)
 	}
-	n, err := s.emu.Write(p)
-	s.noteModes()
-	return n, err
+	return s.emu.Write(p)
 }
 
 // Resize changes the screen's size, as a terminal window would.
@@ -137,30 +140,19 @@ func (s *Screen) ModeOn(mode Mode) bool {
 	return s.modeOn(mode)
 }
 
-// ModesTurnedOn lists every mode that was on at some point.
+// ModesTurnedOn lists every mode that differed from the terminal's default
+// at some point, including any DEC private mode, as "DEC mode N on".
 func (s *Screen) ModesTurnedOn() []Mode {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	var out []Mode
-	for _, m := range allModes {
-		if s.everOn[m] {
-			out = append(out, m)
-		}
-	}
-	return out
+	return sortModes(maps.Keys(s.everOn))
 }
 
-// ModesLeftOn lists every mode that is on now.
+// ModesLeftOn lists every mode that differs from the terminal's default now.
 func (s *Screen) ModesLeftOn() []Mode {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	var out []Mode
-	for _, m := range allModes {
-		if s.modeOn(m) {
-			out = append(out, m)
-		}
-	}
-	return out
+	return sortModes(slices.Values(s.modesNow()))
 }
 
 // Lines returns the text on screen, one string per row, with trailing
@@ -231,22 +223,70 @@ func (s *Screen) cursorHidden() bool {
 	return set && !shown
 }
 
-func (s *Screen) noteModes() {
+// namedDECModes are reported under a Mode name rather than by number.
+// Mode 1048 only saves and restores the cursor, so it is never "left on".
+var namedDECModes = map[int]bool{
+	9: true, 25: true, 47: true, 1000: true, 1001: true, 1002: true, 1003: true,
+	1004: true, 1006: true, 1047: true, 1048: true, 1049: true, 2004: true,
+}
+
+// decModesOnByDefault are the DEC private modes a terminal starts with on.
+var decModesOnByDefault = map[int]bool{7: true, 25: true}
+
+func (s *Screen) modesNow() []Mode {
+	var out []Mode
 	for _, m := range allModes {
 		if s.modeOn(m) {
-			s.everOn[m] = true
+			out = append(out, m)
 		}
+	}
+	for n, on := range s.decModes {
+		if namedDECModes[n] || on == decModesOnByDefault[n] {
+			continue
+		}
+		state := "on"
+		if !on {
+			state = "off"
+		}
+		out = append(out, Mode(fmt.Sprintf("DEC mode %d %s", n, state)))
+	}
+	return out
+}
+
+func (s *Screen) noteModes() {
+	for _, m := range s.modesNow() {
+		s.everOn[m] = true
 	}
 }
 
 func (s *Screen) setDECMode(m ansi.Mode, on bool) {
 	if dec, ok := m.(ansi.DECMode); ok {
 		s.decModes[int(dec)] = on
+		s.noteModes()
 	}
+}
+
+// sortModes puts named modes first, in allModes order, then DEC modes by name.
+func sortModes(modes iter.Seq[Mode]) []Mode {
+	out := slices.Collect(modes)
+	rank := func(m Mode) int {
+		if i := slices.Index(allModes, m); i >= 0 {
+			return i
+		}
+		return len(allModes)
+	}
+	slices.SortFunc(out, func(a, b Mode) int {
+		if c := cmp.Compare(rank(a), rank(b)); c != 0 {
+			return c
+		}
+		return cmp.Compare(a, b)
+	})
+	return out
 }
 
 // handleKeyboardCsi follows the Kitty keyboard protocol and modifyOtherKeys.
 func (s *Screen) handleKeyboardCsi(cmd ansi.Cmd, params ansi.Params) {
+	defer s.noteModes()
 	switch {
 	case cmd.Final() == 'u' && cmd.Prefix() == '>': // push flags
 		flags, _, _ := params.Param(0, 0)
