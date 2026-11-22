@@ -24,10 +24,11 @@ build:
 	go build -o bin/chorale ./cmd/chorale
 
 # Unit, interface snapshot and interaction tests. The JSON is read by the
-# scenario check.
+# scenario check. -count=1 because some tests build programs from source,
+# and Go's test cache can't see changes to what they build.
 test:
 	@mkdir -p bin
-	$(GOTESTSUM) --jsonfile bin/test.json -- $(UNIT_PKGS)
+	$(GOTESTSUM) --jsonfile bin/test.json -- -count=1 $(UNIT_PKGS)
 
 # Terminal-level tests. -count=1 because they build chorale themselves, and
 # Go's test cache can't see changes to the code they build.

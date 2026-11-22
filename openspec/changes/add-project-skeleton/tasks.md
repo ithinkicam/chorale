@@ -16,7 +16,7 @@ Every behaviour task below comes in a pair: first the failing test, then the cod
 - [x] 2.2 Implement the wrapper over `github.com/charmbracelet/x/vt` and verify the test from 2.1 passes. If it can't track a mode, try `vt10x`. Record the choice and the reason in `design.md` and remove the unused library
 - [x] 2.3 Write tests for the harness: that `TestMain` builds `chorale` into a temporary folder, that a program can be started at a given size with the fixed environment, and that the screen, cursor and raw bytes can be read. Also test the idle detector against the two fixture programs, one that redraws on a timer and must be caught, and one that draws once and must pass. Run them and confirm they fail because the helpers don't exist yet
 - [x] 2.4 Implement the harness helpers, the colour code parser and the idle detector, and verify the tests from 2.3 pass
-- [ ] 2.5 Write a terminal-level test for the scenario "Quitting restores the terminal". Run it and confirm it fails at its GIVEN, because `chorale` never switches to the alternate screen yet
+- [x] 2.5 Write a terminal-level test for the scenario "Quitting restores the terminal". Run it and confirm it fails at its GIVEN, because `chorale` never switches to the alternate screen yet
 
 ## 3. Version flag
 

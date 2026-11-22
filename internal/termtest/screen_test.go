@@ -114,15 +114,3 @@ func write(t *testing.T, s *Screen, text string) {
 		t.Fatalf("Write(%s): %v", quote(text), err)
 	}
 }
-
-func quote(s string) string {
-	out := make([]rune, 0, len(s))
-	for _, r := range s {
-		if r == 0x1b {
-			out = append(out, '⎋')
-			continue
-		}
-		out = append(out, r)
-	}
-	return string(out)
-}
