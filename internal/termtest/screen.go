@@ -126,7 +126,7 @@ func (s *Screen) Close() error {
 	var err error
 	s.closeOnce.Do(func() {
 		if pipe, ok := s.emu.InputPipe().(io.Closer); ok {
-			_ = pipe.Close() // ends readReplies before the emulator is closed
+			_ = pipe.Close() // closing the reply pipe can't fail in a way that matters here
 		}
 		<-s.readerDone
 		s.replies.close()
@@ -145,7 +145,7 @@ func (s *Screen) ModeOn(mode Mode) bool {
 }
 
 // ModesTurnedOn lists every mode that differed from the terminal's default
-// at some point, including any DEC private mode, as "DEC mode N on".
+// at some point, with DEC private modes named like "DEC mode 2027 on".
 func (s *Screen) ModesTurnedOn() []Mode {
 	s.mu.Lock()
 	defer s.mu.Unlock()

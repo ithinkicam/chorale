@@ -3,10 +3,10 @@ package termtest
 import (
 	"io"
 	"sync"
+	"time"
 )
 
-// replyQueue hands the emulator's replies to their writer on its own
-// goroutine, so a program that never reads its input can't block the screen.
+// replyQueue writes the emulator's replies to their writer on its own goroutine.
 type replyQueue struct {
 	mu      sync.Mutex
 	ready   *sync.Cond
@@ -41,7 +41,10 @@ func (q *replyQueue) close() {
 	q.closed = true
 	q.ready.Signal()
 	q.mu.Unlock()
-	<-q.done
+	select {
+	case <-q.done:
+	case <-time.After(DefaultTimeout):
+	}
 }
 
 func (q *replyQueue) run() {
@@ -58,6 +61,6 @@ func (q *replyQueue) run() {
 		reply, w := q.pending[0], q.writer
 		q.pending = q.pending[1:]
 		q.mu.Unlock()
-		_, _ = w.Write(reply)
+		_, _ = w.Write(reply) // a program that has exited no longer needs its replies
 	}
 }

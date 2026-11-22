@@ -21,7 +21,7 @@ func runWithFixtures(m *testing.M) int {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
 	}
-	defer func() { _ = os.RemoveAll(dir) }()
+	defer func() { _ = os.RemoveAll(dir) }() // a leftover temporary folder is harmless
 	drawonce = filepath.Join(dir, "drawonce")
 	redrawer = filepath.Join(dir, "redrawer")
 	noreader = filepath.Join(dir, "noreader")

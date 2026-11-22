@@ -63,7 +63,7 @@ func Check(openspecDir string, results ...io.Reader) (Report, error) {
 	}
 
 	var report Report
-	report.Duplicates = duplicates(scenarios)
+	report.Duplicates = duplicates(openspecDir, scenarios)
 	for _, s := range scenarios {
 		switch {
 		case s.Reason != "":
@@ -209,16 +209,32 @@ func normalise(name string) string {
 	return b.String()
 }
 
-func duplicates(scenarios []Scenario) []Scenario {
+// duplicates finds scenarios that share a name within the main specs or
+// within one change. A change may repeat the main specs' scenarios, because
+// a modified requirement is restated in full.
+func duplicates(openspecDir string, scenarios []Scenario) []Scenario {
+	key := func(s Scenario) string { return scope(openspecDir, s.File) + "\x00" + normalise(s.Name) }
 	count := map[string]int{}
 	for _, s := range scenarios {
-		count[normalise(s.Name)]++
+		count[key(s)]++
 	}
 	var out []Scenario
 	for _, s := range scenarios {
-		if count[normalise(s.Name)] > 1 {
+		if count[key(s)] > 1 {
 			out = append(out, s)
 		}
 	}
 	return out
+}
+
+func scope(openspecDir, file string) string {
+	rel, err := filepath.Rel(openspecDir, file)
+	if err != nil {
+		return file
+	}
+	parts := strings.Split(filepath.ToSlash(rel), "/")
+	if len(parts) > 1 && parts[0] == "changes" {
+		return "changes/" + parts[1]
+	}
+	return "specs"
 }

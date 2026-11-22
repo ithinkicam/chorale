@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"golang.org/x/sys/unix"
 )
@@ -18,5 +19,5 @@ func main() {
 	}
 	fmt.Print(strings.Repeat("\x1b[?2004$p", 50000))
 	fmt.Print("done")
-	select {}
+	time.Sleep(time.Hour)
 }

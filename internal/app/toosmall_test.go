@@ -84,5 +84,6 @@ func TestMessageComesFirstInAVeryShortWindow(t *testing.T) {
 	mt.WaitFor("the whole message", func(screen string) bool {
 		return strings.Contains(joinWithSpaces(screen), tooSmallWords)
 	})
+	mt.RequireGolden()
 	assertViewFits(t, mt, 20, 2)
 }

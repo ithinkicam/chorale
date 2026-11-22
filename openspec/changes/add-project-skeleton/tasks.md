@@ -67,6 +67,8 @@ Every behaviour task below comes in a pair: first the failing test, then the cod
 - [x] 9.6 Clean up the test runs and tooling: remove the temporary folders the tests create, add `--ignore-scripts` to `npm ci`, fix `scripts/check-gofmt.sh` for deleted files, add a test that the actionlint fixture still fails, and list gotestsum in the proposal. Verify `make check` passes and the temporary folder count doesn't grow
 - [x] 9.7 Fix the docs that disagree with the code: the getting-started guide's install steps, with a pinned golangci-lint and `npm ci`, the cursor check in `docs/testing.md`, where golden files live, and the lines that say `make check` doesn't exist yet. Remove the comments that still break `docs/style.md`, and make failure messages say what was wanted. Verify each command in the getting-started guide runs as written
 
+- [x] 9.8 Fix the findings from the review of group 9. Write a scenario check test where a change modifies a requirement and repeats its scenarios, run it and confirm it fails, then flag duplicates only within the main specs or within one change, and verify it passes. Make the actionlint fixture check require exit status 1 and an existing fixture. Restore the global OpenSpec install and telemetry opt-out in the getting-started guide, because the OpenSpec skills call `openspec` directly. Add a golden file for the very short window, give `Screen.Close` a time limit, keep the noreader fixture alive after it prints, and fix the comments that break `docs/style.md`. Verify `make check` passes
+
 ## Workflow follow-up
 
 - An outside agent and our own adversarial reviewer review the change, then Cami reviews it before it is applied.

@@ -112,3 +112,16 @@ func TestARelativeOpenSpecPathWorks(t *testing.T) {
 		t.Errorf("found %d scenarios from the current folder, want 8", got)
 	}
 }
+
+func TestAChangeMayRepeatScenariosFromTheMainSpecs(t *testing.T) {
+	report, err := Check("testdata/modified", strings.NewReader(`{"Action":"pass","Test":"TestSharedScenario"}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(report.Duplicates) != 0 {
+		t.Errorf("Duplicates = %+v, want none, because a modified requirement repeats its scenarios", report.Duplicates)
+	}
+	if report.Failed() {
+		t.Error("report.Failed() is true for a change that modifies a requirement")
+	}
+}

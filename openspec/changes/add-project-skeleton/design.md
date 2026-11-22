@@ -100,7 +100,7 @@ A scenario that can only be checked by hand carries this line in its spec, with 
 - **Checked by hand:** <reason>
 ```
 
-The check lists those scenarios and doesn't fail on them. It prints every uncovered scenario and exits non-zero if there are any.
+The check lists those scenarios and doesn't fail on them. It also fails when two scenarios share a name within the main specs or within one change, because one passing test would cover both. A change may repeat scenarios from the main specs, because a modified requirement is restated in full. It prints every problem and exits non-zero if there are any.
 
 ### OpenSpec in the gate
 

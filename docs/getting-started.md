@@ -36,6 +36,14 @@ npm ci --ignore-scripts
 npx openspec --version
 ```
 
+The OpenSpec skills that agents use call `openspec` directly, so install the same version globally too, and turn off its anonymous usage reports:
+
+```
+npm install -g @fission-ai/openspec@2.1.1
+openspec config set telemetry.enabled false
+openspec --version
+```
+
 ## 4. Check everything works
 
 ```
