@@ -78,3 +78,37 @@ func assertNames(t *testing.T, what string, got []Scenario, want ...string) {
 		t.Errorf("%s scenarios = %q, want %q", what, names, want)
 	}
 }
+
+func TestDuplicateScenarioNamesFail(t *testing.T) {
+	report, err := Check("testdata/dupes", strings.NewReader(`{"Action":"pass","Test":"TestSameName"}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertNames(t, "duplicate", report.Duplicates, "Same name", "Same name")
+	if !report.Failed() {
+		t.Error("report.Failed() is false with duplicate scenario names")
+	}
+}
+
+func TestScenarioHeadingsInCodeBlocksAreIgnored(t *testing.T) {
+	report, err := Check("testdata/dupes", strings.NewReader(""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, s := range slices.Concat(report.Covered, report.Uncovered, report.ByHand) {
+		if s.Name == "Inside a code block" {
+			t.Errorf("the heading inside a code block was read as a scenario")
+		}
+	}
+}
+
+func TestARelativeOpenSpecPathWorks(t *testing.T) {
+	t.Chdir("testdata/openspec")
+	report, err := Check(".", strings.NewReader(""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := len(report.Uncovered) + len(report.ByHand); got != 8 {
+		t.Errorf("found %d scenarios from the current folder, want 8", got)
+	}
+}

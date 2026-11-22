@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/fs"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"unicode"
@@ -23,13 +24,17 @@ type Scenario struct {
 // Report sorts every scenario into covered, uncovered and checked by hand.
 type Report struct {
 	Covered, Uncovered, ByHand []Scenario
+	Duplicates                 []Scenario
 }
 
 // Failed reports whether any scenario is uncovered.
-func (r Report) Failed() bool { return len(r.Uncovered) > 0 }
+func (r Report) Failed() bool { return len(r.Uncovered) > 0 || len(r.Duplicates) > 0 }
 
 // Print writes the report for a person to read.
 func (r Report) Print(w io.Writer) {
+	for _, s := range r.Duplicates {
+		_, _ = fmt.Fprintf(w, "Duplicate scenario name: %q in %s\n", s.Name, s.File)
+	}
 	for _, s := range r.ByHand {
 		_, _ = fmt.Fprintf(w, "Checked by hand: %q in %s, because %s\n", s.Name, s.File, s.Reason)
 	}
@@ -58,6 +63,7 @@ func Check(openspecDir string, results ...io.Reader) (Report, error) {
 	}
 
 	var report Report
+	report.Duplicates = duplicates(scenarios)
 	for _, s := range scenarios {
 		switch {
 		case s.Reason != "":
@@ -85,7 +91,7 @@ func readScenarios(openspecDir string) ([]Scenario, error) {
 			if d.IsDir() && path == archive {
 				return filepath.SkipDir
 			}
-			if d.IsDir() || filepath.Ext(path) != ".md" || !strings.Contains(filepath.ToSlash(path), "/specs/") {
+			if d.IsDir() || filepath.Ext(path) != ".md" || !slices.Contains(strings.Split(filepath.ToSlash(path), "/"), "specs") {
 				return nil
 			}
 			found, err := scenariosIn(path)
@@ -107,8 +113,16 @@ func scenariosIn(path string) ([]Scenario, error) {
 	}
 	var scenarios []Scenario
 	current := -1
+	inFence := false
 	for _, line := range strings.Split(data, "\n") {
 		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "```") {
+			inFence = !inFence
+			continue
+		}
+		if inFence {
+			continue
+		}
 		switch {
 		case strings.HasPrefix(trimmed, scenarioPrefix):
 			name := strings.TrimSpace(strings.TrimPrefix(trimmed, scenarioPrefix))
@@ -193,4 +207,18 @@ func normalise(name string) string {
 		}
 	}
 	return b.String()
+}
+
+func duplicates(scenarios []Scenario) []Scenario {
+	count := map[string]int{}
+	for _, s := range scenarios {
+		count[normalise(s.Name)]++
+	}
+	var out []Scenario
+	for _, s := range scenarios {
+		if count[normalise(s.Name)] > 1 {
+			out = append(out, s)
+		}
+	}
+	return out
 }
