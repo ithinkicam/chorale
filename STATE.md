@@ -6,15 +6,14 @@ As of 2026-11-22.
 
 The plan, the test standard, the agent rules and the OpenSpec setup are in place. No code exists yet. The repo is public on GitHub, and `main` takes changes only through pull requests.
 
-The first change, `add-project-skeleton` for milestone 0, was revised on 2026-11-22. It now has a scenario for short windows, a fuller continuous integration setup, and an ignore rule for archived changes. It passes `openspec validate --strict`, and it is waiting for the outside and adversarial reviews, then Cami's review.
+The first change, `add-project-skeleton` for milestone 0, was reviewed on 2026-11-22 by Antigravity and by an adversarial reviewer, and revised to answer both. It passes `openspec validate --strict --all`, and it is waiting for Cami's review in pull request `revise-skeleton-review`.
 
 ## Next steps
 
-1. An outside agent and the adversarial reviewer review `add-project-skeleton`, and their findings go to Cami.
-2. Cami reviews the change.
-3. An agent applies it on a branch, test first, and opens a pull request.
-4. Once `make check` passes in continuous integration and the pull request is merged, the change is archived.
-5. The `harden-repository` change is proposed next. It adds security scanning, Dependabot updates and auto-merge, required checks on `main`, `CODEOWNERS` and `SECURITY.md`. Then milestone 1 is proposed.
+1. Cami reviews the change and merges the review pull request.
+2. An agent applies it on a branch, test first, and opens a pull request.
+3. Once `make check` passes in continuous integration, the change is archived as the last commit on its branch, and Cami merges the pull request.
+4. The `harden-repository` change is proposed next. It adds security scanning, Dependabot updates and auto-merge, required checks on `main` in a ruleset nobody can bypass, `CODEOWNERS` and `SECURITY.md`. Then milestone 1 is proposed.
 
 ## Open decisions
 
