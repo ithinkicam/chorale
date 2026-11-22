@@ -4,8 +4,6 @@
 
 Nothing exists yet but the plan, the testing standard and OpenSpec itself. See `proposal.md` for why the skeleton comes first. The stack was chosen in `docs/plan.md`: Go, with Bubble Tea v2 and Lip Gloss v2 for the interface.
 
-This design was revised on 2026-11-22 after an outside review by Antigravity and an adversarial review. The main changes were these. Tests assert each scenario directly instead of relying on golden files. The terminal tests build their own binary. The idle check counts bytes. The scenario check needs a passing test.
-
 ## Goals / Non-Goals
 
 **Goals:**
@@ -45,7 +43,7 @@ scripts/              check-scenarios and other development scripts
 testdata/             shared fixtures
 ```
 
-Each screen package has its own `testdata/` for its golden files. Built binaries go to `bin/`, which is ignored, and `.gitignore` also ignores a stray `/chorale` at the repo root.
+Golden files live in the `testdata/` folder of the package whose tests write them. For this change that is `internal/app`, because the screens are tested through the whole app. Built binaries go to `bin/`, which is ignored, and `.gitignore` also ignores a stray `/chorale` at the repo root.
 
 ### The version
 
@@ -71,7 +69,14 @@ The harness starts the binary in a pseudo-terminal with `creack/pty`, at a given
 
 ### Choosing the emulator library
 
-The candidates are `github.com/charmbracelet/x/vt` and `github.com/hinshun/vt10x`. The choice is made by feeding each one known escape sequences directly and checking it reports each mode correctly. The sequences cover the alternate screen, cursor visibility, mouse reporting in SGR mode, bracketed paste and the keyboard enhancement flags. That way the choice doesn't depend on Chorale producing those sequences yet. If a library tracks modes only through callbacks, the harness keeps its own record from them. Task 2.2 records the choice and the reason here.
+The candidates are `github.com/charmbracelet/x/vt` and `github.com/hinshun/vt10x`. The choice is made by feeding each one known escape sequences directly and checking it reports each mode correctly. The sequences cover the alternate screen, cursor visibility, mouse reporting in SGR mode, bracketed paste and the keyboard enhancement flags. That way the choice doesn't depend on Chorale producing those sequences yet. If a library tracks modes only through callbacks, the harness keeps its own record from them.
+
+The harness uses `github.com/charmbracelet/x/vt` at v0.1.0. It tracks the screen, the cursor position, the alternate screen, mouse reporting, SGR mouse encoding, bracketed paste and focus events, and answers queries such as device attributes. It falls short in two places, and the wrapper in `internal/termtest` covers both:
+
+1. It keeps cursor visibility separately for the main and alternate screens. Real terminals keep it once for the whole terminal, so a program that hides the cursor on the alternate screen and quits leaves it hidden. The wrapper follows DEC mode 25 itself, so that bug is caught.
+2. It ignores the Kitty keyboard protocol and xterm's modifyOtherKeys. The wrapper parses those sequences itself.
+
+`vt10x` was not needed. It has had no release since 2022, and it doesn't track these modes either.
 
 ### Detecting motion
 
@@ -95,7 +100,7 @@ A scenario that can only be checked by hand carries this line in its spec, with 
 - **Checked by hand:** <reason>
 ```
 
-The check lists those scenarios and doesn't fail on them. It prints every uncovered scenario and exits non-zero if there are any.
+The check lists those scenarios and doesn't fail on them. It also fails when two scenarios share a name within the main specs or within one change, because one passing test would cover both. A change may repeat scenarios from the main specs, because a modified requirement is restated in full. It prints every problem and exits non-zero if there are any.
 
 ### OpenSpec in the gate
 
@@ -121,6 +126,12 @@ The workflow in `.github/workflows/check.yml` is set up as follows:
 6. The job names are set explicitly to `check (macos)` and `check (linux)`, because the `harden-repository` change makes them required checks.
 
 Bypassing a ruleset skips every rule in it. So `harden-repository` adds the required checks in a second ruleset that nobody can bypass. Until then, Cami confirms both jobs are green before she merges.
+
+### Code style
+
+`docs/style.md` is the code style for every agent, and `AGENTS.md` points to it. Its first rule is that code explains itself through names, small functions and types, while the reasons live in specs, design documents and `AGENTS.md`. A comment is kept only for what the code can't say. The guide builds on existing guides rather than starting from nothing, and where a rule can be checked by a linter, golangci-lint checks it.
+
+`actionlint` checks the workflow files as part of `make lint`. It is a Go tool pinned in `go.mod`, so the version is the same everywhere with no separate check. It understands GitHub Actions, so it catches invalid permissions, misspelt matrix and step references, and malformed values, which a general YAML linter would miss. It runs `shellcheck` on `run` steps where `shellcheck` is installed. It can't check the inputs of actions pinned by commit hash, so a misspelt input to a pinned action is only caught when the workflow runs.
 
 ### Archiving
 

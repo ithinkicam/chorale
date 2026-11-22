@@ -11,7 +11,7 @@ Chorale is a voice-first terminal workbench on macOS for running coding agents s
 Chorale uses OpenSpec for spec-driven development. Behaviour is defined in specs before it is built, and no code is written without an OpenSpec change behind it.
 
 1. **Propose.** Every piece of work starts as a change in `openspec/changes/<change-name>/`, with a proposal, delta specs, a design where needed, and tasks. Use the `openspec-propose` skill.
-2. **Review.** Before Cami reviews, two other reviews run. An outside agent from a different vendor reviews the change, for example `agy --mode plan -p "<prompt>"` or `codex exec`. With `agy`, `-p` must come last, because it takes the next word as its prompt. Headless `agy` can't ask for permission to read files, so put the change's files into the prompt. An adversarial reviewer from the same session reviews it too. Their findings go to Cami together, each with the proposing agent's view. Nothing a reviewer suggests goes into the change without her decision. Cami then reviews the proposal and specs, and no code is written before she approves them.
+2. **Review.** Before Cami reviews, two other reviews run. An outside agent from a different vendor reviews the change, for example `agy --mode plan --effort xhigh -p "<prompt>"` or `codex exec`. With `agy`, `-p` must come last, because it takes the next word as its prompt. Ask the reviewer to mark anything it couldn't verify as unconfirmed, and check its claims before passing them on. Headless `agy` can't ask for permission to read files, so put the change's files into the prompt. An adversarial reviewer from the same session reviews it too. Their findings go to Cami together, each with the proposing agent's view. Nothing a reviewer suggests goes into the change without her decision. Cami then reviews the proposal and specs, and no code is written before she approves them.
 3. **Apply.** Work on a branch named after the change, and work through `tasks.md` in order with the `openspec-apply-change` skill, ticking each task as it is done. The work reaches `main` through a pull request.
 4. **Archive.** When every task is done and `make check` passes, archive the change with the `openspec-archive-change` skill. This merges its specs into `openspec/specs/`, which describe how Chorale behaves now.
 
@@ -30,6 +30,10 @@ openspec validate --strict --all
 Every behaviour is test first, including the interface. Write the test, run it, and watch it fail for the reason you expect, before writing the code that makes it pass. The test layers, golden files and the scenario check are described in `docs/testing.md`.
 
 Never skip, disable or loosen a test to get work through. Never regenerate a golden file just to make a test pass. When a golden file changes on purpose, say in the commit what changed on screen and why.
+
+## Code style
+
+Follow `docs/style.md`. Code explains itself, and the reasons live in the specs, the designs and commit messages, not in comments. Doc comments are short, because they become published documentation.
 
 ## Accessibility rules
 
@@ -57,11 +61,11 @@ A task is done only when these pass:
 make check
 ```
 
-Until milestone 0 lands, `make check` doesn't exist yet. Use `openspec validate --strict --all` for spec work. Always pass `--all` or an item name: without one, OpenSpec exits with an error when there is no terminal, and asks a question when there is one.
+For spec work on its own, `openspec validate --strict --all` is quicker. Always pass `--all` or an item name: without one, OpenSpec exits with an error when there is no terminal, and asks a question when there is one.
 
 ## Writing
 
-Cami often listens to documents through text-to-speech. Write full sentences in short paragraphs. Put code, paths and commands in backticks. Avoid tables, arrows and symbol chains in prose. Use absolute dates such as 2026-11-22, never "today" or "recently".
+Cami often listens to documents through text-to-speech. Write full sentences in short paragraphs. Put code, paths and commands in backticks. Avoid tables, arrows and symbol chains in prose. Never stamp a document with a date, such as "As of" lines or when something was decided. Git history holds that. When a fact about the outside world needs a date, such as a release date, write it as an absolute date, never "today" or "recently".
 
 ## Things never to do
 

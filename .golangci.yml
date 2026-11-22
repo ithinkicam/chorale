@@ -1,0 +1,56 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  default: standard
+  enable:
+    - bodyclose
+    - dupword
+    - errorlint
+    - gocheckcompilerdirectives
+    - gocritic
+    - godot
+    - godox
+    - gosec
+    - misspell
+    - nolintlint
+    - revive
+    - unconvert
+    - unparam
+  settings:
+    dupword:
+      comments-only: true
+    gocritic:
+      enabled-checks:
+        - commentedOutCode
+        - commentedOutImport
+        - docStub
+        - whyNoLint
+    godot:
+      scope: declarations
+      capital: true
+    misspell:
+      locale: UK
+      # NO_COLOR and Go's own APIs, such as color.Color, are spelt the US way.
+      ignore-rules:
+        - color
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+    revive:
+      # Listing any rule turns revive's defaults off unless this is set.
+      enable-default-rules: true
+      rules:
+        - name: exported
+        - name: comment-spacings
+  exclusions:
+    rules:
+      - path: (_test\.go|internal/termtest/)
+        linters:
+          - gosec
+
+formatters:
+  enable:
+    - gofmt

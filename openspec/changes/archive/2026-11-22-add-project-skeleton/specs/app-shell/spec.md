@@ -61,7 +61,7 @@ Chorale SHALL respect the `NO_COLOR` environment variable by sending no colour c
 
 ### Requirement: No motion
 
-Chorale SHALL NOT write anything to the terminal unless something has happened, such as input, a resize or new data. It SHALL draw the correct screen for the window's size from the start, without first showing a different one.
+Chorale SHALL NOT write anything to the terminal unless something has happened, such as input, a resize or new data. It SHALL draw the correct screen for the window's size from the start, without first showing a different one. The cursor SHALL NOT blink, and Chorale SHALL put the cursor style back to the terminal's default when it exits.
 
 #### Scenario: Idle screen stays still
 
@@ -69,6 +69,13 @@ Chorale SHALL NOT write anything to the terminal unless something has happened, 
 - **AND** Chorale is showing the empty session list and has written nothing for half a second
 - **WHEN** two seconds pass with no input and no new data
 - **THEN** Chorale writes zero bytes to the terminal
+
+#### Scenario: Cursor does not blink
+
+- **GIVEN** a terminal 60 columns wide and 20 rows tall, in the default theme, with colour on
+- **WHEN** Chorale starts with no sessions and has finished drawing
+- **THEN** the cursor style Chorale has set is a steady one, not a blinking one
+- **AND** after `q` is pressed, the cursor style is back to the terminal's default
 
 #### Scenario: Startup draws the session list directly
 
@@ -119,7 +126,7 @@ Chorale SHALL quit when `q` is pressed on the session list or on the window-too-
 
 ### Requirement: Window too small
 
-When the window is narrower than 60 columns or shorter than 20 rows, Chorale SHALL replace the screen with a short message saying the size it needs, wrapped to the window width, followed by "q quit". It SHALL switch between this message and the normal screen whenever a resize crosses that size.
+When the window is narrower than 60 columns or shorter than 20 rows, Chorale SHALL replace the screen with a short message saying the size it needs, wrapped to the window width, followed by "q quit" when there is room for it. The message comes first: when the window is too short for both, "q quit" is left out. Chorale SHALL switch between this message and the normal screen whenever a resize crosses that size.
 
 #### Scenario: Started at 40 columns
 
@@ -144,6 +151,13 @@ When the window is narrower than 60 columns or shorter than 20 rows, Chorale SHA
 - **THEN** no line is wider than 20 columns
 - **AND** the screen's lines, joined with single spaces, contain "Chorale needs at least 60 by 20."
 - **AND** the screen shows "q quit"
+
+#### Scenario: Message comes first in a very short window
+
+- **GIVEN** a terminal 20 columns wide and 2 rows tall, in the default theme, with colour on
+- **WHEN** Chorale starts
+- **THEN** the screen's lines, joined with single spaces, contain "Chorale needs at least 60 by 20."
+- **AND** no line is wider than 20 columns
 
 #### Scenario: Too-small message with colour off
 
