@@ -1,0 +1,65 @@
+# Approves and auto-merges Dependabot's patch and minor updates once every
+# required check passes. Majors, unknown update types and the dependencies
+# named in HELD_BACK wait for Cami. The token lives only in the merge job,
+# which runs no actions, so no third-party code shares a runner with it.
+# See docs/repository.md.
+name: dependabot-auto-merge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  decide:
+    name: decide
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      merge: ${{ steps.policy.outputs.merge }}
+    steps:
+      - id: metadata
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+
+      - id: policy
+        name: Apply the auto-merge policy
+        env:
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
+          DEPENDENCIES: ${{ steps.metadata.outputs.dependency-names }}
+          HELD_BACK: >-
+            github.com/charmbracelet/x/exp/teatest/v2
+            github.com/charmbracelet/x/exp/golden
+            dependabot/fetch-metadata
+        run: |
+          merge=false
+          case "$UPDATE_TYPE" in
+            version-update:semver-patch|version-update:semver-minor) merge=true ;;
+          esac
+          if [[ -z "$DEPENDENCIES" ]]; then merge=false; fi
+          IFS=', ' read -r -a names <<< "$DEPENDENCIES"
+          for name in "${names[@]}"; do
+            for held in $HELD_BACK; do
+              if [[ "$name" == "$held" ]]; then merge=false; fi
+            done
+          done
+          echo "Update type '$UPDATE_TYPE', dependencies '$DEPENDENCIES': merge=$merge"
+          echo "merge=$merge" >> "$GITHUB_OUTPUT"
+
+  merge:
+    name: merge
+    needs: decide
+    if: needs.decide.outputs.merge == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.DEPENDABOT_AUTOMERGE_TOKEN }}
+      PR_URL: ${{ github.event.pull_request.html_url }}
+    steps:
+      - name: Approve
+        run: gh pr review --approve "$PR_URL"
+
+      - name: Turn on auto-merge
+        run: gh pr merge --auto --squash "$PR_URL"
