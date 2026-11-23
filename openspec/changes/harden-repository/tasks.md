@@ -29,7 +29,7 @@ This change has no specs, so no task maps to a scenario. Each new local check is
 - [x] 4.1 Write `.github/rulesets/protect-main.json` with the six fields named in `design.md`, from the live "Protect main". Verify it equals the output of `gh api repos/ithinkicam/chorale/rulesets/27852514` passed through the same `jq` filter
 - [x] 4.2 Write `.github/rulesets/required-checks.json` as described under "The second ruleset holds the required checks" in `design.md`. Once this change's pull request has run all three checks once, show Cami the command that creates it, and with her go-ahead run it. Verify the live ruleset, through the same `jq` filter, equals the file, and that `gh api repos/ithinkicam/chorale/rules/branches/main` includes its required status checks
 - [x] 4.3 Verify `gh pr checks --required` on this change's pull request lists exactly `check (macos)`, `check (linux)` and `dependency-review`
-- [ ] 4.4 On a throwaway branch named `required-checks-canary`, made from this branch, commit a change that breaks one golden file, and open it as a pull request, marked ready for review. Verify both `check` jobs fail, and that GitHub's `viewerCanMergeAsAdmin` is false for it and true for this change's pull request once that is green. Never try to merge the canary. Close it and give Cami the command to delete the branch
+- [x] 4.4 On a throwaway branch named `required-checks-canary`, made from this branch, commit a change that breaks one golden file, and open it as a pull request, marked ready for review. Verify both `check` jobs fail, and that GitHub's merge menu, on the desktop site, offers Cami "Bypass requirements" on this change's pull request once that is green, and offers no bypass on the canary. Never try to merge the canary. Close it and give Cami the command to delete the branch
 - [x] 4.5 On a throwaway branch named `dependency-review-canary`, made from this branch, add a package with a known advisory to `go.mod`, and open it as a draft pull request. Verify the `dependency-review` job fails and names the advisory. Close it and give Cami the command to delete the branch
 
 ## 5. Community files and documents
@@ -37,7 +37,7 @@ This change has no specs, so no task maps to a scenario. Each new local check is
 - [x] 5.1 Add `.github/CODEOWNERS`, `SECURITY.md` and `CONTRIBUTING.md` as described under "Community files" in `design.md`. Verify the security policy link opens the private reporting page. GitHub's community profile reads only `main`, so checking it lists all three is in the follow-ups
 - [x] 5.2 Write `docs/repository.md` as described under "Documents" in `design.md`, with every setting it names checked against what `gh api` reports. Verify each command in it runs as written, except the ones that turn a ruleset off, which are checked for correct syntax only
 - [x] 5.3 Update the pull request rules in `AGENTS.md`, `docs/getting-started.md` and `README.md` as described under "Documents" in `design.md`. Verify every path they name exists
-- [ ] 5.4 Update `STATE.md` with what this change built and with the follow-ups below, and verify `make check` and `openspec validate --strict --all` pass
+- [x] 5.4 Update `STATE.md` with what this change built and with the follow-ups below, and verify `make check` and `openspec validate --strict --all` pass
 
 ## Workflow follow-up
 
