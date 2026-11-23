@@ -22,11 +22,11 @@ This change has no specs, so no task maps to a scenario. Each new local check is
 - [ ] 3.2 Add `.github/workflows/dependabot-auto-merge.yml` with the `decide` and `merge` jobs described under "Auto-merge with a token kept as a Dependabot secret" in `design.md`. Verify `make lint` passes, that `merge` uses no actions, and that both jobs are skipped, not failed, on this change's pull request, because the author isn't Dependabot
 - [ ] 3.3 With Cami's go-ahead, walk her through creating the fine-grained token as `design.md` describes it, and store it as the Dependabot secret `DEPENDABOT_AUTOMERGE_TOKEN` with `gh secret set --app dependabot`. Verify `gh secret list --app dependabot` lists it. The token itself never appears in the repo, a log or this conversation
 - [ ] 3.4 With Cami's go-ahead, put a reminder on her calendar a week before the token expires, saying where `docs/repository.md` describes renewing it. Verify the event exists on that date
-- [ ] 3.5 Verify that `gh api repos/ithinkicam/chorale/actions/permissions/workflow` still reports `can_approve_pull_request_reviews` as false
+- [x] 3.5 Verify that `gh api repos/ithinkicam/chorale/actions/permissions/workflow` still reports `can_approve_pull_request_reviews` as false
 
 ## 4. Required checks
 
-- [ ] 4.1 Write `.github/rulesets/protect-main.json` with the six fields named in `design.md`, from the live "Protect main". Verify it equals the output of `gh api repos/ithinkicam/chorale/rulesets/27852514` passed through the same `jq` filter
+- [x] 4.1 Write `.github/rulesets/protect-main.json` with the six fields named in `design.md`, from the live "Protect main". Verify it equals the output of `gh api repos/ithinkicam/chorale/rulesets/27852514` passed through the same `jq` filter
 - [ ] 4.2 Write `.github/rulesets/required-checks.json` as described under "The second ruleset holds the required checks" in `design.md`. Once this change's pull request has run all three checks once, show Cami the command that creates it, and with her go-ahead run it. Verify the live ruleset, through the same `jq` filter, equals the file, and that `gh api repos/ithinkicam/chorale/rules/branches/main` includes its required status checks
 - [ ] 4.3 Verify `gh pr checks --required` on this change's pull request lists exactly `check (macos)`, `check (linux)` and `dependency-review`
 - [ ] 4.4 On a throwaway branch named `required-checks-canary`, made from this branch, commit a change that breaks one golden file, and open it as a pull request, marked ready for review. Verify both `check` jobs fail, and that GitHub's `viewerCanMergeAsAdmin` is false for it and true for this change's pull request once that is green. Never try to merge the canary. Close it and give Cami the command to delete the branch
@@ -35,8 +35,8 @@ This change has no specs, so no task maps to a scenario. Each new local check is
 ## 5. Community files and documents
 
 - [ ] 5.1 Add `.github/CODEOWNERS`, `SECURITY.md` and `CONTRIBUTING.md` as described under "Community files" in `design.md`. Verify GitHub's community profile for the repo lists all three, and that the security policy link opens the private reporting page
-- [ ] 5.2 Write `docs/repository.md` as described under "Documents" in `design.md`, with every setting it names checked against what `gh api` reports. Verify each command in it runs as written, except the ones that turn a ruleset off, which are checked for correct syntax only
-- [ ] 5.3 Update the pull request rules in `AGENTS.md`, `docs/getting-started.md` and `README.md` as described under "Documents" in `design.md`. Verify every path they name exists
+- [x] 5.2 Write `docs/repository.md` as described under "Documents" in `design.md`, with every setting it names checked against what `gh api` reports. Verify each command in it runs as written, except the ones that turn a ruleset off, which are checked for correct syntax only
+- [x] 5.3 Update the pull request rules in `AGENTS.md`, `docs/getting-started.md` and `README.md` as described under "Documents" in `design.md`. Verify every path they name exists
 - [ ] 5.4 Update `STATE.md` with what this change built and with the follow-ups below, and verify `make check` and `openspec validate --strict --all` pass
 
 ## Workflow follow-up
