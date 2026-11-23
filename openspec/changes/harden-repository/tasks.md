@@ -12,15 +12,15 @@ This change has no specs, so no task maps to a scenario. Each new local check is
 
 ## 2. Workflows for scanning
 
-- [ ] 2.1 Add `.github/workflows/codeql.yml` as described under "CodeQL uses a workflow file" in `design.md`, with Go built by `go build ./...`. Verify `make lint` passes, and that both matrix jobs finish and upload results on this change's pull request
-- [ ] 2.2 Add `.github/workflows/dependency-review.yml` with the job named `dependency-review`, as described in `design.md`. Verify `make lint` passes, and that the job passes on this change's pull request
+- [x] 2.1 Add `.github/workflows/codeql.yml` as described under "CodeQL uses a workflow file" in `design.md`, with Go built by `go build ./...`. Verify `make lint` passes, and that both matrix jobs finish and upload results on this change's pull request
+- [x] 2.2 Add `.github/workflows/dependency-review.yml` with the job named `dependency-review`, as described in `design.md`. Verify `make lint` passes, and that the job passes on this change's pull request
 - [ ] 2.3 Add `.github/workflows/scorecard.yml` as described in `design.md`, checked against the publishing limits in the action's README at the pinned version. Verify `make lint` passes, and start it once by hand on the branch to confirm it runs. Publishing from `main` is checked in the follow-ups
 
 ## 3. Dependabot and auto-merge
 
 - [ ] 3.1 Add `.github/dependabot.yml` for `gomod`, `github-actions` and `npm`, weekly, with patch and minor grouped per ecosystem, a seven-day cooldown, and the three named dependencies left out of the groups. Verify the pull request shows no Dependabot configuration error
-- [ ] 3.2 Add `.github/workflows/dependabot-auto-merge.yml` with the `decide` and `merge` jobs described under "Auto-merge with a token kept as a Dependabot secret" in `design.md`. Verify `make lint` passes, that `merge` uses no actions, and that both jobs are skipped, not failed, on this change's pull request, because the author isn't Dependabot
-- [ ] 3.3 With Cami's go-ahead, walk her through creating the fine-grained token as `design.md` describes it, and store it as the Dependabot secret `DEPENDABOT_AUTOMERGE_TOKEN` with `gh secret set --app dependabot`. Verify `gh secret list --app dependabot` lists it. The token itself never appears in the repo, a log or this conversation
+- [x] 3.2 Add `.github/workflows/dependabot-auto-merge.yml` with the `decide` and `merge` jobs described under "Auto-merge with a token kept as a Dependabot secret" in `design.md`. Verify `make lint` passes, that `merge` uses no actions, and that both jobs are skipped, not failed, on this change's pull request, because the author isn't Dependabot
+- [x] 3.3 With Cami's go-ahead, walk her through creating the fine-grained token as `design.md` describes it, and store it as the Dependabot secret `DEPENDABOT_AUTOMERGE_TOKEN` with `gh secret set --app dependabot`. Verify `gh secret list --app dependabot` lists it. The token itself never appears in the repo, a log or this conversation
 - [ ] 3.4 With Cami's go-ahead, put a reminder on her calendar a week before the token expires, saying where `docs/repository.md` describes renewing it. Verify the event exists on that date
 - [x] 3.5 Verify that `gh api repos/ithinkicam/chorale/actions/permissions/workflow` still reports `can_approve_pull_request_reviews` as false
 

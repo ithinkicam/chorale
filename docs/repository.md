@@ -87,7 +87,7 @@ The `merge` job uses a fine-grained personal access token on Cami's account, sto
 The token has these settings:
 
 1. Resource owner: Cami's account. Repository access: only `ithinkicam/chorale`.
-2. Permissions: Contents, read and write. Pull requests, read and write. Nothing else.
+2. Permissions: Contents, read and write. Pull requests, read and write. Metadata, read-only, which GitHub always adds. Nothing else.
 3. Expiry: one year. A reminder on Cami's calendar comes a week before.
 
 A personal token is used, rather than the workflow's own, for three reasons. The workflow's token could only approve with the setting described under "Merging" turned on. An approval from `github-actions` might not count toward "Protect main", while Cami's does, because she isn't the pull request's author. And a merge enabled by the workflow's token doesn't start the workflows that run on pushes to `main`.
@@ -98,7 +98,7 @@ To renew it, Cami creates a new token with the same settings at https://github.c
 gh secret set DEPENDABOT_AUTOMERGE_TOKEN --app dependabot --repo ithinkicam/chorale
 ```
 
-`gh` asks for the token, so it never lands in the shell history. Then she deletes the old token on GitHub and moves the calendar reminder on a year.
+`gh` asks for the token, so it never lands in the shell history. From a phone, she can store it on the website instead, at https://github.com/ithinkicam/chorale/settings/secrets/dependabot, by updating `DEPENDABOT_AUTOMERGE_TOKEN`. Then she deletes the old token on GitHub and moves the calendar reminder on a year.
 
 If the token lapses, the `merge` job fails, and Dependabot's pull requests wait until it is renewed. Nothing else breaks. If the token leaks, Cami revokes it on GitHub straight away.
 
