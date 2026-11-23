@@ -15,7 +15,7 @@ UNIT_PKGS := $(shell go list ./... | grep -v '/e2e$$')
 
 GOTESTSUM := go tool gotestsum --format testname
 
-.PHONY: go-version build test e2e lint golden scenarios specs check
+.PHONY: go-version build test e2e lint vulncheck golden scenarios specs check
 
 go-version:
 	@go version
@@ -47,6 +47,12 @@ lint:
 	go tool actionlint
 	@./scripts/check-actionlint-fixture.sh
 
+# Known vulnerabilities in code Chorale calls. Needs the network, because it
+# downloads the Go vulnerability database. The fixture proves it still finds one.
+vulncheck:
+	@./scripts/check-vulncheck-fixture.sh
+	go tool govulncheck ./...
+
 # Rewrites golden files. Use on purpose only, and read every change in the diff.
 golden:
 	@./scripts/update-golden.sh
@@ -64,4 +70,4 @@ node_modules/.package-lock.json: package-lock.json
 specs: node_modules/.package-lock.json
 	npx --no-install openspec validate --strict --all
 
-check: lint test e2e scenarios specs
+check: lint vulncheck test e2e scenarios specs
