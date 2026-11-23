@@ -4,23 +4,20 @@
 
 Milestone 0 is built and archived, in pull request 2. That covers the Go project, test layers 1 to 4, the empty session list and the too-small screen, `scripts/check-scenarios`, `make check`, continuous integration on macOS and Linux, and the code style guide in `docs/style.md`. The behaviour it built is in `openspec/specs/app-shell/spec.md`.
 
-The `harden-repository` change is built, archived, and in pull request 4, waiting for Cami to merge it. It added CodeQL, `govulncheck` in `make check`, dependency review, OpenSSF Scorecard, Dependabot with auto-merge for patch and minor updates, the "Required checks" ruleset, and the community files. Every setting, and the reasons for it, is in `docs/repository.md`.
+The `harden-repository` change is merged, in pull request 4. It added CodeQL, `govulncheck` in `make check`, dependency review, OpenSSF Scorecard, Dependabot with auto-merge for patch and minor updates, the "Required checks" ruleset, and the community files. Every setting, and the reasons for it, is in `docs/repository.md`. CodeQL, Scorecard and `check` run on `main`, and Dependabot reads its configuration.
 
 ## Next steps
 
-1. Cami merges pull request 4 with her bypass. On her phone, the bypass shows only on the desktop site, in the menu beside the merge button, as "Bypass requirements".
+1. Cami decides on Dependabot's pull request 7, which moves the held-back `github.com/charmbracelet/x/exp/golden` from a pseudo-version to v0.1.0. Auto-merge correctly left it open.
 2. Work through the follow-ups below.
 3. Propose milestone 1: one Claude session, with the keyboard editor.
 
-## Follow-ups after harden-repository merges
+## Follow-ups from harden-repository
 
 Remove each one from this list once it is done.
 
-1. Check that CodeQL and Scorecard run on `main`, and that their results appear on the security page. Start Scorecard once by hand with `gh workflow run scorecard.yml` and check that it publishes.
-2. Check that the Insights page for Dependabot shows no configuration error for `.github/dependabot.yml`.
-3. Check that `gh api repos/ithinkicam/chorale/community/profile` lists `CODEOWNERS`, `SECURITY.md` and `CONTRIBUTING.md`.
-4. Check that the first Dependabot patch or minor pull request is approved from Cami's account, merges on its own once its checks pass, and that the merge starts `check.yml` on `main`. If the extra approval rule for unattributed changes holds it, bring that to Cami.
-5. When the first major update, or an update to one of the three held-back dependencies, arrives, check that it stays open, and bring Cami the summary `docs/repository.md` describes.
+1. Check that the first Dependabot patch or minor pull request is approved from Cami's account, merges on its own once its checks pass, and that the merge starts `check.yml` on `main`. If the extra approval rule for unattributed changes holds it, bring that to Cami.
+2. Dependabot doesn't update indirect Go modules, and `govulncheck` reports only code Chorale calls. When Scorecard's Vulnerabilities check names an advisory in an indirect module, raise that module by hand.
 
 ## Open decisions
 
