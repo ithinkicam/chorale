@@ -8,7 +8,7 @@ This change has no specs, so no task maps to a scenario. Each new local check is
 - [x] 1.2 Add `govulncheck` as a Go tool with `go get -tool golang.org/x/vuln/cmd/govulncheck`, pinned in `go.mod`. Verify `go tool govulncheck -version` runs, and that `go mod tidy` leaves `go.mod` unchanged
 - [x] 1.3 Build the fixture in `testdata/vulncheck/`: a module with no dependencies that calls `fmt.Println`, and a local database in the Go vulnerability database layout whose one entry marks `fmt.Println` in `stdlib` as vulnerable in every version. Verify the script from 1.1 now passes. Then change the entry to a `fmt` function the fixture doesn't call, confirm the script fails, and restore it
 - [x] 1.4 Add a `vulncheck` target to the `Makefile` that runs the fixture script and then `go tool govulncheck ./...`, and add it to `check` after `lint`. Verify `make vulncheck` passes on the repo, and that `make check` passes from a shell with `CI=1` and no terminal
-- [ ] 1.5 Update `docs/testing.md` so its commands and its list of what `make check` runs include `make vulncheck`, and say that `make check` needs the network. Add the same to the gates section of `AGENTS.md`. Verify each command named runs as written
+- [x] 1.5 Update `docs/testing.md` so its commands and its list of what `make check` runs include `make vulncheck`, and say that `make check` needs the network. Add the same to the gates section of `AGENTS.md`. Verify each command named runs as written
 
 ## 2. Workflows for scanning
 

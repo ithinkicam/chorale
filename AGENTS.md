@@ -61,6 +61,8 @@ A task is done only when these pass:
 make check
 ```
 
+`make check` needs the network, because `make vulncheck` downloads the Go vulnerability database.
+
 For spec work on its own, `openspec validate --strict --all` is quicker. Always pass `--all` or an item name: without one, OpenSpec exits with an error when there is no terminal, and asks a question when there is one.
 
 ## Writing

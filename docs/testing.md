@@ -89,6 +89,7 @@ make build      # build bin/chorale, stamped with the git version
 make test       # unit, snapshot and interaction tests
 make e2e        # terminal-level tests
 make lint       # golangci-lint version check, gofmt, go vet, golangci-lint and actionlint
+make vulncheck  # govulncheck on its fixture, then on Chorale
 make golden     # rewrite golden files, on purpose only
 make scenarios  # make test and make e2e, then the scenario check
 make specs      # openspec validate --strict --all, with OpenSpec from package-lock.json
@@ -96,5 +97,7 @@ make check      # all of the above except build and golden
 ```
 
 `make` pins Go to the release named on the `toolchain` line of `go.mod`. `make lint` fails unless golangci-lint is the version the `Makefile` names. OpenSpec and its dependencies come from `package-lock.json`, through `npm ci`.
+
+`make vulncheck` runs `govulncheck`, which reports known vulnerabilities only in code Chorale actually calls. It first runs on a fixture in `testdata/vulncheck/`, whose local database marks `fmt.Println` as vulnerable, to prove it still finds one. It downloads the Go vulnerability database, so `make check` needs the network. Offline, `make lint test e2e scenarios specs` runs everything else.
 
 Continuous integration runs `make check` on macOS and Linux, on every push to `main` and on every pull request. The workflow is `.github/workflows/check.yml`.
