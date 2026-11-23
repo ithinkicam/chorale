@@ -45,6 +45,6 @@ New files: `.github/workflows/codeql.yml`, `dependency-review.yml`, `scorecard.y
 
 Changed files: `go.mod` and `go.sum` gain `govulncheck` as a tool, the `Makefile` gains a `vulncheck` target inside `check`, and `AGENTS.md`, `README.md`, `docs/testing.md`, `docs/getting-started.md` and `STATE.md` are updated.
 
-GitHub settings and accounts: one new ruleset, a fine-grained token that Cami creates, a Dependabot secret holding it, and a calendar reminder to renew the token. Each is applied only with Cami's go-ahead at that step. The setting that lets GitHub Actions approve pull requests stays off.
+GitHub settings and accounts: one new ruleset, a fine-grained token that Cami creates, and a Dependabot secret holding it. Each is applied only with Cami's go-ahead at that step. The setting that lets GitHub Actions approve pull requests stays off.
 
 `make check` now needs a network connection, because `govulncheck` downloads the Go vulnerability database.

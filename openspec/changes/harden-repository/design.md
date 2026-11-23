@@ -80,7 +80,7 @@ It has two jobs, so the token never shares a runner with a third-party action.
 
 fetch-metadata calls an update between two Go pseudo-versions a patch, because it compares only the first two parts of the version. That is why the two experimental Charm pins are excluded by name. `dependabot/fetch-metadata` is excluded too, because a pull request that updates it runs the new version in its own `decide` job. The two-job split means that new version never sees the token.
 
-The token is a fine-grained personal access token that Cami creates on her account. It is limited to this one repo, with read and write access to contents and to pull requests and nothing else, and it expires after a year. A calendar reminder a week before it expires asks her to renew it. When it lapses, the `merge` job fails and Dependabot's pull requests wait. Nothing breaks, and `docs/repository.md` says how to renew it.
+The token is a fine-grained personal access token that Cami creates on her account. It is limited to this one repo, with read and write access to contents and to pull requests and nothing else. It never expires, by Cami's decision, so there is no renewal chore. If it is revoked, the `merge` job fails and Dependabot's pull requests wait. Nothing breaks, and `docs/repository.md` says how to replace it.
 
 A token kept as a Dependabot secret solves three problems that the workflow token has:
 
@@ -116,7 +116,7 @@ Both rulesets are kept in `.github/rulesets/` as the payload GitHub accepts when
 
 ### Documents
 
-`docs/repository.md` is new. It describes every repository setting: the security features, both rulesets and why there are two, merge settings, Dependabot's schedule, groups and cooldown, the auto-merge policy and its token, how to renew the token, how major updates are handled, and the way out when a required check is stuck. It says what to do with a CodeQL or Scorecard finding.
+`docs/repository.md` is new. It describes every repository setting: the security features, both rulesets and why there are two, merge settings, Dependabot's schedule, groups and cooldown, the auto-merge policy and its token, how to replace the token, how major updates are handled, and the way out when a required check is stuck. It says what to do with a CodeQL or Scorecard finding.
 
 `AGENTS.md` changes in the pull request rules and the gates, as the proposal says. `docs/testing.md` gains `make vulncheck` in its commands and in what `make check` runs, and says that `make check` needs the network. `docs/getting-started.md` says `govulncheck` is a Go tool beside the others, and points to `package.json` for the OpenSpec version instead of naming one, so a Dependabot update can't leave it stale. `README.md` points to `docs/repository.md`.
 
@@ -126,7 +126,7 @@ Both rulesets are kept in `.github/rulesets/` as the payload GitHub accepts when
 
 **Auto-merge can't be seen working until this change has merged.** Dependabot opens pull requests only from the configuration on `main`. That check is listed as a follow-up after merging, and `STATE.md` records it until it is done.
 
-**The token is a long-lived credential.** It is limited to one repo and two permissions, it reaches only runs Dependabot starts, it never shares a runner with a third-party action, and it expires within a year. If it leaks, Cami revokes it on GitHub, and Dependabot's pull requests wait until a new one is stored.
+**The token is a long-lived credential.** It is limited to one repo and two permissions, it reaches only runs Dependabot starts, and it never shares a runner with a third-party action. It has no expiry, so a leaked copy works until it is revoked. If it leaks, Cami revokes it on GitHub, and Dependabot's pull requests wait until a new one is stored.
 
 **A canary for the required-checks ruleset could merge broken code.** The canary pull request is never merged, and nobody tries `gh pr merge` on it. The ruleset is proved by reading what GitHub reports, as the test strategy says.
 
@@ -141,7 +141,7 @@ Both rulesets are kept in `.github/rulesets/` as the payload GitHub accepts when
 The order matters, because a required check that never reports would block every pull request.
 
 1. The new workflows, configuration and documents land on the `harden-repository` branch, and its pull request runs them all.
-2. With Cami's go-ahead, she creates the token, and it is stored as the Dependabot secret, with the renewal reminder on her calendar.
+2. With Cami's go-ahead, she creates the token, and it is stored as the Dependabot secret.
 3. With the pull request open, its three checks having run once, and Cami's go-ahead, the "Required checks" ruleset is created. The change's own pull request is the first to meet it.
 4. Canary pull requests from the branch prove that dependency review and the ruleset block what they should. Then they are closed.
 5. Cami merges the change. Dependabot reads its configuration from `main` and opens its first pull requests.
