@@ -8,9 +8,8 @@ The `harden-repository` change is merged, in pull request 4. It added CodeQL, `g
 
 ## Next steps
 
-1. Cami decides on Dependabot's pull request 7, which moves the held-back `github.com/charmbracelet/x/exp/golden` from a pseudo-version to v0.1.0. Auto-merge correctly left it open.
-2. Work through the follow-ups below.
-3. Propose milestone 1: one Claude session, with the keyboard editor.
+1. Work through the follow-ups below.
+2. Propose milestone 1: one Claude session, with the keyboard editor.
 
 ## Follow-ups from harden-repository
 
