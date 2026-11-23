@@ -1,0 +1,40 @@
+# Weekly version updates. Patch and minor updates are grouped per
+# ecosystem and auto-merge once checks pass, except the dependencies left
+# out of the groups below, which wait for Cami. See docs/repository.md.
+version: 2
+
+updates:
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      go-minor-and-patch:
+        update-types: [minor, patch]
+        exclude-patterns:
+          - github.com/charmbracelet/x/exp/teatest/v2
+          - github.com/charmbracelet/x/exp/golden
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions-minor-and-patch:
+        update-types: [minor, patch]
+        exclude-patterns:
+          - dependabot/fetch-metadata
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      npm-minor-and-patch:
+        update-types: [minor, patch]

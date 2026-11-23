@@ -51,7 +51,7 @@ The choir theme is for characters and visuals only. Keys, menus, status lines, d
 
 ## Pull requests
 
-`main` is protected. Every change reaches it through a pull request that needs one approval and passing checks. Agents push as Cami's GitHub account, and GitHub doesn't let a pull request's author approve it. So for our own pull requests, the adversarial reviewer posts its review as a comment, and Cami merges using her admin bypass once she's satisfied. Bypassing skips every rule in the ruleset, so until the required checks sit in a ruleset of their own, Cami confirms both continuous integration jobs are green before merging. A contributor's pull request needs Cami's approval. Never force-push, and never push to `main` directly.
+`main` is protected. Every change reaches it through a pull request that needs one approval and passing checks. Agents push as Cami's GitHub account, and GitHub doesn't let a pull request's author approve it. So for our own pull requests, the adversarial reviewer posts its review as a comment, and Cami merges using her admin bypass once she's satisfied. Her bypass skips only the approval: the required checks sit in a ruleset of their own that nobody can bypass. A contributor's pull request needs Cami's approval. Dependabot's patch and minor updates merge on their own once the checks pass. Agents never merge a major update or a held-back dependency on their own, and bring Cami a summary instead. The settings and the reasons for them are in `docs/repository.md`. Never force-push, and never push to `main` directly.
 
 ## Gates
 
@@ -60,6 +60,8 @@ A task is done only when these pass:
 ```
 make check
 ```
+
+`make check` needs the network, because `make vulncheck` downloads the Go vulnerability database.
 
 For spec work on its own, `openspec validate --strict --all` is quicker. Always pass `--all` or an item name: without one, OpenSpec exits with an error when there is no terminal, and asks a question when there is one.
 

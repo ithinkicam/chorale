@@ -29,17 +29,17 @@ golangci-lint version --short
 
 ## 3. Install the project's own tools
 
-OpenSpec comes from the repo's `package-lock.json`, so everyone gets the same version. gotestsum and actionlint are Go tools pinned in `go.mod`, and need no install step.
+OpenSpec comes from the repo's `package-lock.json`, so everyone gets the same version. gotestsum, actionlint and govulncheck are Go tools pinned in `go.mod`, and need no install step.
 
 ```
 npm ci --ignore-scripts
 npx openspec --version
 ```
 
-The OpenSpec skills that agents use call `openspec` directly, so install the same version globally too, and turn off its anonymous usage reports:
+The OpenSpec skills that agents use call `openspec` directly, so install the same version globally too, and turn off its anonymous usage reports. The version comes from `package.json`, which Dependabot keeps current:
 
 ```
-npm install -g @fission-ai/openspec@2.1.1
+npm install -g "@fission-ai/openspec@$(node -p "require('./package.json').devDependencies['@fission-ai/openspec']")"
 openspec config set telemetry.enabled false
 openspec --version
 ```
@@ -50,13 +50,13 @@ openspec --version
 make check
 ```
 
-This runs the linters, every test layer, the scenario check and OpenSpec validation. It should end with every scenario covered and validation passing.
+This runs the linters, `govulncheck`, every test layer, the scenario check and OpenSpec validation. It needs the network, because `govulncheck` downloads the Go vulnerability database. It should end with every scenario covered and validation passing.
 
 ## 5. Make a change
 
 All work starts as an OpenSpec change. Open an agent in the repo and propose one with the `openspec-propose` skill. Once it has had its reviews and you've approved it, apply it with the `openspec-apply-change` skill. In Claude Code, these are `/openspec-propose` and `/openspec-apply-change`. In Codex, use `$` instead of `/`. In Antigravity CLI, use `/`.
 
-The agent works on a branch, through `tasks.md` test first: it writes each test, shows it failing, then writes the code. It opens a pull request when it's done, because `main` only accepts pull requests. The rules it follows are in `AGENTS.md`, and the code style is in `docs/style.md`. Claude Code reads the rules through `CLAUDE.md`.
+The agent works on a branch, through `tasks.md` test first: it writes each test, shows it failing, then writes the code. It opens a pull request when it's done, because `main` only accepts pull requests. The rules it follows are in `AGENTS.md`, and the code style is in `docs/style.md`. How the repo itself is set up on GitHub, including the required checks and Dependabot, is in `docs/repository.md`. Claude Code reads the rules through `CLAUDE.md`.
 
 ## Good to know
 
