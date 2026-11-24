@@ -30,6 +30,7 @@ func (e *Editor) Move(m Movement, extend bool) {
 		e.wantColSet = false
 	}
 	e.endOfRow = false
+	e.typing = false
 
 	switch m {
 	case MoveLeft:

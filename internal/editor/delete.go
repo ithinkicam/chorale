@@ -34,12 +34,12 @@ func (e *Editor) DeleteToRowEnd() {
 
 // Clear removes the whole prompt.
 func (e *Editor) Clear() {
-	e.replace(0, len(e.gs), "")
+	e.apply(0, len(e.gs), "", false)
 }
 
 func (e *Editor) remove(start, end int) {
 	if e.HasSelection() {
 		start, end = e.Selection()
 	}
-	e.replace(start, end, "")
+	e.apply(start, end, "", false)
 }

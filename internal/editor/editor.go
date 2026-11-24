@@ -21,11 +21,14 @@ type Editor struct {
 	wantColSet bool
 	rows       []Row
 	rowsOK     bool
+
+	hist   history
+	typing bool
 }
 
 // New returns an empty editor that lays text out to width columns, measured by method.
 func New(width int, method ansi.Method) *Editor {
-	return &Editor{width: width, method: method}
+	return &Editor{width: width, method: method, hist: newHistory("")}
 }
 
 // SetWidth changes the width the text is laid out to, and how characters are measured.
@@ -61,10 +64,46 @@ func (e *Editor) Caret() int {
 	return e.caret
 }
 
-// Insert types s at the insertion point, replacing the selection if there is one.
+// Insert types s at the insertion point, replacing the selection if there is
+// one. Undo removes what was typed a word at a time.
 func (e *Editor) Insert(s string) {
 	start, end := e.Selection()
-	e.replace(start, end, s)
+	prev := ""
+	if start > 0 {
+		prev = e.gs[start-1]
+	}
+
+	var chunk strings.Builder
+	for _, g := range Graphemes(s) {
+		chunk.WriteString(g)
+		closes := isSpace(g) && !isSpace(prev)
+		prev = g
+		if !closes {
+			continue
+		}
+		e.apply(start, end, chunk.String(), true)
+		e.typing = false
+		chunk.Reset()
+		start, end = e.caret, e.caret
+	}
+	if chunk.Len() > 0 {
+		e.apply(start, end, chunk.String(), true)
+	}
+}
+
+func isSpace(g string) bool {
+	return g == "" || g == " " || g == "\n"
+}
+
+// apply swaps the characters from start to end for s as one edit in the
+// history. Typing edits join the group before them while it is still open.
+func (e *Editor) apply(start, end int, s string, typing bool) {
+	caret, anchor := e.caret, e.anchor
+	if !e.replace(start, end, s) {
+		return
+	}
+	e.record(caret, anchor, typing && e.typing)
+	e.typing = typing
 }
 
 // Selection returns the start and end of the selected characters, equal when
@@ -96,12 +135,16 @@ func (e *Editor) SelectAll() {
 	e.caret = len(e.gs)
 	e.endOfRow = false
 	e.wantColSet = false
+	e.typing = false
 }
 
 // replace swaps the characters from start to end for s, and puts the insertion
 // point after s. The characters on either side of the change are segmented
 // again together with s, so accents and joiners attach to their neighbours.
-func (e *Editor) replace(start, end int, s string) {
+func (e *Editor) replace(start, end int, s string) bool {
+	if start == end && s == "" {
+		return false
+	}
 	from := max(start-1, 0)
 	to := min(end+1, len(e.gs))
 	left := strings.Join(e.gs[from:start], "")
@@ -121,4 +164,5 @@ func (e *Editor) replace(start, end int, s string) {
 	e.endOfRow = false
 	e.wantColSet = false
 	e.rowsOK = false
+	return true
 }
