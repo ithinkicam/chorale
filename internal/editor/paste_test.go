@@ -1,6 +1,10 @@
 package editor
 
-import "testing"
+import (
+	"strings"
+	"testing"
+	"time"
+)
 
 func TestCleanPasteTurnsCarriageReturnsIntoNewLines(t *testing.T) {
 	if got, want := cleanPaste("a\r\nb\rc\nd"), "a\nb\nc\nd"; got != want {
@@ -161,5 +165,21 @@ func TestCleanPasteTreatsC1IntroducersLikeTheirEscapeForms(t *testing.T) {
 		if got := cleanPaste(tt.in); got != tt.want {
 			t.Errorf("%s: cleaned paste is %q, want %q", tt.name, got, tt.want)
 		}
+	}
+}
+
+func TestCleanPasteTakesLinearTimeForC1Strings(t *testing.T) {
+	timeOf := func(in string) time.Duration {
+		start := time.Now()
+		cleanPaste(in)
+		return time.Since(start)
+	}
+	const repeats = 20000
+	escForm := timeOf(strings.Repeat("\x1b]ab", repeats))
+	c1Form := timeOf(strings.Repeat("\u009dab", repeats))
+
+	limit := 20 * max(escForm, 2*time.Millisecond)
+	if c1Form > limit {
+		t.Errorf("cleaning %d C1 strings took %v, want at most %v, 20 times the %v the escape form took", repeats, c1Form, limit, escForm)
 	}
 }
