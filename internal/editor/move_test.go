@@ -261,3 +261,36 @@ func TestUpAfterEndOnTheFirstRowGoesToTheStartOfThePrompt(t *testing.T) {
 	assertPos(t, e, 0, 0)
 	assertCaret(t, e, 0)
 }
+
+func TestMovingByWordLeftSkipsASymbolBetweenWords(t *testing.T) {
+	e := withText("a + b", 5)
+	e.Move(MoveWordLeft, false)
+	assertCaret(t, e, 4)
+	e.Move(MoveWordLeft, false)
+	assertCaret(t, e, 0)
+}
+
+func TestMovingByWordRightSkipsSymbols(t *testing.T) {
+	e := withText("x=y|z", 0)
+	e.Move(MoveWordRight, false)
+	assertCaret(t, e, 1)
+	e.Move(MoveWordRight, false)
+	assertCaret(t, e, 3)
+	e.Move(MoveWordRight, false)
+	assertCaret(t, e, 5)
+}
+
+func TestAnArrowIsNotAWord(t *testing.T) {
+	e := withText("a → b", 5)
+	e.Move(MoveWordLeft, false)
+	e.Move(MoveWordLeft, false)
+	assertCaret(t, e, 0)
+}
+
+func TestDeleteWordBackAfterASymbolSkipsItToTheWord(t *testing.T) {
+	e := withText("a + b", 5)
+	e.DeleteWordBack()
+	assertText(t, e, "a + ")
+	e.DeleteWordBack()
+	assertText(t, e, "")
+}
