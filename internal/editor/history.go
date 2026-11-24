@@ -21,8 +21,8 @@ func newHistory(text string) history {
 	return history{snaps: []snapshot{{text: text}}, size: len(text)}
 }
 
-// HistoryLen returns how many snapshots the undo history holds.
-func (e *Editor) HistoryLen() int {
+// historyLen returns how many snapshots the undo history holds.
+func (e *Editor) historyLen() int {
 	return len(e.hist.snaps)
 }
 
@@ -65,9 +65,7 @@ func (e *Editor) restore(s snapshot) {
 	e.rowsOK = false
 }
 
-// record adds the editor's current state to the history. The state before
-// the edit keeps the insertion point and anchor it had then, so undo returns
-// to them. A joining edit replaces the latest snapshot instead.
+// record adds the current state to the history.
 func (e *Editor) record(prevCaret, prevAnchor int, joining bool) {
 	h := &e.hist
 	now := snapshot{text: e.Text(), caret: e.caret, anchor: e.anchor}

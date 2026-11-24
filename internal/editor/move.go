@@ -76,12 +76,6 @@ func (e *Editor) stepRight(extend bool) int {
 	return min(e.caret+1, len(e.gs))
 }
 
-// EndOfRow reports whether the insertion point is drawn at the end of the row
-// above a soft wrap, rather than at the start of the row below it.
-func (e *Editor) EndOfRow() bool {
-	return e.endOfRow
-}
-
 // CursorPos returns the row and the column in it where the insertion point is drawn.
 func (e *Editor) CursorPos() (row, col int) {
 	row = e.caretRow()

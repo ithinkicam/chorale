@@ -8,10 +8,8 @@ import (
 
 var pasteCleaner = strings.NewReplacer("\r\n", "\n", "\r", "\n")
 
-// CleanPaste returns pasted text as it is inserted: with new lines for
-// carriage returns, escape sequences removed whole, tabs as four spaces, and
-// every other control character removed.
-func CleanPaste(s string) string {
+// cleanPaste returns pasted text as it is inserted.
+func cleanPaste(s string) string {
 	s = stripEscapes(pasteCleaner.Replace(s))
 	s = strings.ReplaceAll(s, "\t", "    ")
 	return strings.Map(func(r rune) rune {
@@ -25,7 +23,7 @@ func CleanPaste(s string) string {
 // Paste inserts cleaned s at the insertion point as one edit, replacing the
 // selection if there is one.
 func (e *Editor) Paste(s string) {
-	s = CleanPaste(s)
+	s = cleanPaste(s)
 	if s == "" {
 		return
 	}

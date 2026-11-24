@@ -121,10 +121,10 @@ func TestClearIsOneUndo(t *testing.T) {
 func TestAnEditThatChangesNothingIsNotRecorded(t *testing.T) {
 	e := newEditor()
 	e.Insert("a")
-	before := e.HistoryLen()
+	before := e.historyLen()
 	e.Move(MoveStart, false)
 	e.Backspace()
-	if got := e.HistoryLen(); got != before {
+	if got := e.historyLen(); got != before {
 		t.Errorf("history has %d snapshots after an edit that changed nothing, want %d", got, before)
 	}
 }
@@ -147,7 +147,7 @@ func TestHistoryKeepsAtMostTwoHundredSnapshots(t *testing.T) {
 		e.Move(MoveStart, false)
 		e.Insert("x")
 	}
-	if got := e.HistoryLen(); got != 200 {
+	if got := e.historyLen(); got != 200 {
 		t.Fatalf("history has %d snapshots, want 200", got)
 	}
 	undone := 0
@@ -175,15 +175,15 @@ func TestHistoryTextStaysUnderSixteenMegabytes(t *testing.T) {
 	if got := e.HistorySize(); got > 16<<20 {
 		t.Errorf("history stores %d bytes of text, want at most %d", got, 16<<20)
 	}
-	if got := e.HistoryLen(); got < 10 || got >= 200 {
+	if got := e.historyLen(); got < 10 || got >= 200 {
 		t.Errorf("history has %d snapshots, want between 10 and 199", got)
 	}
 	undone := 0
 	for e.Undo() {
 		undone++
 	}
-	if undone != e.HistoryLen()-1 {
-		t.Errorf("undid %d edits, want %d", undone, e.HistoryLen()-1)
+	if undone != e.historyLen()-1 {
+		t.Errorf("undid %d edits, want %d", undone, e.historyLen()-1)
 	}
 }
 

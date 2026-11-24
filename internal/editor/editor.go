@@ -65,11 +65,6 @@ func (e *Editor) Text() string {
 	return strings.Join(e.gs, "")
 }
 
-// Len returns the number of characters in the prompt.
-func (e *Editor) Len() int {
-	return len(e.gs)
-}
-
 // Caret returns the insertion point as a character index.
 func (e *Editor) Caret() int {
 	return e.caret
@@ -150,9 +145,7 @@ func (e *Editor) SelectAll() {
 	e.last = editOther
 }
 
-// replace swaps the characters from start to end for s, and puts the insertion
-// point after s. The characters on either side of the change are segmented
-// again together with s, so accents and joiners attach to their neighbours.
+// replace swaps the characters from start to end for s.
 func (e *Editor) replace(start, end int, s string) bool {
 	if start == end && s == "" {
 		return false

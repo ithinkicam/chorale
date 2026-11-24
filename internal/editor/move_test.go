@@ -149,7 +149,7 @@ func TestMoveToTheEndOfARowSetsTheEndOfRowFlag(t *testing.T) {
 	e := withText(wrapped, 3)
 	e.Move(MoveRowEnd, false)
 	assertCaret(t, e, secondRowStart)
-	if !e.EndOfRow() {
+	if !e.endOfRow {
 		t.Error("end-of-row flag is not set after moving to the end of a row")
 	}
 	assertPos(t, e, 0, 55)
@@ -178,7 +178,7 @@ func TestAnyOtherKeyClearsTheEndOfRowFlag(t *testing.T) {
 		e := withText(wrapped, 3)
 		e.Move(MoveRowEnd, false)
 		act(e)
-		if e.EndOfRow() {
+		if e.endOfRow {
 			t.Errorf("%s left the end-of-row flag set", name)
 		}
 	}

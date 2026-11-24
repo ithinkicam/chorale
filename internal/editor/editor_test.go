@@ -62,7 +62,7 @@ func TestInsertJoinsACombiningAccent(t *testing.T) {
 	e.Insert("́")
 	assertText(t, e, "é")
 	assertCaret(t, e, 1)
-	if got := e.Len(); got != 1 {
+	if got := len(e.gs); got != 1 {
 		t.Errorf("text has %d characters, want 1", got)
 	}
 }
@@ -72,7 +72,7 @@ func TestInsertJoinsAnEmojiBuiltFromSeveralKeystrokes(t *testing.T) {
 	for _, part := range []string{"👨", "\u200d", "👩"} {
 		e.Insert(part)
 	}
-	if got := e.Len(); got != 1 {
+	if got := len(e.gs); got != 1 {
 		t.Errorf("text has %d characters, want 1", got)
 	}
 	assertCaret(t, e, 1)

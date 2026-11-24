@@ -3,13 +3,13 @@ package editor
 import "testing"
 
 func TestCleanPasteTurnsCarriageReturnsIntoNewLines(t *testing.T) {
-	if got, want := CleanPaste("a\r\nb\rc\nd"), "a\nb\nc\nd"; got != want {
+	if got, want := cleanPaste("a\r\nb\rc\nd"), "a\nb\nc\nd"; got != want {
 		t.Errorf("cleaned paste is %q, want %q", got, want)
 	}
 }
 
 func TestCleanPasteRemovesAColourCodeWhole(t *testing.T) {
-	if got, want := CleanPaste("safe\x1b[31mtext"), "safetext"; got != want {
+	if got, want := cleanPaste("safe\x1b[31mtext"), "safetext"; got != want {
 		t.Errorf("cleaned paste is %q, want %q", got, want)
 	}
 }
@@ -20,14 +20,14 @@ func TestCleanPasteRemovesAnOperatingSystemCommandWhole(t *testing.T) {
 		"ended by string terminal": "a\x1b]0;a title\x1b\\b",
 	}
 	for name, in := range tests {
-		if got, want := CleanPaste(in), "ab"; got != want {
+		if got, want := cleanPaste(in), "ab"; got != want {
 			t.Errorf("%s: cleaned paste is %q, want %q", name, got, want)
 		}
 	}
 }
 
 func TestCleanPasteRemovesADeviceControlStringWhole(t *testing.T) {
-	if got, want := CleanPaste("a\x1bP1$rabc\x1b\\b"), "ab"; got != want {
+	if got, want := cleanPaste("a\x1bP1$rabc\x1b\\b"), "ab"; got != want {
 		t.Errorf("cleaned paste is %q, want %q", got, want)
 	}
 }
@@ -39,27 +39,27 @@ func TestCleanPasteRemovesALoneEscapeByte(t *testing.T) {
 		{"before a new line and more text", "a\x1b\nb", "a\nb"},
 	}
 	for _, tt := range tests {
-		if got := CleanPaste(tt.in); got != tt.want {
+		if got := cleanPaste(tt.in); got != tt.want {
 			t.Errorf("%s: cleaned paste is %q, want %q", tt.name, got, tt.want)
 		}
 	}
 }
 
 func TestCleanPasteTurnsATabIntoFourSpaces(t *testing.T) {
-	if got, want := CleanPaste("a\tb"), "a    b"; got != want {
+	if got, want := cleanPaste("a\tb"), "a    b"; got != want {
 		t.Errorf("cleaned paste is %q, want %q", got, want)
 	}
 }
 
 func TestCleanPasteRemovesC0C1AndDeleteCharacters(t *testing.T) {
-	if got, want := CleanPaste("a\x00b\x07c\x08d\u0085e\x7ff"), "abcdef"; got != want {
+	if got, want := cleanPaste("a\x00b\x07c\x08d\u0085e\x7ff"), "abcdef"; got != want {
 		t.Errorf("cleaned paste is %q, want %q", got, want)
 	}
 }
 
 func TestCleanPasteKeepsTextEmojiAndNewLines(t *testing.T) {
 	in := "合唱 🎵 é\n\nend"
-	if got := CleanPaste(in); got != in {
+	if got := cleanPaste(in); got != in {
 		t.Errorf("cleaned paste is %q, want it unchanged", got)
 	}
 }
@@ -113,10 +113,10 @@ func TestPasteDoesNotJoinTheTypingBeforeIt(t *testing.T) {
 func TestPastingOnlyEscapeSequencesChangesNothing(t *testing.T) {
 	e := newEditor()
 	e.Insert("a")
-	before := e.HistoryLen()
+	before := e.historyLen()
 	e.Paste("\x1b[31m")
 	assertText(t, e, "a")
-	if got := e.HistoryLen(); got != before {
+	if got := e.historyLen(); got != before {
 		t.Errorf("history has %d snapshots, want %d", got, before)
 	}
 }
@@ -124,14 +124,14 @@ func TestPastingOnlyEscapeSequencesChangesNothing(t *testing.T) {
 func TestCleanPasteKeepsTextAfterAControlStringThatNeverEnds(t *testing.T) {
 	for _, intro := range []string{"]", "P", "X", "^", "_"} {
 		in := "a\x1b" + intro + "\nsecond\nthird"
-		if got, want := CleanPaste(in), "a\nsecond\nthird"; got != want {
+		if got, want := cleanPaste(in), "a\nsecond\nthird"; got != want {
 			t.Errorf("escape %s: cleaned paste is %q, want %q", intro, got, want)
 		}
 	}
 }
 
 func TestCleanPasteKeepsTextAfterAControlStringThatEndsWithTheText(t *testing.T) {
-	if got, want := CleanPaste("a\x1b]0;title"), "a0;title"; got != want {
+	if got, want := cleanPaste("a\x1b]0;title"), "a0;title"; got != want {
 		t.Errorf("cleaned paste is %q, want %q", got, want)
 	}
 }
@@ -143,7 +143,7 @@ func TestCleanPasteKeepsTextAfterAControlSequenceWithNoFinalByte(t *testing.T) {
 		{"a\x1b[31", "a31"},
 	}
 	for _, tt := range tests {
-		if got := CleanPaste(tt.in); got != tt.want {
+		if got := cleanPaste(tt.in); got != tt.want {
 			t.Errorf("cleaned paste of %q is %q, want %q", tt.in, got, tt.want)
 		}
 	}
@@ -158,7 +158,7 @@ func TestCleanPasteTreatsC1IntroducersLikeTheirEscapeForms(t *testing.T) {
 		{"unfinished", "a\u009d0;x\nsecond", "a0;x\nsecond"},
 	}
 	for _, tt := range tests {
-		if got := CleanPaste(tt.in); got != tt.want {
+		if got := cleanPaste(tt.in); got != tt.want {
 			t.Errorf("%s: cleaned paste is %q, want %q", tt.name, got, tt.want)
 		}
 	}
