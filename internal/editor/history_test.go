@@ -267,3 +267,26 @@ func TestBackspacingASelectionDoesNotJoinTheRunAfterIt(t *testing.T) {
 	e.Undo()
 	assertText(t, e, "abcdef")
 }
+
+func TestUndoKeepsTheInsertionPointAndAnchorInsideTheText(t *testing.T) {
+	e := newEditor()
+	e.Insert("a")
+	e.hist.snaps[0].caret = 5
+	e.hist.snaps[0].anchor = 7
+	e.Undo()
+	assertCaret(t, e, 0)
+	assertSelection(t, e, 0, 0)
+	e.CursorPos()
+}
+
+func TestRedoKeepsTheInsertionPointAndAnchorInsideTheText(t *testing.T) {
+	e := newEditor()
+	e.Insert("ab")
+	e.Undo()
+	e.hist.snaps[1].caret = 9
+	e.hist.snaps[1].anchor = 4
+	e.Redo()
+	assertCaret(t, e, 2)
+	assertSelection(t, e, 2, 2)
+	e.CursorPos()
+}
