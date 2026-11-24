@@ -85,7 +85,7 @@ func TestHistorySizeIsTheTextOfEverySnapshot(t *testing.T) {
 func TestSetWidthClearsTheEndOfRowFlag(t *testing.T) {
 	e := withText(wrapped, 3)
 	e.Move(MoveRowEnd, false)
-	e.SetWidth(textWidth, ansi.GraphemeWidth)
+	e.SetWidth(textWidth-1, ansi.GraphemeWidth)
 	if e.endOfRow {
 		t.Error("end-of-row flag is still set after SetWidth")
 	}
@@ -94,7 +94,7 @@ func TestSetWidthClearsTheEndOfRowFlag(t *testing.T) {
 func TestSetWidthForgetsTheRememberedColumn(t *testing.T) {
 	e := withText("abcdef\nab\nabcdef", 5)
 	e.Move(MoveDown, false)
-	e.SetWidth(textWidth, ansi.GraphemeWidth)
+	e.SetWidth(textWidth-1, ansi.GraphemeWidth)
 	e.Move(MoveDown, false)
 	assertCaret(t, e, 10+2)
 }
