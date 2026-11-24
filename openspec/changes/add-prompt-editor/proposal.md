@@ -8,7 +8,7 @@ This is the first of three changes that make up milestone 1, "one Claude session
 
 ## What Changes
 
-- A prompt box appears at the bottom of the empty session list, focused, with the real terminal cursor at the insertion point.
+- A prompt box appears at the bottom of the empty session list, labelled "▸ Prompt" to mark its focus, with the real terminal cursor at the insertion point.
 - The prompt box is a keyboard editor, written for Chorale:
   - It moves the cursor by character, by word, by line, and to the start or end of the prompt.
   - It selects with Shift and the movement keys, and selects everything with one key.
@@ -17,11 +17,13 @@ This is the first of three changes that make up milestone 1, "one Claude session
   - It wraps soft at word boundaries to the real window width, counting wide characters correctly.
   - It accepts bracketed paste as one block, which one undo removes.
   - It copies and cuts the selection to the Mac clipboard through OSC 52.
-  - It shows the selection in the accent colour and in inverse video, so the selection is never colour alone.
+  - It shows the selection in the accent colour and in inverse video, and says how many characters are selected, so the selection is never colour alone.
   - It grows with the prompt up to a limit, then scrolls to keep the cursor in view, saying in words how many lines are out of sight.
-- Every editor action has a Ctrl or Option key, which works in every terminal. In Ghostty, which `cmux` is built on, the usual Cmd keys work too where the terminal passes them through.
-- Enter sends the prompt, and Shift-Enter, Option-Enter or Ctrl-J starts a new line. With no agent connected yet, sending keeps the prompt in the box and says that no agent is connected. The third change replaces this with a real send.
-- **BREAKING:** `q` no longer quits from the session list, because the focused prompt box types it. Ctrl-C quits instead. If the prompt has text, the first Ctrl-C clears it, and undo brings it back. `q` still quits from the window-too-small message, where there is no prompt box.
+  - A status row confirms in words what just happened, such as "Copied." or "Prompt cleared. Ctrl-Z brings it back."
+- Every editor action has a Ctrl or Option key, which works in every terminal. In Ghostty, which `cmux` is built on, the usual Cmd keys work too where the terminal passes them through. Tab does nothing for now.
+- Enter sends the prompt, and Shift-Enter, Option-Enter or Ctrl-J starts a new line. Ctrl-J is the one that works in every terminal. With no agent connected yet, sending keeps the prompt in the box and says that no agent is connected. The third change replaces this with a real send.
+- The key line follows the prompt's state, and names what Ctrl-C will do next: copy, clear or quit.
+- **BREAKING:** `q` no longer quits anywhere, because the focused prompt box types it. Ctrl-C quits instead, and always asks first: on an empty prompt, the first press shows "Press Ctrl-C again to quit." and only a second press quits. If the prompt has text, the first Ctrl-C clears it, and undo brings it back. The window-too-small message keeps the prompt, says so, and quits the same way.
 
 ## Capabilities
 
@@ -31,7 +33,7 @@ This is the first of three changes that make up milestone 1, "one Claude session
 
 ### Modified Capabilities
 
-- `app-shell`: the empty session list now shows the prompt box, with the cursor in it, and its key line changes. Quitting moves from `q` to Ctrl-C on the session list, and stays on `q` for the window-too-small message.
+- `app-shell`: the empty session list now shows the prompt box, with the cursor in it, and its key line changes. Quitting moves from `q` to two presses of Ctrl-C, on the session list and on the window-too-small message, which now keeps the prompt.
 
 ## Out of scope
 
@@ -44,7 +46,8 @@ This is the first of three changes that make up milestone 1, "one Claude session
 
 ## Impact
 
-1. New package `internal/editor`, holding the text buffer, the edit history, the wrapping and the key table, with unit tests.
-2. A new screen part for the prompt box in `internal/screens`, and changes to `internal/app` to route keys, paste and quitting.
-3. New interface, interaction and terminal-level tests, and new golden files. The golden files for the empty session list change, because the prompt box and the new key line appear on it.
-4. No new dependencies. Bubble Tea v2.1.2 already provides bracketed paste, OSC 52 copy, the Cmd modifier and keyboard enhancements, and `github.com/charmbracelet/x/ansi`, already in `go.mod`, measures text width.
+1. New package `internal/editor`, holding the text buffer, the edit history, the wrapping and the key table, with unit tests and a benchmark.
+2. `scripts/check-scenarios` learns to skip main-spec requirements that an open change removes or replaces, under narrow rules, and to list what it skipped.
+3. A new screen part for the prompt box in `internal/screens`, and changes to `internal/app` to route keys, paste and quitting.
+4. New interface, interaction and terminal-level tests, and new golden files. The golden files for the empty session list change, because the prompt box and the new key line appear on it.
+5. No new dependencies. Bubble Tea v2.1.2 already provides bracketed paste, OSC 52 copy, the Cmd modifier and keyboard enhancements, and `github.com/charmbracelet/x/ansi`, already in `go.mod`, measures text width.
