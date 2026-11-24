@@ -1,7 +1,6 @@
 package editor
 
-// pictographRanges approximates the Unicode Extended_Pictographic property,
-// which the standard library does not carry.
+// pictographRanges holds the Extended_Pictographic ranges.
 var pictographRanges = [][2]rune{
 	{0x00A9, 0x00A9}, {0x00AE, 0x00AE}, {0x203C, 0x203C}, {0x2049, 0x2049},
 	{0x2122, 0x2122}, {0x2139, 0x2139}, {0x2194, 0x2199}, {0x21A9, 0x21AA},

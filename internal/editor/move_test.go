@@ -294,6 +294,7 @@ func TestDeleteWordBackAfterASymbolSkipsItToTheWord(t *testing.T) {
 	e.DeleteWordBack()
 	assertText(t, e, "")
 }
+
 func TestEveryKindOfEmojiIsAWordOfItsOwn(t *testing.T) {
 	for _, emoji := range []string{"🎵", "❤️", "😀", "👨‍👩‍👧", "⭐"} {
 		e := withText("go "+emoji+emoji+"x", len(Graphemes("go "+emoji+emoji+"x")))

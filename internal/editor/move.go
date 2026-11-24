@@ -83,7 +83,7 @@ func (e *Editor) CursorPos() (row, col int) {
 	return row, e.colIn(e.layout()[row], e.caret)
 }
 
-// Rows returns the text laid out to the editor's width.
+// Rows returns the text laid out to the editor's width. The caller must not change it.
 func (e *Editor) Rows() []Row {
 	return e.layout()
 }
