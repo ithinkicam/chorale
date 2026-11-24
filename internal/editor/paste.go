@@ -126,6 +126,8 @@ func stringEnd(s string, start int, bell bool) int {
 			return j + 2
 		case b == 0xc2 && j+1 < len(s) && s[j+1] == 0x9c:
 			return j + 2
+		case b == 0xc2 && j+1 < len(s) && s[j+1] >= 0x80 && s[j+1] <= 0x9f:
+			return start
 		case b < 0x20 || b == 0x7f:
 			return start
 		}
