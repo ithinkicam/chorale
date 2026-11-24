@@ -120,3 +120,46 @@ func TestPastingOnlyEscapeSequencesChangesNothing(t *testing.T) {
 		t.Errorf("history has %d snapshots, want %d", got, before)
 	}
 }
+
+func TestCleanPasteKeepsTextAfterAControlStringThatNeverEnds(t *testing.T) {
+	for _, intro := range []string{"]", "P", "X", "^", "_"} {
+		in := "a\x1b" + intro + "\nsecond\nthird"
+		if got, want := CleanPaste(in), "a\nsecond\nthird"; got != want {
+			t.Errorf("escape %s: cleaned paste is %q, want %q", intro, got, want)
+		}
+	}
+}
+
+func TestCleanPasteKeepsTextAfterAControlStringThatEndsWithTheText(t *testing.T) {
+	if got, want := CleanPaste("a\x1b]0;title"), "a0;title"; got != want {
+		t.Errorf("cleaned paste is %q, want %q", got, want)
+	}
+}
+
+func TestCleanPasteKeepsTextAfterAControlSequenceWithNoFinalByte(t *testing.T) {
+	tests := []struct{ in, want string }{
+		{"a\x1b[\nsecond\nthird", "a\nsecond\nthird"},
+		{"a\x1b[31\nsecond", "a31\nsecond"},
+		{"a\x1b[31", "a31"},
+	}
+	for _, tt := range tests {
+		if got := CleanPaste(tt.in); got != tt.want {
+			t.Errorf("cleaned paste of %q is %q, want %q", tt.in, got, tt.want)
+		}
+	}
+}
+
+func TestCleanPasteTreatsC1IntroducersLikeTheirEscapeForms(t *testing.T) {
+	tests := []struct{ name, in, want string }{
+		{"control sequence", "\u009b31mtext", "text"},
+		{"operating system command", "a\u009d0;title\x07b", "ab"},
+		{"device control string", "a\u0090qabc\u009cb", "ab"},
+		{"string ended by an escape and a backslash", "a\u009d0;title\x1b\\b", "ab"},
+		{"unfinished", "a\u009d0;x\nsecond", "a0;x\nsecond"},
+	}
+	for _, tt := range tests {
+		if got := CleanPaste(tt.in); got != tt.want {
+			t.Errorf("%s: cleaned paste is %q, want %q", tt.name, got, tt.want)
+		}
+	}
+}
