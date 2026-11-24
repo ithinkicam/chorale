@@ -61,9 +61,41 @@ func (e *Editor) Caret() int {
 	return e.caret
 }
 
-// Insert types s at the insertion point.
+// Insert types s at the insertion point, replacing the selection if there is one.
 func (e *Editor) Insert(s string) {
-	e.replace(e.caret, e.caret, s)
+	start, end := e.Selection()
+	e.replace(start, end, s)
+}
+
+// Selection returns the start and end of the selected characters, equal when
+// nothing is selected.
+func (e *Editor) Selection() (start, end int) {
+	return min(e.anchor, e.caret), max(e.anchor, e.caret)
+}
+
+// HasSelection reports whether any characters are selected.
+func (e *Editor) HasSelection() bool {
+	return e.anchor != e.caret
+}
+
+// SelectedText returns the selected characters.
+func (e *Editor) SelectedText() string {
+	start, end := e.Selection()
+	return strings.Join(e.gs[start:end], "")
+}
+
+// SelectedCount returns how many characters are selected.
+func (e *Editor) SelectedCount() int {
+	start, end := e.Selection()
+	return end - start
+}
+
+// SelectAll selects the whole prompt, leaving the insertion point at its end.
+func (e *Editor) SelectAll() {
+	e.anchor = 0
+	e.caret = len(e.gs)
+	e.endOfRow = false
+	e.wantColSet = false
 }
 
 // replace swaps the characters from start to end for s, and puts the insertion

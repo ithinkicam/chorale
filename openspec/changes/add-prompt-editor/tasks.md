@@ -24,7 +24,7 @@ Every scenario has a test named after it, as `docs/testing.md` describes, and th
 ## 3. Selection, deletion, history and paste
 
 - [x] 3.1 Write unit tests for selection: extending with Shift movement, replacing the selection by typing, selecting everything, clearing it by moving, and counting the selected characters. Run them and confirm they fail
-- [ ] 3.2 Implement the selection anchor, and verify the tests from 3.1 pass
+- [x] 3.2 Implement the selection anchor, and verify the tests from 3.1 pass
 - [ ] 3.3 Write unit tests for deletion: Backspace over an emoji, a word before and after, a word after an emoji, to the start and end of a row, a character across a soft wrap, and clearing the whole prompt. Run them and confirm they fail
 - [ ] 3.4 Implement the deletions and clearing, and verify the tests from 3.3 pass
 - [ ] 3.5 Write unit tests for the history: typing undone a word at a time, redo, undo restoring the selection, a new edit discarding redo, at most 200 snapshots kept, and the total stored text kept under 16 MB, read from the history's own size report after 300 edits to a 10,000-line prompt. Run them and confirm they fail
