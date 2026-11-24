@@ -239,3 +239,25 @@ func TestShiftDownAfterShiftEndExtendsFromTheDrawnRow(t *testing.T) {
 	e.Move(MoveDown, true)
 	assertSelection(t, e, 3, secondRowStart+54)
 }
+
+func TestShiftUpOnTheFirstRowSelectsToTheStart(t *testing.T) {
+	e := withText("one\ntwo", 2)
+	e.Move(MoveUp, true)
+	assertSelection(t, e, 0, 2)
+	assertCaret(t, e, 0)
+}
+
+func TestShiftDownOnTheLastRowSelectsToTheEnd(t *testing.T) {
+	e := withText("one\ntwo", 5)
+	e.Move(MoveDown, true)
+	assertSelection(t, e, 5, 7)
+	assertCaret(t, e, 7)
+}
+
+func TestUpAfterEndOnTheFirstRowGoesToTheStartOfThePrompt(t *testing.T) {
+	e := withText(manyWords, 3)
+	e.Move(MoveRowEnd, false)
+	e.Move(MoveUp, false)
+	assertPos(t, e, 0, 0)
+	assertCaret(t, e, 0)
+}
