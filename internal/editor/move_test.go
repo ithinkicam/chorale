@@ -119,13 +119,13 @@ func TestDownIntoASoftRowStopsBeforeItsWrapPoint(t *testing.T) {
 	assertPos(t, e, 1, 54)
 }
 
-func TestUpOnTheFirstRowAndDownOnTheLastDoNothing(t *testing.T) {
+func TestUpOnTheFirstRowGoesToTheStartAndDownOnTheLastToTheEnd(t *testing.T) {
 	e := withText("one\ntwo", 2)
 	e.Move(MoveUp, false)
-	assertCaret(t, e, 2)
+	assertCaret(t, e, 0)
 	e = withText("one\ntwo", 5)
 	e.Move(MoveDown, false)
-	assertCaret(t, e, 5)
+	assertCaret(t, e, 7)
 }
 
 func TestAnotherKeyForgetsTheRememberedColumn(t *testing.T) {
