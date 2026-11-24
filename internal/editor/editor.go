@@ -15,11 +15,24 @@ type Editor struct {
 	anchor int
 	width  int
 	method ansi.Method
+
+	endOfRow   bool
+	wantCol    int
+	wantColSet bool
+	rows       []Row
+	rowsOK     bool
 }
 
 // New returns an empty editor that lays text out to width columns, measured by method.
 func New(width int, method ansi.Method) *Editor {
 	return &Editor{width: width, method: method}
+}
+
+// SetWidth changes the width the text is laid out to, and how characters are measured.
+func (e *Editor) SetWidth(width int, method ansi.Method) {
+	e.width = width
+	e.method = method
+	e.rowsOK = false
 }
 
 // Graphemes splits s into user-perceived characters.
@@ -73,4 +86,7 @@ func (e *Editor) replace(start, end int, s string) {
 	e.gs = gs
 	e.caret = min(caret, from+len(joined))
 	e.anchor = e.caret
+	e.endOfRow = false
+	e.wantColSet = false
+	e.rowsOK = false
 }
