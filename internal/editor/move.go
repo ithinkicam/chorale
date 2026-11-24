@@ -2,6 +2,7 @@ package editor
 
 import (
 	"sort"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 )
@@ -150,13 +151,18 @@ const (
 func classOf(g string) charClass {
 	r, _ := utf8.DecodeRuneInString(g)
 	switch {
+	case isEmoji(g, r):
+		return emoji
 	case r == '_' || unicode.IsLetter(r) || unicode.IsDigit(r) || unicode.IsMark(r):
 		return letter
-	case startsWithPictograph(g):
-		return emoji
 	default:
 		return gap
 	}
+}
+
+func isEmoji(g string, first rune) bool {
+	return isPictograph(first) || (first >= 0x1F1E6 && first <= 0x1F1FF) ||
+		strings.ContainsRune(g, 0xFE0F) || strings.ContainsRune(g, 0x20E3)
 }
 
 func (e *Editor) wordLeft(i int) int {

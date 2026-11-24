@@ -1,7 +1,5 @@
 package editor
 
-import "unicode/utf8"
-
 // pictographRanges approximates the Unicode Extended_Pictographic property,
 // which the standard library does not carry.
 var pictographRanges = [][2]rune{
@@ -27,8 +25,7 @@ var pictographRanges = [][2]rune{
 	{0x1F947, 0x1FAFF}, {0x1FC00, 0x1FFFD},
 }
 
-func startsWithPictograph(g string) bool {
-	r, _ := utf8.DecodeRuneInString(g)
+func isPictograph(r rune) bool {
 	for _, rng := range pictographRanges {
 		if r >= rng[0] && r <= rng[1] {
 			return true
