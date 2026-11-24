@@ -10,7 +10,7 @@ Every scenario has a test named after it, as `docs/testing.md` describes, and th
 - [x] 1.2 Write unit tests for `scripts/check-scenarios` covering each rule in `design.md` under "The scenario check and replaced requirements": a removed requirement is skipped, a modified one is skipped and the change's copy is required, a renamed and modified one is skipped, a bare rename is not skipped, a delta in one capability doesn't skip a same-named requirement in another, a name that differs only in case is not matched, a delta naming a missing requirement is an error, and every skip is printed. Run them and confirm they fail because the check has none of these rules
 - [x] 1.3 Teach the check those rules, and verify the tests from 1.2 and the existing check tests pass
 - [x] 1.4 Write a test for a new `termtest.Screen.Cell` method, feeding known escape sequences for inverse video and a palette foreground colour, and asserting the text, the inverse flag and the colour of chosen cells. Run it and confirm it fails because the method doesn't exist
-- [ ] 1.5 Implement `Screen.Cell` over `x/vt`, and verify the test from 1.4 passes
+- [x] 1.5 Implement `Screen.Cell` over `x/vt`, and verify the test from 1.4 passes
 
 ## 2. Editor text, layout and movement
 

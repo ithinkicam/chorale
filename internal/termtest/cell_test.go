@@ -1,6 +1,7 @@
 package termtest
 
 import (
+	"image/color"
 	"testing"
 
 	"github.com/charmbracelet/x/ansi"
@@ -35,4 +36,13 @@ func TestScreenCellOutsideTheScreenIsBlank(t *testing.T) {
 	if got := s.Cell(10, 10); got != (Cell{}) {
 		t.Errorf("Cell(10, 10) = %+v, want a blank cell", got)
 	}
+}
+
+func sameColour(a, b color.Color) bool {
+	if a == nil || b == nil {
+		return a == nil && b == nil
+	}
+	ar, ag, ab, aa := a.RGBA()
+	br, bg, bb, ba := b.RGBA()
+	return ar == br && ag == bg && ab == bb && aa == ba
 }
