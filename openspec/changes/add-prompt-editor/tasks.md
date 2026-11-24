@@ -29,7 +29,7 @@ Every scenario has a test named after it, as `docs/testing.md` describes, and th
 - [x] 3.4 Implement the deletions and clearing, and verify the tests from 3.3 pass
 - [x] 3.5 Write unit tests for the history: typing undone a word at a time, redo, undo restoring the selection, a new edit discarding redo, at most 200 snapshots kept, and the total stored text kept under 16 MB, read from the history's own size report after 300 edits to a 10,000-line prompt. Run them and confirm they fail
 - [x] 3.6 Implement the history, with word-sized typing groups and both limits, and verify the tests from 3.5 pass
-- [ ] 3.7 Write unit tests for paste cleaning, with one case for each step in `design.md` under "Paste": carriage returns, a colour code, an OSC sequence, a device control string, a lone escape byte, a tab, and C1 and delete characters. Add tests that a paste replaces a selection and is one undo group. Run them and confirm they fail
+- [x] 3.7 Write unit tests for paste cleaning, with one case for each step in `design.md` under "Paste": carriage returns, a colour code, an OSC sequence, a device control string, a lone escape byte, a tab, and C1 and delete characters. Add tests that a paste replaces a selection and is one undo group. Run them and confirm they fail
 - [ ] 3.8 Implement paste cleaning and insertion, and verify the tests from 3.7 pass
 - [ ] 3.9 Add a benchmark that inserts a 10,000-line paste, lays it out at width 57 and moves to its end. Run it once and record the timings in the commit, as a record to compare against
 
