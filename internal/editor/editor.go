@@ -177,7 +177,7 @@ func (e *Editor) replace(start, end int, s string) bool {
 	return true
 }
 
-// Chars returns the prompt's characters, indexed as Rows are.
+// Chars returns the prompt's characters, indexed as Rows are. The caller must not change it.
 func (e *Editor) Chars() []string {
-	return nil
+	return e.gs
 }
