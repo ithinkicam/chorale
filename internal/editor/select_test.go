@@ -84,3 +84,23 @@ func TestSelectedCountIsZeroWithNothingSelected(t *testing.T) {
 		t.Errorf("selected count is %d, want 0", got)
 	}
 }
+
+func TestRightCollapsesTheSelectionToItsEnd(t *testing.T) {
+	e := withText("run the tests", 13)
+	e.Move(MoveWordLeft, true)
+	e.Move(MoveRight, false)
+	assertCaret(t, e, 13)
+	if e.HasSelection() {
+		t.Error("selection remains after Right")
+	}
+}
+
+func TestLeftCollapsesABackwardsSelectionToItsStart(t *testing.T) {
+	e := withText("run the tests", 8)
+	e.Move(MoveWordRight, true)
+	e.Move(MoveLeft, false)
+	assertCaret(t, e, 8)
+	if e.HasSelection() {
+		t.Error("selection remains after Left")
+	}
+}
