@@ -199,3 +199,43 @@ func TestMoveToTheStartAndEndOfThePrompt(t *testing.T) {
 	e.Move(MoveEnd, false)
 	assertCaret(t, e, 13)
 }
+
+var manyWords = strings.Repeat("word ", 30)
+
+func TestHomeAfterEndGoesToTheStartOfTheSameRow(t *testing.T) {
+	e := withText(wrapped, 3)
+	e.Move(MoveRowEnd, false)
+	e.Move(MoveRowStart, false)
+	assertPos(t, e, 0, 0)
+	assertCaret(t, e, 0)
+}
+
+func TestEndTwiceStaysAtTheEndOfTheSameRow(t *testing.T) {
+	e := withText(wrapped, 3)
+	e.Move(MoveRowEnd, false)
+	e.Move(MoveRowEnd, false)
+	assertPos(t, e, 0, 55)
+	assertCaret(t, e, secondRowStart)
+}
+
+func TestDownAfterEndMovesToTheRowBelowTheDrawnRow(t *testing.T) {
+	e := withText(manyWords, 3)
+	e.Move(MoveRowEnd, false)
+	e.Move(MoveDown, false)
+	assertPos(t, e, 1, 54)
+}
+
+func TestShiftHomeAfterShiftEndSelectsFromTheDrawnRow(t *testing.T) {
+	e := withText(wrapped, 3)
+	e.Move(MoveRowEnd, true)
+	e.Move(MoveRowStart, true)
+	assertSelection(t, e, 0, 3)
+	assertCaret(t, e, 0)
+}
+
+func TestShiftDownAfterShiftEndExtendsFromTheDrawnRow(t *testing.T) {
+	e := withText(manyWords, 3)
+	e.Move(MoveRowEnd, true)
+	e.Move(MoveDown, true)
+	assertSelection(t, e, 3, secondRowStart+54)
+}
