@@ -7,10 +7,10 @@ import (
 	"github.com/charmbracelet/x/ansi"
 )
 
-func rowTexts(text string, width int, m ansi.Method) []string {
+func rowTexts(text string, m ansi.Method) []string {
 	gs := Graphemes(text)
 	var out []string
-	for _, r := range Layout(gs, width, m) {
+	for _, r := range Layout(gs, textWidth, m) {
 		out = append(out, strings.Join(gs[r.Start:r.End], ""))
 	}
 	return out
@@ -36,12 +36,12 @@ func TestLayoutOfEmptyTextIsOneEmptyRow(t *testing.T) {
 }
 
 func TestLayoutBreaksAtANewLine(t *testing.T) {
-	assertRows(t, rowTexts("one\ntwo\n", textWidth, ansi.GraphemeWidth), []string{"one", "two", ""})
+	assertRows(t, rowTexts("one\ntwo\n", ansi.GraphemeWidth), []string{"one", "two", ""})
 }
 
 func TestLayoutWrapsAtASpaceAndKeepsTheSpaceAtTheEndOfItsRow(t *testing.T) {
 	text := strings.Repeat("word ", 11) + "word end"
-	got := rowTexts(text, textWidth, ansi.GraphemeWidth)
+	got := rowTexts(text, ansi.GraphemeWidth)
 	assertRows(t, got, []string{strings.Repeat("word ", 11), "word end"})
 	if strings.Join(got, "") != text {
 		t.Errorf("rows join to %q, want the original text", strings.Join(got, ""))
@@ -49,19 +49,19 @@ func TestLayoutWrapsAtASpaceAndKeepsTheSpaceAtTheEndOfItsRow(t *testing.T) {
 }
 
 func TestLayoutBreaksAWordWiderThanTheRow(t *testing.T) {
-	got := rowTexts(strings.Repeat("x", 100), textWidth, ansi.GraphemeWidth)
+	got := rowTexts(strings.Repeat("x", 100), ansi.GraphemeWidth)
 	assertRows(t, got, []string{strings.Repeat("x", 57), strings.Repeat("x", 43)})
 }
 
 func TestLayoutMovesAWideCharacterToTheNextRowWhole(t *testing.T) {
-	got := rowTexts(strings.Repeat("合", 40), textWidth, ansi.GraphemeWidth)
+	got := rowTexts(strings.Repeat("合", 40), ansi.GraphemeWidth)
 	assertRows(t, got, []string{strings.Repeat("合", 28), strings.Repeat("合", 12)})
 }
 
 func TestLayoutFillsARowExactlyToTheWidth(t *testing.T) {
 	text := strings.Repeat("a", 57) + "bbb"
 	rows := Layout(Graphemes(text), textWidth, ansi.GraphemeWidth)
-	assertRows(t, rowTexts(text, textWidth, ansi.GraphemeWidth), []string{strings.Repeat("a", 57), "bbb"})
+	assertRows(t, rowTexts(text, ansi.GraphemeWidth), []string{strings.Repeat("a", 57), "bbb"})
 	if rows[0].EndCol != 57 {
 		t.Errorf("first row ends at column %d, want 57", rows[0].EndCol)
 	}
@@ -119,11 +119,11 @@ func TestHeartWithVariationSelectorIsTwoColumnsByGraphemesAndOneByCodePoints(t *
 
 func TestLayoutWrapsHeartsDifferentlyByMethod(t *testing.T) {
 	text := strings.Repeat("❤️", 40)
-	byGraphemes := rowTexts(text, textWidth, ansi.GraphemeWidth)
+	byGraphemes := rowTexts(text, ansi.GraphemeWidth)
 	if got := len(Graphemes(byGraphemes[0])); got != 28 {
 		t.Errorf("by graphemes, the first row holds %d hearts, want 28", got)
 	}
-	byCodePoints := rowTexts(text, textWidth, ansi.WcWidth)
+	byCodePoints := rowTexts(text, ansi.WcWidth)
 	if got := len(byCodePoints); got != 1 {
 		t.Errorf("by code points, got %d rows, want 1", got)
 	}
