@@ -97,7 +97,7 @@ func TestCharsLineUpWithTheRowsOfAWrappedPrompt(t *testing.T) {
 	e.Insert(strings.Repeat("合", 40) + " 🎵 é\nsecond line")
 	chars := e.Chars()
 	if len(chars) != 40+1+1+1+1+1+11 {
-		t.Fatalf("got %d characters, want 57", len(chars))
+		t.Fatalf("got %d characters, want 56", len(chars))
 	}
 
 	var got []string
