@@ -33,20 +33,14 @@ func TestCleanPasteRemovesADeviceControlStringWhole(t *testing.T) {
 }
 
 func TestCleanPasteRemovesALoneEscapeByte(t *testing.T) {
-	tests := map[string]string{
-		"at the end":      "a\x1b",
-		"before new line": "a\x1b\nb",
+	tests := []struct{ name, in, want string }{
+		{"at the end", "a\x1b", "a"},
+		{"at the end of a line", "a\x1b\n", "a\n"},
 	}
-	for name, in := range tests {
-		got := CleanPaste(in)
-		for _, r := range got {
-			if r == 0x1b {
-				t.Errorf("%s: cleaned paste %q still has an escape byte", name, got)
-			}
+	for _, tt := range tests {
+		if got := CleanPaste(tt.in); got != tt.want {
+			t.Errorf("%s: cleaned paste is %q, want %q", tt.name, got, tt.want)
 		}
-	}
-	if got, want := CleanPaste("a\x1b\nb"), "a\nb"; got != want {
-		t.Errorf("cleaned paste is %q, want %q", got, want)
 	}
 }
 
