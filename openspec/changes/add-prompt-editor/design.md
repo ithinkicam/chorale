@@ -43,7 +43,7 @@ So `Layout` takes the width method as an argument, and the app passes whichever 
 
 ### Words
 
-A word is a run of letters, digits and underscores, and an emoji is a word of its own. Every other character, including symbols such as `+`, `=`, `<` and `|`, counts as punctuation. Moving or deleting by word skips any spaces and punctuation first, then one word. That is how macOS text fields behave with Option-arrow and Option-Backspace: "run the tests" moves one word per press, and Option-Backspace after "go 🎵" removes only the emoji.
+A word is a run of letters, digits and underscores, and an emoji is a word of its own. An emoji here is a character that starts with an Extended_Pictographic code point or a regional indicator, or that contains the emoji variation selector or the keycap mark, so flags and keycaps count. Every other character, including symbols such as `+`, `=`, `<` and `|`, counts as punctuation. Moving or deleting by word skips any spaces and punctuation first, then one word. That is how macOS text fields behave with Option-arrow and Option-Backspace: "run the tests" moves one word per press, and Option-Backspace after "go 🎵" removes only the emoji.
 
 ### Wrapping and the insertion point at a wrap
 
@@ -70,13 +70,15 @@ Typing extends the current snapshot group until a word boundary: a space or new 
 Bubble Tea v2 already turns on bracketed paste and delivers the pasted text as one `tea.PasteMsg`. The editor cleans it before inserting, in this order:
 
 1. Carriage-return and new-line pairs, and lone carriage returns, become new lines.
-2. Every escape sequence is removed whole, using the `x/ansi` parser. That covers control sequences such as colour codes, operating system commands such as clipboard and title sequences, device control strings, and a lone escape byte.
+2. Every complete escape sequence is removed whole, by a small scanner in the editor that follows the terminal's escape grammar. That covers control sequences such as colour codes, operating system commands such as clipboard and title sequences, device control strings, and their C1 forms. The `x/ansi` parser can't be used here, because it drops ordinary text after a broken sequence.
 3. Tabs become four spaces.
 4. Every remaining control character is removed, including the C1 range and delete.
 
-Removing whole sequences matters: removing only the escape byte would leave text such as `[31m` behind. But a paste must never lose ordinary text to a broken sequence. An escape byte followed by a control character, such as a new line, is a lone escape, and the text after it is kept. A control string that never ends, such as an operating system command with no terminator, loses only its introducer, and the rest of the paste is kept. C1 introducers written as Unicode characters, such as U+009B, are treated the same as their escape forms.
+Removing whole sequences matters: removing only the escape byte would leave text such as `[31m` behind. But a paste must never lose ordinary text to a broken sequence. An escape byte followed by a control character, such as a new line, is a lone escape, and the text after it is kept. A control string that never ends, such as an operating system command with no terminator, loses only its introducer, and the rest of the paste is kept. C1 introducers written as Unicode characters, such as U+009B, are treated the same as their escape forms. A string that meets any control character, another introducer or an escape that doesn't end it counts as never ending, so its body is kept as text, and step 4 still removes every control character from it. An escape followed by a space is a lone escape too, so the word after it is kept. The scanner never looks at the same text twice, so cleaning stays linear in the paste's length.
 
-Undo restores a snapshot by splitting its text into graphemes again, so it keeps the insertion point and the anchor within the restored text. The paste is one undo group, and it replaces any selection.
+The paste is one undo group, and it replaces any selection.
+
+Undo restores a snapshot by splitting its text into graphemes again, so it keeps the insertion point and the anchor within the restored text.
 
 ### Copy and cut
 

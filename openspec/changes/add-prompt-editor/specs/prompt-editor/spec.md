@@ -109,7 +109,7 @@ Option-Left and Option-Right, and Alt-B and Alt-F, SHALL move to the start of th
 
 ### Requirement: Moving by row and to the ends
 
-Up and Down SHALL move between the rows as they appear on screen, across soft wraps, keeping the screen column the insertion point had when vertical movement began. Home and End, and Ctrl-A and Ctrl-E, SHALL move to the start and end of the row on screen. Option-Up and Option-Down SHALL move to the start and end of the whole prompt.
+Up and Down SHALL move between the rows as they appear on screen, across soft wraps, keeping the screen column the insertion point had when vertical movement began. Home and End, and Ctrl-A and Ctrl-E, SHALL move to the start and end of the row on screen. Option-Up and Option-Down SHALL move to the start and end of the whole prompt. Up on the first row SHALL move to the start of the prompt, and Down on the last row to its end.
 
 #### Scenario: Down keeps the column
 
@@ -124,6 +124,13 @@ Up and Down SHALL move between the rows as they appear on screen, across soft wr
 - **THEN** the terminal cursor is on the prompt box's first text row, on the eleventh column of the screen
 - **AND** the insertion point is between "wor" and "d" in the second "word"
 
+#### Scenario: Up on the first row
+
+- **GIVEN** a terminal 60 columns wide and 20 rows tall, in the default theme, with colour on, and the prompt is "one\ntwo" with the insertion point after "on"
+- **WHEN** Up is pressed
+- **THEN** the insertion point is before "one"
+- **AND** after Down is pressed twice, it is after "two"
+
 #### Scenario: Start and end of the prompt
 
 - **GIVEN** a terminal 60 columns wide and 20 rows tall, in the default theme, with colour on, and the prompt is "one\ntwo\nthree" with the insertion point after "tw"
@@ -133,7 +140,7 @@ Up and Down SHALL move between the rows as they appear on screen, across soft wr
 
 ### Requirement: Selecting with the keyboard
 
-Holding Shift with any movement key SHALL extend a selection from where the insertion point was. Ctrl-Shift-A SHALL select the whole prompt. Moving without Shift SHALL clear the selection. Typing, pasting or deleting while text is selected SHALL replace the selection.
+Holding Shift with any movement key SHALL extend a selection from where the insertion point was. Ctrl-Shift-A SHALL select the whole prompt. Moving without Shift SHALL clear the selection, and Left or Right without Shift SHALL move to the selection's start or end. Typing, pasting or deleting while text is selected SHALL replace the selection.
 
 #### Scenario: Selecting a word
 
@@ -148,6 +155,13 @@ Holding Shift with any movement key SHALL extend a selection from where the inse
 - **WHEN** "build" is typed
 - **THEN** the prompt is "run the build"
 - **AND** nothing is selected
+
+#### Scenario: Right moves to the end of a selection
+
+- **GIVEN** a terminal 60 columns wide and 20 rows tall, in the default theme, with colour on, and the prompt is "run the tests now" with "tests" selected and the insertion point before it
+- **WHEN** Right is pressed
+- **THEN** nothing is selected
+- **AND** the insertion point is after "tests"
 
 #### Scenario: Selecting everything
 
@@ -211,7 +225,7 @@ Backspace and Delete SHALL remove one character before or after the insertion po
 
 ### Requirement: Undo and redo
 
-Ctrl-Z SHALL undo the last edit and Ctrl-Y or Ctrl-Shift-Z SHALL redo it, across the whole prompt, restoring the text, the insertion point and the selection. Typing is undone a word at a time: a run of typing ends at a space or new line after a word, at any movement, and at any other kind of edit. A new edit after an undo SHALL discard what could be redone.
+Ctrl-Z SHALL undo the last edit and Ctrl-Y or Ctrl-Shift-Z SHALL redo it, across the whole prompt, restoring the text, the insertion point and the selection. Typing is undone a word at a time: a run of typing ends at a space or new line after a word, at any movement, and at any other kind of edit. A run of Backspace presses, or of Delete presses, SHALL be undone in one step. A new edit after an undo SHALL discard what could be redone.
 
 #### Scenario: Undo typing a word at a time
 
@@ -219,6 +233,12 @@ Ctrl-Z SHALL undo the last edit and Ctrl-Y or Ctrl-Shift-Z SHALL redo it, across
 - **WHEN** "run the tests" is typed and Ctrl-Z is pressed
 - **THEN** the prompt is "run the "
 - **AND** after Ctrl-Z is pressed twice more, the prompt is empty
+
+#### Scenario: Undoing a run of Backspace
+
+- **GIVEN** a terminal 60 columns wide and 20 rows tall, in the default theme, with colour on, and the prompt is "run the tests" with the insertion point at the end
+- **WHEN** Backspace is pressed five times and then Ctrl-Z once
+- **THEN** the prompt is "run the tests"
 
 #### Scenario: Redo after undo
 
