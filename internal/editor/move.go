@@ -110,7 +110,12 @@ func (e *Editor) moveVertically(from, dir int) {
 		e.wantColSet = true
 	}
 	to := from + dir
-	if to < 0 || to >= len(rows) {
+	if to < 0 {
+		e.caret = 0
+		return
+	}
+	if to >= len(rows) {
+		e.caret = len(e.gs)
 		return
 	}
 
