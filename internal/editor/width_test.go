@@ -98,3 +98,20 @@ func TestSetWidthForgetsTheRememberedColumn(t *testing.T) {
 	e.Move(MoveDown, false)
 	assertCaret(t, e, 10+2)
 }
+
+func TestSetWidthWithTheSameWidthKeepsTheEndOfRowFlag(t *testing.T) {
+	e := withText(wrapped, 3)
+	e.Move(MoveRowEnd, false)
+	e.SetWidth(textWidth, ansi.GraphemeWidth)
+	if !e.endOfRow {
+		t.Error("end-of-row flag was cleared by SetWidth with the same width")
+	}
+}
+
+func TestSetWidthWithTheSameWidthKeepsTheRememberedColumn(t *testing.T) {
+	e := withText("abcdef\nab\nabcdef", 5)
+	e.Move(MoveDown, false)
+	e.SetWidth(textWidth, ansi.GraphemeWidth)
+	e.Move(MoveDown, false)
+	assertCaret(t, e, 15)
+}
