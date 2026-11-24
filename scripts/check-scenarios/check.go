@@ -16,15 +16,17 @@ import (
 
 // Scenario is one "#### Scenario:" in a spec.
 type Scenario struct {
-	Name   string
-	File   string
-	Reason string
+	Name        string
+	File        string
+	Requirement string
+	Reason      string
 }
 
 // Report sorts every scenario into covered, uncovered and checked by hand.
 type Report struct {
 	Covered, Uncovered, ByHand []Scenario
 	Duplicates                 []Scenario
+	Skipped                    []Skip
 }
 
 // Failed reports whether any scenario is uncovered.
@@ -32,6 +34,9 @@ func (r Report) Failed() bool { return len(r.Uncovered) > 0 || len(r.Duplicates)
 
 // Print writes the report for a person to read.
 func (r Report) Print(w io.Writer) {
+	for _, s := range r.Skipped {
+		_, _ = fmt.Fprintf(w, "Skipped %q in %s, because change %s %s it\n", s.Requirement, s.File, s.Change, s.Verb)
+	}
 	for _, s := range r.Duplicates {
 		_, _ = fmt.Fprintf(w, "Duplicate scenario name: %q in %s\n", s.Name, s.File)
 	}
@@ -52,6 +57,8 @@ const (
 
 // Check reads the scenarios in openspecDir/specs and in each open change
 // under openspecDir/changes, and reports which the test results cover.
+// A main-spec requirement that an open change removes or replaces is
+// skipped, and the change's own copy is checked instead.
 func Check(openspecDir string, results ...io.Reader) (Report, error) {
 	scenarios, err := readScenarios(openspecDir)
 	if err != nil {
@@ -62,10 +69,21 @@ func Check(openspecDir string, results ...io.Reader) (Report, error) {
 		return Report{}, err
 	}
 
-	var report Report
+	skips, err := replaced(openspecDir)
+	if err != nil {
+		return Report{}, err
+	}
+	skipped := map[[2]string]bool{}
+	for _, s := range skips {
+		skipped[[2]string{s.File, s.Requirement}] = true
+	}
+
+	report := Report{Skipped: skips}
 	report.Duplicates = duplicates(openspecDir, scenarios)
 	for _, s := range scenarios {
 		switch {
+		case skipped[[2]string{s.File, s.Requirement}]:
+			continue
 		case s.Reason != "":
 			report.ByHand = append(report.ByHand, s)
 		case outcomes[normalise(s.Name)] == passed:
@@ -113,6 +131,7 @@ func scenariosIn(path string) ([]Scenario, error) {
 	}
 	var scenarios []Scenario
 	current := -1
+	requirement := ""
 	inFence := false
 	for _, line := range strings.Split(data, "\n") {
 		trimmed := strings.TrimSpace(line)
@@ -123,10 +142,15 @@ func scenariosIn(path string) ([]Scenario, error) {
 		if inFence {
 			continue
 		}
+		if name, ok := requirementName(trimmed); ok {
+			requirement = name
+		} else if strings.HasPrefix(trimmed, "## ") {
+			requirement = ""
+		}
 		switch {
 		case strings.HasPrefix(trimmed, scenarioPrefix):
 			name := strings.TrimSpace(strings.TrimPrefix(trimmed, scenarioPrefix))
-			scenarios = append(scenarios, Scenario{Name: name, File: path})
+			scenarios = append(scenarios, Scenario{Name: name, File: path, Requirement: requirement})
 			current = len(scenarios) - 1
 		case strings.HasPrefix(trimmed, "#"):
 			current = -1
