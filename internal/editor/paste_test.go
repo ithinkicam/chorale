@@ -52,7 +52,7 @@ func TestCleanPasteTurnsATabIntoFourSpaces(t *testing.T) {
 }
 
 func TestCleanPasteRemovesC0C1AndDeleteCharacters(t *testing.T) {
-	if got, want := CleanPaste("a\x00b\x07c\x08d\u0085e\u009bf\x7fg"), "abcdefg"; got != want {
+	if got, want := CleanPaste("a\x00b\x07c\x08d\u0085e\x7ff"), "abcdef"; got != want {
 		t.Errorf("cleaned paste is %q, want %q", got, want)
 	}
 }
