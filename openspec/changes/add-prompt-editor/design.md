@@ -43,15 +43,19 @@ So `Layout` takes the width method as an argument, and the app passes whichever 
 
 ### Words
 
-A word is a run of letters, digits and underscores, and an emoji or other symbol is a word of its own. Moving or deleting by word skips any spaces and punctuation first, then one word. That is how macOS text fields behave with Option-arrow and Option-Backspace: "run the tests" moves one word per press, and Option-Backspace after "go 🎵" removes only the emoji.
+A word is a run of letters, digits and underscores, and an emoji is a word of its own. Every other character, including symbols such as `+`, `=`, `<` and `|`, counts as punctuation. Moving or deleting by word skips any spaces and punctuation first, then one word. That is how macOS text fields behave with Option-arrow and Option-Backspace: "run the tests" moves one word per press, and Option-Backspace after "go 🎵" removes only the emoji.
 
 ### Wrapping and the insertion point at a wrap
 
 The text width is the window width minus three: two columns of indent and one column kept free at the right edge. The free column means that a cursor after the last character of a full row is always drawn on screen, never past the edge, where terminals behave inconsistently.
 
-The layout breaks a logical line at the last space that fits. A word wider than the box is broken at the last grapheme that fits. The space at a wrap point stays at the end of the row it ends, so the text is unchanged. A row is never wider than the text width, and a wide character that would straddle the edge moves to the next row whole.
+The layout breaks a logical line after the last space that fits. A word wider than the box is broken at the last grapheme that fits. The space at a wrap point stays at the end of the row it ends when it fits there, so the text is unchanged. A row is never wider than the text width, so when a word exactly fills the rest of a row and the space after it doesn't fit, the word moves down to the next row. When a row has no earlier space, the space that doesn't fit starts the next row. A wide character that would straddle the edge moves to the next row whole.
 
 At a soft wrap, the end of one row and the start of the next are the same grapheme index. The insertion point carries a flag saying which of the two it is drawn at. End, Ctrl-E and Cmd-Right set it to the end of the row. Everything else sets it to the start of the next row. Up and Down keep a remembered screen column until some other key is pressed.
+
+The row a key moves from is the row the cursor is drawn on, worked out before the flag changes. So Home after End goes to the start of the same row, and a second End stays put.
+
+Up on the first row moves to the start of the prompt, and Down on the last row moves to its end, as in macOS text fields. Left and Right with a selection, and without Shift, move to the selection's start or end and clear it, rather than moving one character.
 
 ### Undo history
 
@@ -59,7 +63,7 @@ The history is a list of snapshots, each holding the text as one string, the ins
 
 The history keeps at most 200 snapshots, and drops the oldest when the total size of their text passes 16 MB. A 10,000-line prompt of about 500 KB still keeps around 30 undo steps under that cap. The history reports its own size, and a unit test checks both limits directly.
 
-Typing extends the current snapshot group until a word boundary: a space or new line typed after a non-space ends the group. Any movement, paste, cut, delete-word or clear starts a new group, so each is one undo. A new edit after an undo truncates the redo part.
+Typing extends the current snapshot group until a word boundary: a space or new line typed after a non-space ends the group. A run of Backspace presses is one group too, and so is a run of Delete presses, as in macOS text fields, so holding Backspace can't push earlier text out of the history. Any movement, paste, cut, delete-word or clear starts a new group, so each is one undo. A new edit after an undo truncates the redo part.
 
 ### Paste
 
@@ -70,7 +74,9 @@ Bubble Tea v2 already turns on bracketed paste and delivers the pasted text as o
 3. Tabs become four spaces.
 4. Every remaining control character is removed, including the C1 range and delete.
 
-Removing whole sequences matters: removing only the escape byte would leave text such as `[31m` behind. The paste is one undo group, and it replaces any selection.
+Removing whole sequences matters: removing only the escape byte would leave text such as `[31m` behind. But a paste must never lose ordinary text to a broken sequence. An escape byte followed by a control character, such as a new line, is a lone escape, and the text after it is kept. A control string that never ends, such as an operating system command with no terminator, loses only its introducer, and the rest of the paste is kept. C1 introducers written as Unicode characters, such as U+009B, are treated the same as their escape forms.
+
+Undo restores a snapshot by splitting its text into graphemes again, so it keeps the insertion point and the anchor within the restored text. The paste is one undo group, and it replaces any selection.
 
 ### Copy and cut
 

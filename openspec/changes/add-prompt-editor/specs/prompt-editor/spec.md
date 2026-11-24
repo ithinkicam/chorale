@@ -98,7 +98,7 @@ Left and Right, and Ctrl-B and Ctrl-F, SHALL move the insertion point by one cha
 
 ### Requirement: Moving by word
 
-Option-Left and Option-Right, and Alt-B and Alt-F, SHALL move to the start of the previous word and the end of the next word, skipping any spaces and punctuation in between. A word is a run of letters, digits and underscores, and an emoji or other symbol counts as a word of its own.
+Option-Left and Option-Right, and Alt-B and Alt-F, SHALL move to the start of the previous word and the end of the next word, skipping any spaces and punctuation in between. A word is a run of letters, digits and underscores, and an emoji counts as a word of its own. Other symbols, such as `+`, `=` and `|`, are skipped like punctuation.
 
 #### Scenario: Moving by word
 
@@ -242,7 +242,7 @@ Ctrl-Z SHALL undo the last edit and Ctrl-Y or Ctrl-Shift-Z SHALL redo it, across
 
 ### Requirement: Soft wrapping
 
-The prompt box SHALL wrap text to its real width at spaces, breaking a word only when it is wider than the box. A space at a wrap stays at the end of the row it ends. It SHALL never split a character, and SHALL count wide characters as two columns, measuring every character the same way the screen draws it. Wrapping SHALL NOT change the prompt's text. A resize SHALL rewrap it and keep the insertion point on the same character.
+The prompt box SHALL wrap text to its real width at spaces, breaking a word only when it is wider than the box. A space at a wrap stays at the end of the row it ends when it fits there, and otherwise starts the next row. It SHALL never split a character, and SHALL count wide characters as two columns, measuring every character the same way the screen draws it. Wrapping SHALL NOT change the prompt's text. A resize SHALL rewrap it and keep the insertion point on the same character.
 
 #### Scenario: Wrapping at a space at 60 columns
 
