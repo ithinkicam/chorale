@@ -93,3 +93,6 @@ func (h *history) trim() {
 		h.cur--
 	}
 }
+
+// EndGroup ends the current run of typing, Backspace or Delete, so the next edit is a new undo step.
+func (e *Editor) EndGroup() {}

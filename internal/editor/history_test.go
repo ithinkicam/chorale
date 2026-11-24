@@ -290,3 +290,33 @@ func TestRedoKeepsTheInsertionPointAndAnchorInsideTheText(t *testing.T) {
 	assertSelection(t, e, 2, 2)
 	e.CursorPos()
 }
+
+func TestADeleteThatDoesNothingEndsARunOfBackspaces(t *testing.T) {
+	e := newEditor()
+	e.Insert("abc")
+	e.Backspace()
+	e.Delete()
+	e.Backspace()
+	assertText(t, e, "a")
+	e.Undo()
+	assertText(t, e, "ab")
+}
+
+func TestEndGroupEndsARunOfBackspaces(t *testing.T) {
+	e := newEditor()
+	e.Insert("abc")
+	e.Backspace()
+	e.EndGroup()
+	e.Backspace()
+	e.Undo()
+	assertText(t, e, "ab")
+}
+
+func TestEndGroupEndsTyping(t *testing.T) {
+	e := newEditor()
+	e.Insert("ab")
+	e.EndGroup()
+	e.Insert("c")
+	e.Undo()
+	assertText(t, e, "ab")
+}
