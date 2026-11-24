@@ -1,0 +1,76 @@
+// Package editor is the prompt editor's logic: grapheme text, the insertion
+// point, selection, layout, movement, deletion, history and paste cleaning.
+package editor
+
+import (
+	"strings"
+
+	"github.com/charmbracelet/x/ansi"
+)
+
+// Editor holds a prompt and the insertion point in it.
+type Editor struct {
+	gs     []string
+	caret  int
+	anchor int
+	width  int
+	method ansi.Method
+}
+
+// New returns an empty editor that lays text out to width columns, measured by method.
+func New(width int, method ansi.Method) *Editor {
+	return &Editor{width: width, method: method}
+}
+
+// Graphemes splits s into user-perceived characters.
+func Graphemes(s string) []string {
+	var out []string
+	for s != "" {
+		g, _ := ansi.FirstGraphemeCluster(s, ansi.GraphemeWidth)
+		out = append(out, g)
+		s = s[len(g):]
+	}
+	return out
+}
+
+// Text returns the whole prompt.
+func (e *Editor) Text() string {
+	return strings.Join(e.gs, "")
+}
+
+// Len returns the number of characters in the prompt.
+func (e *Editor) Len() int {
+	return len(e.gs)
+}
+
+// Caret returns the insertion point as a character index.
+func (e *Editor) Caret() int {
+	return e.caret
+}
+
+// Insert types s at the insertion point.
+func (e *Editor) Insert(s string) {
+	e.replace(e.caret, e.caret, s)
+}
+
+// replace swaps the characters from start to end for s, and puts the insertion
+// point after s. The characters on either side of the change are segmented
+// again together with s, so accents and joiners attach to their neighbours.
+func (e *Editor) replace(start, end int, s string) {
+	from := max(start-1, 0)
+	to := min(end+1, len(e.gs))
+	left := strings.Join(e.gs[from:start], "")
+	right := strings.Join(e.gs[end:to], "")
+
+	joined := Graphemes(left + s + right)
+	caret := from + len(Graphemes(left+s))
+
+	gs := make([]string, 0, len(e.gs)-(to-from)+len(joined))
+	gs = append(gs, e.gs[:from]...)
+	gs = append(gs, joined...)
+	gs = append(gs, e.gs[to:]...)
+
+	e.gs = gs
+	e.caret = min(caret, from+len(joined))
+	e.anchor = e.caret
+}

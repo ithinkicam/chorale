@@ -52,7 +52,7 @@ func TestInsertAcceptsWideCharactersAndEmoji(t *testing.T) {
 	e := newEditor()
 	e.Insert("合唱 🎵 é")
 	assertText(t, e, "合唱 🎵 é")
-	assertCaret(t, e, 7)
+	assertCaret(t, e, 6)
 }
 
 func TestInsertJoinsACombiningAccent(t *testing.T) {
@@ -68,7 +68,7 @@ func TestInsertJoinsACombiningAccent(t *testing.T) {
 
 func TestInsertJoinsAnEmojiBuiltFromSeveralKeystrokes(t *testing.T) {
 	e := newEditor()
-	for _, part := range []string{"👨", "‍", "👩"} {
+	for _, part := range []string{"👨", "\u200d", "👩"} {
 		e.Insert(part)
 	}
 	if got := e.Len(); got != 1 {
