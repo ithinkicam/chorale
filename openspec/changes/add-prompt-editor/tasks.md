@@ -14,7 +14,7 @@ Every scenario has a test named after it, as `docs/testing.md` describes, and th
 
 ## 2. Editor text, layout and movement
 
-- [ ] 2.1 Write unit tests in `internal/editor` for inserting text at the insertion point: plain letters, inserting in the middle, wide characters and emoji, and a combining accent inserted on its own joining the letter before it. Run them and confirm they fail because the package doesn't exist
+- [x] 2.1 Write unit tests in `internal/editor` for inserting text at the insertion point: plain letters, inserting in the middle, wide characters and emoji, and a combining accent inserted on its own joining the letter before it. Run them and confirm they fail because the package doesn't exist
 - [ ] 2.2 Implement the grapheme text and insertion, with re-segmenting around the insertion point, and verify the tests from 2.1 pass
 - [ ] 2.3 Write unit tests for `Layout` at a text width of 57: wrapping at a space with the space kept at the end of its row, breaking a word wider than the row, wide characters moving to the next row whole, a row filled exactly to the width, and the heart with its emoji variation selector measured as two columns by graphemes and one by code points. Run them and confirm they fail
 - [ ] 2.4 Implement `Layout` with both width methods, as `design.md` describes, and verify the tests from 2.3 pass
