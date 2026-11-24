@@ -37,3 +37,18 @@ func BenchmarkKeystrokeAtTheEndOfALargePrompt(b *testing.B) {
 		e.CursorPos()
 	}
 }
+
+func BenchmarkUndoInALargePrompt(b *testing.B) {
+	var paste strings.Builder
+	for i := range 10000 {
+		fmt.Fprintf(&paste, "line number %d of a long prompt\n", i)
+	}
+	e := newEditor()
+	e.Paste(paste.String())
+	e.Insert("x")
+
+	for b.Loop() {
+		e.Undo()
+		e.Redo()
+	}
+}
