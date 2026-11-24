@@ -43,9 +43,21 @@ const (
 // stripEscapes removes each complete escape sequence. A sequence that never
 // ends loses only its introducer.
 func stripEscapes(s string) string {
+	out, _ := scan(s)
+	return out
+}
+
+// scanner counts the bytes it examines, so a test can check the scan stays linear.
+type scanner struct {
+	examined int
+}
+
+func scan(s string) (string, int) {
+	var sc scanner
 	var b strings.Builder
 	for i := 0; i < len(s); {
-		end := escapeEnd(s, i)
+		sc.examined++
+		end := sc.escapeEnd(s, i)
 		if end == i {
 			_, size := utf8.DecodeRuneInString(s[i:])
 			b.WriteString(s[i : i+size])
@@ -53,41 +65,42 @@ func stripEscapes(s string) string {
 		}
 		i = end
 	}
-	return b.String()
+	return b.String(), sc.examined
 }
 
 // escapeEnd returns the index after the escape sequence or introducer that
 // starts at i, or i when there is none.
-func escapeEnd(s string, i int) int {
+func (sc *scanner) escapeEnd(s string, i int) int {
 	if s[i] == 0x1b {
-		return escapeFormEnd(s, i)
+		return sc.escapeFormEnd(s, i)
 	}
 	r, size := utf8.DecodeRuneInString(s[i:])
 	switch r {
 	case c1CSI:
-		return sequenceEnd(s, i+size)
+		return sc.sequenceEnd(s, i+size)
 	case c1OSC:
-		return stringEnd(s, i+size, true)
+		return sc.stringEnd(s, i+size, true)
 	case c1DCS, c1SOS, c1PM, c1APC:
-		return stringEnd(s, i+size, false)
+		return sc.stringEnd(s, i+size, false)
 	}
 	return i
 }
 
-func escapeFormEnd(s string, i int) int {
+func (sc *scanner) escapeFormEnd(s string, i int) int {
 	if i+1 >= len(s) {
 		return i + 1
 	}
 	switch c := s[i+1]; {
 	case c == '[':
-		return sequenceEnd(s, i+2)
+		return sc.sequenceEnd(s, i+2)
 	case c == ']':
-		return stringEnd(s, i+2, true)
+		return sc.stringEnd(s, i+2, true)
 	case c == 'P' || c == 'X' || c == '^' || c == '_':
-		return stringEnd(s, i+2, false)
+		return sc.stringEnd(s, i+2, false)
 	case c >= 0x21 && c <= 0x2f:
 		j := i + 1
 		for j < len(s) && s[j] >= 0x21 && s[j] <= 0x2f {
+			sc.examined++
 			j++
 		}
 		if j < len(s) && s[j] >= 0x30 && s[j] <= 0x7e {
@@ -102,8 +115,9 @@ func escapeFormEnd(s string, i int) int {
 
 // sequenceEnd returns the index after the control sequence whose parameters
 // start at start, or start when it has no final byte.
-func sequenceEnd(s string, start int) int {
+func (sc *scanner) sequenceEnd(s string, start int) int {
 	for j := start; j < len(s); j++ {
+		sc.examined++
 		switch b := s[j]; {
 		case b >= 0x20 && b <= 0x3f:
 		case b >= 0x40 && b <= 0x7e:
@@ -117,8 +131,9 @@ func sequenceEnd(s string, start int) int {
 
 // stringEnd returns the index after the control string whose text starts at
 // start, or start when it has no terminator.
-func stringEnd(s string, start int, bell bool) int {
+func (sc *scanner) stringEnd(s string, start int, bell bool) int {
 	for j := start; j < len(s); j++ {
+		sc.examined++
 		switch b := s[j]; {
 		case bell && b == 0x07:
 			return j + 1

@@ -3,7 +3,6 @@ package editor
 import (
 	"strings"
 	"testing"
-	"time"
 )
 
 func TestCleanPasteTurnsCarriageReturnsIntoNewLines(t *testing.T) {
@@ -168,19 +167,13 @@ func TestCleanPasteTreatsC1IntroducersLikeTheirEscapeForms(t *testing.T) {
 	}
 }
 
-func TestCleanPasteTakesLinearTimeForC1Strings(t *testing.T) {
-	timeOf := func(in string) time.Duration {
-		start := time.Now()
-		cleanPaste(in)
-		return time.Since(start)
-	}
-	const repeats = 20000
-	escForm := timeOf(strings.Repeat("\x1b]ab", repeats))
-	c1Form := timeOf(strings.Repeat("\u009dab", repeats))
-
-	limit := 20 * max(escForm, 2*time.Millisecond)
-	if c1Form > limit {
-		t.Errorf("cleaning %d C1 strings took %v, want at most %v, 20 times the %v the escape form took", repeats, c1Form, limit, escForm)
+func TestScanningC1StringsExaminesAConstantNumberOfBytesPerInputByte(t *testing.T) {
+	for _, unit := range []string{"\u009dab", "\x1b]ab", "\u0090ab", "\x1b[1"} {
+		in := strings.Repeat(unit, 20000)
+		_, examined := scan(in)
+		if limit := 4 * len(in); examined > limit {
+			t.Errorf("scanning %q repeated examined %d bytes of %d, want at most %d", unit, examined, len(in), limit)
+		}
 	}
 }
 
