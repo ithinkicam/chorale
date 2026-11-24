@@ -107,6 +107,7 @@ func isSpace(g string) bool {
 func (e *Editor) apply(start, end int, s string, kind editKind) {
 	caret, anchor := e.caret, e.anchor
 	if !e.replace(start, end, s) {
+		e.last = editOther
 		return
 	}
 	e.record(caret, anchor, kind != editOther && kind == e.last)

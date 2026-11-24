@@ -95,4 +95,6 @@ func (h *history) trim() {
 }
 
 // EndGroup ends the current run of typing, Backspace or Delete, so the next edit is a new undo step.
-func (e *Editor) EndGroup() {}
+func (e *Editor) EndGroup() {
+	e.last = editOther
+}
