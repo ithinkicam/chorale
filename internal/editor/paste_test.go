@@ -189,3 +189,25 @@ func TestCleanPasteKeepsTheWordAfterAnEscapeAndASpace(t *testing.T) {
 		t.Errorf("cleaned paste is %q, want %q", got, want)
 	}
 }
+
+func TestCleanPasteHandlesOtherShapesOfEscapeSequence(t *testing.T) {
+	tests := []struct{ name, in, want string }{
+		{"control sequence with a private marker", "a\x1b[?2004hb", "ab"},
+		{"escape form string ended by a C1 terminator", "a\x1bPqabc\u009cb", "ab"},
+		{"operating system command ended by a C1 terminator", "a\x1b]0;t\u009cb", "ab"},
+		{"C1 start of string", "a\u0098xyz\u009cb", "ab"},
+		{"C1 privacy message", "a\u009exyz\u009cb", "ab"},
+		{"C1 application program command", "a\u009fxyz\u009cb", "ab"},
+		{"raw 8-bit control sequence introducer", "a\x9b31mb", "a�31mb"},
+		{"raw 8-bit operating system command", "a\x9d0;t\x07b", "a�0;tb"},
+		{"null inside a control sequence", "a\x1b[3\x001mb", "a31mb"},
+		{"null inside a control string", "a\x1b]0;t\x00x\x07b", "a0;txb"},
+		{"escape and intermediates with no final byte", "a\x1b(\nb", "a(\nb"},
+		{"escape and intermediates at the end", "a\x1b((", "a(("},
+	}
+	for _, tt := range tests {
+		if got := cleanPaste(tt.in); got != tt.want {
+			t.Errorf("%s: cleaned paste is %q, want %q", tt.name, got, tt.want)
+		}
+	}
+}
