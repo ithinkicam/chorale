@@ -42,6 +42,9 @@ func New(width int, method ansi.Method) *Editor {
 
 // SetWidth changes the width the text is laid out to, and how characters are measured.
 func (e *Editor) SetWidth(width int, method ansi.Method) {
+	if width == e.width && method == e.method {
+		return
+	}
 	e.width = width
 	e.method = method
 	e.endOfRow = false
