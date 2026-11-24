@@ -150,7 +150,7 @@ type charClass int
 const (
 	gap charClass = iota
 	letter
-	symbol
+	emoji
 )
 
 func classOf(g string) charClass {
@@ -158,10 +158,10 @@ func classOf(g string) charClass {
 	switch {
 	case r == '_' || unicode.IsLetter(r) || unicode.IsDigit(r) || unicode.IsMark(r):
 		return letter
-	case unicode.IsSpace(r) || unicode.IsPunct(r) || unicode.IsControl(r):
-		return gap
+	case startsWithPictograph(g):
+		return emoji
 	default:
-		return symbol
+		return gap
 	}
 }
 
@@ -169,7 +169,7 @@ func (e *Editor) wordLeft(i int) int {
 	for i > 0 && classOf(e.gs[i-1]) == gap {
 		i--
 	}
-	if i > 0 && classOf(e.gs[i-1]) == symbol {
+	if i > 0 && classOf(e.gs[i-1]) == emoji {
 		return i - 1
 	}
 	for i > 0 && classOf(e.gs[i-1]) == letter {
@@ -182,7 +182,7 @@ func (e *Editor) wordRight(i int) int {
 	for i < len(e.gs) && classOf(e.gs[i]) == gap {
 		i++
 	}
-	if i < len(e.gs) && classOf(e.gs[i]) == symbol {
+	if i < len(e.gs) && classOf(e.gs[i]) == emoji {
 		return i + 1
 	}
 	for i < len(e.gs) && classOf(e.gs[i]) == letter {
