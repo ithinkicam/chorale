@@ -1,6 +1,7 @@
 package editor
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/charmbracelet/x/ansi"
@@ -89,4 +90,26 @@ func TestGraphemesKeepsAnEmojiWhole(t *testing.T) {
 	if len(got) != 3 {
 		t.Errorf("got %d graphemes %q, want 3", len(got), got)
 	}
+}
+
+func TestCharsLineUpWithTheRowsOfAWrappedPrompt(t *testing.T) {
+	e := newEditor()
+	e.Insert(strings.Repeat("合", 40) + " 🎵 é\nsecond line")
+	chars := e.Chars()
+	if len(chars) != 40+1+1+1+1+1+11 {
+		t.Fatalf("got %d characters, want 57", len(chars))
+	}
+
+	var got []string
+	for _, r := range e.Rows() {
+		if r.End > len(chars) {
+			t.Fatalf("row ends at %d, past the %d characters", r.End, len(chars))
+		}
+		got = append(got, strings.Join(chars[r.Start:r.End], ""))
+		if w := ansi.GraphemeWidth.StringWidth(got[len(got)-1]); w != r.EndCol {
+			t.Errorf("row %q is %d columns wide, but ends at column %d", got[len(got)-1], w, r.EndCol)
+		}
+	}
+	want := []string{strings.Repeat("合", 28), strings.Repeat("合", 12) + " 🎵 é", "second line"}
+	assertRows(t, got, want)
 }

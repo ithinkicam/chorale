@@ -176,3 +176,8 @@ func (e *Editor) replace(start, end int, s string) bool {
 	e.rowsOK = false
 	return true
 }
+
+// Chars returns the prompt's characters, indexed as Rows are.
+func (e *Editor) Chars() []string {
+	return nil
+}
