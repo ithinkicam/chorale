@@ -2,44 +2,45 @@ package editor
 
 // Backspace removes the selection, or the character before the insertion point.
 func (e *Editor) Backspace() {
-	e.remove(max(e.caret-1, 0), e.caret)
+	e.remove(max(e.caret-1, 0), e.caret, editBackspace)
 }
 
 // Delete removes the selection, or the character after the insertion point.
 func (e *Editor) Delete() {
-	e.remove(e.caret, min(e.caret+1, len(e.gs)))
+	e.remove(e.caret, min(e.caret+1, len(e.gs)), editDelete)
 }
 
 // DeleteWordBack removes the selection, or the word before the insertion point.
 func (e *Editor) DeleteWordBack() {
-	e.remove(e.wordLeft(e.caret), e.caret)
+	e.remove(e.wordLeft(e.caret), e.caret, editOther)
 }
 
 // DeleteWordForward removes the selection, or the word after the insertion point.
 func (e *Editor) DeleteWordForward() {
-	e.remove(e.caret, e.wordRight(e.caret))
+	e.remove(e.caret, e.wordRight(e.caret), editOther)
 }
 
 // DeleteToRowStart removes the selection, or everything from the start of the
 // row to the insertion point.
 func (e *Editor) DeleteToRowStart() {
-	e.remove(e.layout()[e.caretRow()].Start, e.caret)
+	e.remove(e.layout()[e.caretRow()].Start, e.caret, editOther)
 }
 
 // DeleteToRowEnd removes the selection, or everything from the insertion
 // point to the end of the row.
 func (e *Editor) DeleteToRowEnd() {
-	e.remove(e.caret, e.layout()[e.caretRow()].End)
+	e.remove(e.caret, e.layout()[e.caretRow()].End, editOther)
 }
 
 // Clear removes the whole prompt.
 func (e *Editor) Clear() {
-	e.apply(0, len(e.gs), "", false)
+	e.apply(0, len(e.gs), "", editOther)
 }
 
-func (e *Editor) remove(start, end int) {
+func (e *Editor) remove(start, end int, kind editKind) {
 	if e.HasSelection() {
 		start, end = e.Selection()
+		kind = editOther
 	}
-	e.apply(start, end, "", false)
+	e.apply(start, end, "", kind)
 }

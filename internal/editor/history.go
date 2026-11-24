@@ -60,7 +60,7 @@ func (e *Editor) restore(s snapshot) {
 	e.caret, e.anchor = s.caret, s.anchor
 	e.endOfRow = false
 	e.wantColSet = false
-	e.typing = false
+	e.last = editOther
 	e.rowsOK = false
 }
 

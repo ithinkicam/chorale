@@ -30,7 +30,7 @@ func (e *Editor) Paste(s string) {
 		return
 	}
 	start, end := e.Selection()
-	e.apply(start, end, s, false)
+	e.apply(start, end, s, editOther)
 }
 
 const (

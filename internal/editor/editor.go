@@ -22,9 +22,18 @@ type Editor struct {
 	rows       []Row
 	rowsOK     bool
 
-	hist   history
-	typing bool
+	hist history
+	last editKind
 }
+
+type editKind int
+
+const (
+	editOther editKind = iota
+	editTyping
+	editBackspace
+	editDelete
+)
 
 // New returns an empty editor that lays text out to width columns, measured by method.
 func New(width int, method ansi.Method) *Editor {
@@ -81,13 +90,13 @@ func (e *Editor) Insert(s string) {
 		if !closes {
 			continue
 		}
-		e.apply(start, end, chunk.String(), true)
-		e.typing = false
+		e.apply(start, end, chunk.String(), editTyping)
+		e.last = editOther
 		chunk.Reset()
 		start, end = e.caret, e.caret
 	}
 	if chunk.Len() > 0 {
-		e.apply(start, end, chunk.String(), true)
+		e.apply(start, end, chunk.String(), editTyping)
 	}
 }
 
@@ -96,14 +105,15 @@ func isSpace(g string) bool {
 }
 
 // apply swaps the characters from start to end for s as one edit in the
-// history. Typing edits join the group before them while it is still open.
-func (e *Editor) apply(start, end int, s string, typing bool) {
+// history. An edit of the same kind as the last one joins its group, except
+// for editOther.
+func (e *Editor) apply(start, end int, s string, kind editKind) {
 	caret, anchor := e.caret, e.anchor
 	if !e.replace(start, end, s) {
 		return
 	}
-	e.record(caret, anchor, typing && e.typing)
-	e.typing = typing
+	e.record(caret, anchor, kind != editOther && kind == e.last)
+	e.last = kind
 }
 
 // Selection returns the start and end of the selected characters, equal when
@@ -135,7 +145,7 @@ func (e *Editor) SelectAll() {
 	e.caret = len(e.gs)
 	e.endOfRow = false
 	e.wantColSet = false
-	e.typing = false
+	e.last = editOther
 }
 
 // replace swaps the characters from start to end for s, and puts the insertion

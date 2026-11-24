@@ -31,7 +31,7 @@ func (e *Editor) Move(m Movement, extend bool) {
 	}
 	row := e.caretRow()
 	e.endOfRow = false
-	e.typing = false
+	e.last = editOther
 
 	switch m {
 	case MoveLeft:
