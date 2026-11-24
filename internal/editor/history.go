@@ -57,7 +57,8 @@ func (e *Editor) Redo() bool {
 
 func (e *Editor) restore(s snapshot) {
 	e.gs = Graphemes(s.text)
-	e.caret, e.anchor = s.caret, s.anchor
+	e.caret = min(s.caret, len(e.gs))
+	e.anchor = min(s.anchor, len(e.gs))
 	e.endOfRow = false
 	e.wantColSet = false
 	e.last = editOther
