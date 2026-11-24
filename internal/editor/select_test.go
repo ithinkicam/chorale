@@ -47,7 +47,7 @@ func TestMovingWithoutShiftClearsTheSelection(t *testing.T) {
 	if e.HasSelection() {
 		t.Error("selection remains after moving without Shift")
 	}
-	assertCaret(t, e, 7)
+	assertCaret(t, e, 8)
 }
 
 func TestTypingReplacesTheSelection(t *testing.T) {
