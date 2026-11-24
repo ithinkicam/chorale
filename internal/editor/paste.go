@@ -85,9 +85,9 @@ func escapeFormEnd(s string, i int) int {
 		return stringEnd(s, i+2, true)
 	case c == 'P' || c == 'X' || c == '^' || c == '_':
 		return stringEnd(s, i+2, false)
-	case c >= 0x20 && c <= 0x2f:
+	case c >= 0x21 && c <= 0x2f:
 		j := i + 1
-		for j < len(s) && s[j] >= 0x20 && s[j] <= 0x2f {
+		for j < len(s) && s[j] >= 0x21 && s[j] <= 0x2f {
 			j++
 		}
 		if j < len(s) && s[j] >= 0x30 && s[j] <= 0x7e {
