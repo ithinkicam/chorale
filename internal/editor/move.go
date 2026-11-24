@@ -35,9 +35,9 @@ func (e *Editor) Move(m Movement, extend bool) {
 
 	switch m {
 	case MoveLeft:
-		e.caret = max(e.caret-1, 0)
+		e.caret = e.stepLeft(extend)
 	case MoveRight:
-		e.caret = min(e.caret+1, len(e.gs))
+		e.caret = e.stepRight(extend)
 	case MoveWordLeft:
 		e.caret = e.wordLeft(e.caret)
 	case MoveWordRight:
@@ -60,6 +60,20 @@ func (e *Editor) Move(m Movement, extend bool) {
 	if !extend {
 		e.anchor = e.caret
 	}
+}
+
+func (e *Editor) stepLeft(extend bool) int {
+	if start, _ := e.Selection(); e.HasSelection() && !extend {
+		return start
+	}
+	return max(e.caret-1, 0)
+}
+
+func (e *Editor) stepRight(extend bool) int {
+	if _, end := e.Selection(); e.HasSelection() && !extend {
+		return end
+	}
+	return min(e.caret+1, len(e.gs))
 }
 
 // EndOfRow reports whether the insertion point is drawn at the end of the row
