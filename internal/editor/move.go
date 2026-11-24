@@ -29,6 +29,7 @@ func (e *Editor) Move(m Movement, extend bool) {
 	if m != MoveUp && m != MoveDown {
 		e.wantColSet = false
 	}
+	row := e.caretRow()
 	e.endOfRow = false
 	e.typing = false
 
@@ -42,13 +43,13 @@ func (e *Editor) Move(m Movement, extend bool) {
 	case MoveWordRight:
 		e.caret = e.wordRight(e.caret)
 	case MoveUp:
-		e.moveVertically(-1)
+		e.moveVertically(row, -1)
 	case MoveDown:
-		e.moveVertically(1)
+		e.moveVertically(row, 1)
 	case MoveRowStart:
-		e.caret = e.layout()[e.caretRow()].Start
+		e.caret = e.layout()[row].Start
 	case MoveRowEnd:
-		e.caret = e.layout()[e.caretRow()].End
+		e.caret = e.layout()[row].End
 		e.endOfRow = true
 	case MoveStart:
 		e.caret = 0
@@ -102,9 +103,8 @@ func (e *Editor) colIn(row Row, index int) int {
 	return row.Cols[index-row.Start]
 }
 
-func (e *Editor) moveVertically(dir int) {
+func (e *Editor) moveVertically(from, dir int) {
 	rows := e.layout()
-	from := e.caretRow()
 	if !e.wantColSet {
 		e.wantCol = e.colIn(rows[from], e.caret)
 		e.wantColSet = true
