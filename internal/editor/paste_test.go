@@ -36,6 +36,7 @@ func TestCleanPasteRemovesALoneEscapeByte(t *testing.T) {
 	tests := []struct{ name, in, want string }{
 		{"at the end", "a\x1b", "a"},
 		{"at the end of a line", "a\x1b\n", "a\n"},
+		{"before a new line and more text", "a\x1b\nb", "a\nb"},
 	}
 	for _, tt := range tests {
 		if got := CleanPaste(tt.in); got != tt.want {
