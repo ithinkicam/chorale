@@ -44,6 +44,8 @@ func New(width int, method ansi.Method) *Editor {
 func (e *Editor) SetWidth(width int, method ansi.Method) {
 	e.width = width
 	e.method = method
+	e.endOfRow = false
+	e.wantColSet = false
 	e.rowsOK = false
 }
 
