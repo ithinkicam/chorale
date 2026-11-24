@@ -305,3 +305,32 @@ func TestEveryKindOfEmojiIsAWordOfItsOwn(t *testing.T) {
 		assertCaret(t, e, 3)
 	}
 }
+
+func TestDeleteWordBackAfterAFlagRemovesOnlyTheFlag(t *testing.T) {
+	text := "go 🇺🇸"
+	e := withText(text, len(Graphemes(text)))
+	e.DeleteWordBack()
+	assertText(t, e, "go ")
+}
+
+func TestDeleteWordBackAfterAKeycapRemovesOnlyTheKeycap(t *testing.T) {
+	text := "go #️⃣"
+	e := withText(text, len(Graphemes(text)))
+	e.DeleteWordBack()
+	assertText(t, e, "go ")
+}
+
+func TestEachKeycapIsAWordOfItsOwn(t *testing.T) {
+	text := "go 1️⃣2️⃣"
+	e := withText(text, len(Graphemes(text)))
+	e.DeleteWordBack()
+	assertText(t, e, "go 1️⃣")
+}
+
+func TestEachFlagIsAWordOfItsOwn(t *testing.T) {
+	text := "🇺🇸🇫🇷x"
+	e := withText(text, len(Graphemes(text)))
+	e.Move(MoveWordLeft, false)
+	e.Move(MoveWordLeft, false)
+	assertCaret(t, e, 1)
+}
