@@ -18,7 +18,7 @@ Every scenario has a test named after it, as `docs/testing.md` describes, and th
 - [x] 2.2 Implement the grapheme text and insertion, with re-segmenting around the insertion point, and verify the tests from 2.1 pass
 - [x] 2.3 Write unit tests for `Layout` at a text width of 57: wrapping at a space with the space kept at the end of its row, breaking a word wider than the row, wide characters moving to the next row whole, a row filled exactly to the width, and the heart with its emoji variation selector measured as two columns by graphemes and one by code points. Run them and confirm they fail
 - [x] 2.4 Implement `Layout` with both width methods, as `design.md` describes, and verify the tests from 2.3 pass
-- [ ] 2.5 Write unit tests for movement: by character over an emoji and across a soft wrap, by word with the word rules in `design.md`, by row keeping the remembered column across hard and soft wraps, to the start and end of a row with the end-of-row flag set by End, and to the start and end of the prompt. Run them and confirm they fail
+- [x] 2.5 Write unit tests for movement: by character over an emoji and across a soft wrap, by word with the word rules in `design.md`, by row keeping the remembered column across hard and soft wraps, to the start and end of a row with the end-of-row flag set by End, and to the start and end of the prompt. Run them and confirm they fail
 - [ ] 2.6 Implement the movements, the remembered column and the end-of-row flag, and verify the tests from 2.5 pass
 
 ## 3. Selection, deletion, history and paste
