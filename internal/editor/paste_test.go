@@ -183,3 +183,9 @@ func TestCleanPasteTakesLinearTimeForC1Strings(t *testing.T) {
 		t.Errorf("cleaning %d C1 strings took %v, want at most %v, 20 times the %v the escape form took", repeats, c1Form, limit, escForm)
 	}
 }
+
+func TestCleanPasteKeepsTheWordAfterAnEscapeAndASpace(t *testing.T) {
+	if got, want := cleanPaste("a\x1b word"), "a word"; got != want {
+		t.Errorf("cleaned paste is %q, want %q", got, want)
+	}
+}
