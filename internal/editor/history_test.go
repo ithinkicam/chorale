@@ -186,3 +186,84 @@ func TestHistoryTextStaysUnderSixteenMegabytes(t *testing.T) {
 		t.Errorf("undid %d edits, want %d", undone, e.HistoryLen()-1)
 	}
 }
+
+func TestARunOfBackspacesIsOneUndo(t *testing.T) {
+	e := newEditor()
+	e.Insert("abcdefghij")
+	for range 10 {
+		e.Backspace()
+	}
+	assertText(t, e, "")
+	e.Undo()
+	assertText(t, e, "abcdefghij")
+}
+
+func TestARunOfDeletesIsOneUndo(t *testing.T) {
+	e := newEditor()
+	e.Insert("abcdefghij")
+	e.Move(MoveStart, false)
+	for range 10 {
+		e.Delete()
+	}
+	assertText(t, e, "")
+	e.Undo()
+	assertText(t, e, "abcdefghij")
+}
+
+func TestMovingBetweenBackspacesMakesTwoUndos(t *testing.T) {
+	e := newEditor()
+	e.Insert("abcdef")
+	e.Backspace()
+	e.Move(MoveLeft, false)
+	e.Backspace()
+	assertText(t, e, "abce")
+	e.Undo()
+	assertText(t, e, "abcde")
+	e.Undo()
+	assertText(t, e, "abcdef")
+}
+
+func TestARunOfBackspacesAndARunOfDeletesAreSeparateUndos(t *testing.T) {
+	e := newEditor()
+	e.Insert("abcdef")
+	e.Move(MoveLeft, false)
+	e.Move(MoveLeft, false)
+	e.Backspace()
+	e.Backspace()
+	e.Delete()
+	e.Delete()
+	assertText(t, e, "ab")
+	e.Undo()
+	assertText(t, e, "abef")
+	e.Undo()
+	assertText(t, e, "abcdef")
+}
+
+func TestTypingBetweenBackspacesMakesSeparateUndos(t *testing.T) {
+	e := newEditor()
+	e.Insert("abc")
+	e.Backspace()
+	e.Insert("x")
+	e.Backspace()
+	e.Undo()
+	assertText(t, e, "abx")
+	e.Undo()
+	assertText(t, e, "ab")
+	e.Undo()
+	assertText(t, e, "abc")
+}
+
+func TestBackspacingASelectionDoesNotJoinTheRunAfterIt(t *testing.T) {
+	e := newEditor()
+	e.Insert("abcdef")
+	e.Move(MoveLeft, true)
+	e.Move(MoveLeft, true)
+	e.Backspace()
+	e.Backspace()
+	e.Backspace()
+	assertText(t, e, "ab")
+	e.Undo()
+	assertText(t, e, "abcd")
+	e.Undo()
+	assertText(t, e, "abcdef")
+}
