@@ -125,3 +125,51 @@ func TestAChangeMayRepeatScenariosFromTheMainSpecs(t *testing.T) {
 		t.Error("report.Failed() is true for a change that modifies a requirement")
 	}
 }
+
+func TestAChangeReplacesMainSpecRequirements(t *testing.T) {
+	report, err := Check("testdata/replaced", strings.NewReader(""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertNames(t, "uncovered", report.Uncovered,
+		"Same requirement name in another capability",
+		"Scenario after the change",
+		"Scenario kept through a rename",
+		"Scenario under the new name",
+		"Untouched scenario")
+}
+
+func TestSkippedRequirementsAreListed(t *testing.T) {
+	report, err := Check("testdata/replaced", strings.NewReader(""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var out strings.Builder
+	report.Print(&out)
+	for _, want := range []string{
+		`Skipped "Removed one" in testdata/replaced/specs/shell/spec.md, because change rework removes it`,
+		`Skipped "Renamed and modified" in testdata/replaced/specs/shell/spec.md, because change rework renames and modifies it`,
+		`Skipped "Modified one" in testdata/replaced/specs/shell/spec.md, because change rework modifies it`,
+	} {
+		if !strings.Contains(out.String(), want) {
+			t.Errorf("the report doesn't say %q; it says:\n%s", want, out.String())
+		}
+	}
+	if got := strings.Count(out.String(), "Skipped "); got != 3 {
+		t.Errorf("the report lists %d skips, want 3:\n%s", got, out.String())
+	}
+}
+
+func TestAChangeNamingAMissingRequirementIsAnError(t *testing.T) {
+	_, err := Check("testdata/stale", strings.NewReader(""))
+	if err == nil || !strings.Contains(err.Error(), `"Long gone"`) || !strings.Contains(err.Error(), "old") {
+		t.Fatalf("err = %v, want an error naming the requirement \"Long gone\" and the change old", err)
+	}
+}
+
+func TestRequirementNamesAreMatchedExactly(t *testing.T) {
+	_, err := Check("testdata/case", strings.NewReader(""))
+	if err == nil || !strings.Contains(err.Error(), `"quit with Q"`) {
+		t.Fatalf("err = %v, want an error, because \"quit with Q\" is not \"Quit with q\"", err)
+	}
+}
