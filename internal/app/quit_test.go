@@ -287,3 +287,16 @@ func TestCtrlCOnTheTooSmallScreenKeepsTheRememberedColumn(t *testing.T) {
 
 	waitForPrompt(t, mt, "abcdeXf")
 }
+
+func TestEnterEndsTheUndoGroup(t *testing.T) {
+	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20})
+	mt.WaitForText(emptyWords)
+
+	mt.Type("ab")
+	mt.Send(tea.KeyPressMsg{Code: tea.KeyEnter})
+	mt.Type("c")
+	waitForPrompt(t, mt, "abc")
+	mt.Send(tea.KeyPressMsg{Code: 'z', Mod: tea.ModCtrl})
+
+	waitForPrompt(t, mt, "ab")
+}

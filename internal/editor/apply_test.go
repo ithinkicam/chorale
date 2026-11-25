@@ -73,3 +73,27 @@ func TestActionsThatDoNothingClearTheRememberedColumn(t *testing.T) {
 		})
 	}
 }
+
+func TestActionsThatDoNothingEndTheUndoGroup(t *testing.T) {
+	tests := []struct {
+		name   string
+		action Action
+	}{
+		{"send", Action{Kind: ActionSend}},
+		{"copy", Action{Kind: ActionCopy}},
+		{"cut with nothing selected", Action{Kind: ActionCut}},
+		{"interrupt", Action{Kind: ActionInterrupt}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := newEditor()
+			e.Insert("ab")
+
+			e.Apply(tt.action)
+			e.Insert("c")
+			e.Apply(Action{Kind: ActionUndo})
+
+			assertText(t, e, "ab")
+		})
+	}
+}
