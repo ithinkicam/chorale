@@ -300,3 +300,31 @@ func TestEnterEndsTheUndoGroup(t *testing.T) {
 
 	waitForPrompt(t, mt, "ab")
 }
+
+func TestCancellingTheQuitOnTheTooSmallScreenWithoutATerminal(t *testing.T) {
+	var m tea.Model = app.New()
+	m, _ = m.Update(tea.WindowSizeMsg{Width: 40, Height: 20})
+
+	m, _ = m.Update(ctrlC())
+	m, _ = m.Update(tea.KeyPressMsg{Code: 'q', Text: "q"})
+	m, cmd := m.Update(ctrlC())
+
+	if isQuit(cmd) {
+		t.Error("the second Ctrl-C quit, after another key cancelled the first")
+	}
+	if !app.PendingQuit(m) {
+		t.Error("the second Ctrl-C didn't ask before quitting")
+	}
+	_, cmd = m.Update(ctrlC())
+	if !isQuit(cmd) {
+		t.Error("the third Ctrl-C didn't quit")
+	}
+}
+
+func isQuit(cmd tea.Cmd) bool {
+	if cmd == nil {
+		return false
+	}
+	_, quit := cmd().(tea.QuitMsg)
+	return quit
+}
