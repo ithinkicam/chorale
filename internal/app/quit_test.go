@@ -244,3 +244,44 @@ func TestCancellingTheQuitOnTheTooSmallScreen(t *testing.T) {
 	mt.WaitForText(emptyWords)
 	requireRunning(t, mt)
 }
+
+func TestCtrlCClearsTheRememberedColumnOnTheSessionList(t *testing.T) {
+	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20})
+	mt.WaitForText(emptyWords)
+	mt.Send(tea.PasteMsg{Content: "abcdef\nab\nabcdef"})
+	waitForPrompt(t, mt, "abcdef")
+	mt.Send(tea.KeyPressMsg{Code: tea.KeyHome, Mod: tea.ModCtrl})
+	for range 5 {
+		mt.Send(tea.KeyPressMsg{Code: tea.KeyRight})
+	}
+
+	mt.Send(tea.KeyPressMsg{Code: tea.KeyDown, Mod: tea.ModShift})
+	mt.Send(ctrlC())
+	mt.Send(tea.KeyPressMsg{Code: tea.KeyDown})
+	mt.Send(tea.KeyPressMsg{Code: 'X', Text: "X"})
+
+	waitForPrompt(t, mt, "abXcdef")
+}
+
+func TestCtrlCOnTheTooSmallScreenKeepsTheRememberedColumn(t *testing.T) {
+	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20})
+	mt.WaitForText(emptyWords)
+	mt.Send(tea.PasteMsg{Content: "abcdef\nab\nabcdef"})
+	waitForPrompt(t, mt, "abcdef")
+	mt.Send(tea.KeyPressMsg{Code: tea.KeyHome, Mod: tea.ModCtrl})
+	for range 5 {
+		mt.Send(tea.KeyPressMsg{Code: tea.KeyRight})
+	}
+	mt.Send(tea.KeyPressMsg{Code: tea.KeyDown})
+
+	mt.Resize(40, 20)
+	mt.WaitForText(tooSmallWords)
+	mt.Send(ctrlC())
+	mt.Send(tea.KeyPressMsg{Code: 'q', Text: "q"})
+	mt.Resize(60, 20)
+	mt.WaitForText(emptyWords)
+	mt.Send(tea.KeyPressMsg{Code: tea.KeyDown})
+	mt.Send(tea.KeyPressMsg{Code: 'X', Text: "X"})
+
+	waitForPrompt(t, mt, "abcdeXf")
+}
