@@ -95,6 +95,7 @@ func (h *history) trim() {
 }
 
 // EndGroup ends the current run of typing, Backspace or Delete, so the next edit is a new undo step.
+// It also forgets the remembered column.
 func (e *Editor) EndGroup() {
 	e.wantColSet = false
 	e.last = editOther
