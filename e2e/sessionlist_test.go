@@ -8,7 +8,7 @@ import (
 	"github.com/ithinkicam/chorale/internal/termtest"
 )
 
-var sessionListWords = []string{"♪ chorale", "No sessions yet.", "q quit"}
+var sessionListWords = []string{"♪ chorale", "No sessions yet.", "▸ Prompt", "Enter send · Ctrl-C quit"}
 
 func startSessionList(t *testing.T, opts termtest.Options) *termtest.Term {
 	t.Helper()
@@ -42,17 +42,17 @@ func TestColourOnUsesTheTerminalPalette(t *testing.T) {
 	}
 }
 
-func TestCursorOnTheEmptyMessage(t *testing.T) {
+func TestCursorSitsInTheEmptyPromptBox(t *testing.T) {
 	term := startSessionList(t, termtest.Options{Width: 60, Height: 20})
 
-	wantX, wantY := find(t, term.Screen().Lines(), "No sessions yet.")
+	labelX, labelY := find(t, term.Screen().Lines(), "▸ Prompt")
 	x, y, visible := term.Screen().Cursor()
 	if !visible {
 		t.Error("the cursor is hidden")
 	}
-	if x != wantX || y != wantY {
-		t.Errorf("cursor at column %d, row %d; want column %d, row %d, the start of %q",
-			x+1, y+1, wantX+1, wantY+1, "No sessions yet.")
+	if x != labelX+2 || y != labelY+1 {
+		t.Errorf("cursor at column %d, row %d; want column %d, row %d, below the %q label",
+			x+1, y+1, labelX+3, labelY+2, "▸ Prompt")
 	}
 }
 
