@@ -73,7 +73,9 @@ func (m Model) layOutPrompt() {
 func (m Model) press(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	action, bound := editor.Lookup(msg.String())
 	if bound && action.Kind == editor.ActionInterrupt {
-		m.prompt.Apply(action)
+		if !m.tooSmall() {
+			m.prompt.EndGroup()
+		}
 		return m.interrupt()
 	}
 	m.pendingQuit = false
