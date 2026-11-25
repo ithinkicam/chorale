@@ -29,11 +29,12 @@ const (
 )
 
 // Prompt is what the prompt box shows: one row of text, the column the
-// cursor is in, and the message on the status row.
+// cursor is in, the message on the status row, and what Ctrl-C does next.
 type Prompt struct {
 	Text      string
 	CursorCol int
 	Status    string
+	CtrlC     string
 }
 
 // Render draws the empty session list for a window of the given height,
@@ -49,7 +50,7 @@ func Render(height int, prompt Prompt) screens.Screen {
 	if prompt.Status != "" {
 		rows[statusRow] = strings.Repeat(" ", indent) + prompt.Status
 	}
-	rows[height-1] = keyStyle.Render("Enter") + " send · " + keyStyle.Render("Ctrl-C") + " quit"
+	rows[height-1] = keyStyle.Render("Enter") + " send · " + keyStyle.Render("Ctrl-C") + " " + prompt.CtrlC
 	return screens.Screen{
 		Content: strings.Join(rows, "\n"),
 		CursorX: indent + prompt.CursorCol,
