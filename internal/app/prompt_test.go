@@ -457,6 +457,18 @@ func TestAStatusMessageGoesAtTheNextKey(t *testing.T) {
 	s.wantViewWithout(noAgentWords)
 }
 
+func TestAPasteClearsAStatusMessage(t *testing.T) {
+	s := startPromptSession(t)
+	s.givenAtEnd("run the tests")
+	s.press(named(tea.KeyEnter, 0))
+	s.mt.WaitForText(noAgentWords)
+
+	s.paste("x")
+
+	s.wantScreenWithout(noAgentWords)
+	s.wantText("run the testsx")
+}
+
 func TestCmdZUndoes(t *testing.T) {
 	s := startPromptSession(t)
 	s.typeText("run the tests")

@@ -293,6 +293,13 @@ func (s *session) wantViewWithout(words string) {
 	}
 }
 
+func (s *session) wantScreenWithout(words string) {
+	s.t.Helper()
+	if screen := strings.Join(s.frame(), "\n"); strings.Contains(screen, words) {
+		s.t.Errorf("the terminal's screen shows %q, want it not to:\n%s", words, screen)
+	}
+}
+
 func named(code rune, mod tea.KeyMod) tea.KeyPressMsg {
 	return tea.KeyPressMsg{Code: code, Mod: mod}
 }
