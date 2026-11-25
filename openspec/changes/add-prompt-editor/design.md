@@ -119,7 +119,7 @@ These arrive as their own keys: the four arrows, with and without Shift; Option-
 
 These arrive in another form. Option-Left and Option-Right arrive as `alt+b` and `alt+f`, and Cmd-Left and Cmd-Right as `ctrl+a` and `ctrl+e`, because Ghostty translates them. Cmd-Backspace arrives as `ctrl+u`.
 
-Home, End and forward Delete depend on the keyboard. Cami's Keychron keyboard handles its own fn key, so macOS never turns fn-Left into Home, fn-Right into End, or fn-Backspace into Delete, and those arrive as plain Left, Right and Backspace. The keyboard's own Home and End keys arrive as `home` and `end`. Forward Delete wasn't seen in any run, so its binding rests on the terminal-level test that sends Delete's standard escape sequence.
+Home, End and forward Delete depend on the keyboard. Cami's Keychron keyboard handles its own fn key, so macOS never turns fn-Left into Home, fn-Right into End, or fn-Backspace into Delete, and those arrive as plain Left, Right and Backspace. The keyboard's own Home, End and Delete keys arrive as `home`, `end` and `delete`.
 
 These never reach Chorale in `cmux`, because Ghostty or `cmux` takes them first: Cmd-Up and Cmd-Down, which jump between shell prompts; Cmd-A, which selects the terminal's text; Cmd-K, which clears the screen; Cmd-semicolon, Cmd-Y, Cmd-W and Cmd-J, which are `cmux` shortcuts. Cmd-Up, Cmd-Down and Cmd-A stay in the table, because other terminals pass them through. In `cmux`, Option-Up, Option-Down and Ctrl-Shift-A do the same jobs, and the key help says so.
 
