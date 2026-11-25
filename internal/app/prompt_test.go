@@ -443,6 +443,7 @@ func TestEnterOnAnEmptyPrompt(t *testing.T) {
 	s.press(named(tea.KeyEnter, 0))
 
 	s.wantViewWithout(noAgentWords)
+	s.wantScreenWithout(noAgentWords)
 	s.wantText("  \n ")
 }
 
