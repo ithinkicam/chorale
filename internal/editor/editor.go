@@ -74,8 +74,12 @@ func (e *Editor) Caret() int {
 }
 
 // Insert types s at the insertion point, replacing the selection if there is
-// one. Undo removes what was typed a word at a time.
+// one. It cleans s as Paste does, and Undo removes what was typed a word at a time.
 func (e *Editor) Insert(s string) {
+	s = cleanPaste(s)
+	if s == "" {
+		return
+	}
 	start, end := e.Selection()
 	prev := ""
 	if start > 0 {
