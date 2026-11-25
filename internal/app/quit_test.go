@@ -174,3 +174,33 @@ func TestWidthMethodFollowsTheModeReport(t *testing.T) {
 		})
 	}
 }
+
+func TestKeysThatDoNothingClearTheRememberedColumn(t *testing.T) {
+	tests := []struct {
+		name string
+		key  tea.KeyPressMsg
+	}{
+		{"tab", tea.KeyPressMsg{Code: tea.KeyTab}},
+		{"escape", tea.KeyPressMsg{Code: tea.KeyEscape}},
+		{"shift tab", tea.KeyPressMsg{Code: tea.KeyTab, Mod: tea.ModShift}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20})
+			mt.WaitForText(emptyWords)
+			mt.Send(tea.PasteMsg{Content: "abcdef\nab\nabcdef"})
+			waitForPrompt(t, mt, "abcdef")
+			mt.Send(tea.KeyPressMsg{Code: tea.KeyHome, Mod: tea.ModCtrl})
+			for range 5 {
+				mt.Send(tea.KeyPressMsg{Code: tea.KeyRight})
+			}
+
+			mt.Send(tea.KeyPressMsg{Code: tea.KeyDown})
+			mt.Send(tt.key)
+			mt.Send(tea.KeyPressMsg{Code: tea.KeyDown})
+			mt.Send(tea.KeyPressMsg{Code: 'X', Text: "X"})
+
+			waitForPrompt(t, mt, "abXcdef")
+		})
+	}
+}

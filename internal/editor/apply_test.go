@@ -49,3 +49,27 @@ func TestApplyRedoRepeatsWhatUndoReverted(t *testing.T) {
 	e.Apply(Action{Kind: ActionRedo})
 	assertText(t, e, "ab")
 }
+
+func TestActionsThatDoNothingClearTheRememberedColumn(t *testing.T) {
+	tests := []struct {
+		name string
+		do   func(e *Editor)
+	}{
+		{"copy", func(e *Editor) { e.Apply(Action{Kind: ActionCopy}) }},
+		{"cut", func(e *Editor) { e.Apply(Action{Kind: ActionCut}) }},
+		{"interrupt", func(e *Editor) { e.Apply(Action{Kind: ActionInterrupt}) }},
+		{"send", func(e *Editor) { e.Apply(Action{Kind: ActionSend}) }},
+		{"end of group", func(e *Editor) { e.EndGroup() }},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := withText("abcdef\nab\nabcdef", 5)
+			e.Move(MoveDown, false)
+
+			tt.do(e)
+			e.Move(MoveDown, false)
+
+			assertCaret(t, e, 9+3)
+		})
+	}
+}
