@@ -35,7 +35,7 @@ Every scenario has a test named after it, as `docs/testing.md` describes, and th
 
 ## 4. Key table and the prompt box on screen
 
-- [ ] 4.1 Write unit tests for the key table: every binding in `design.md` maps to its action, including the Cmd forms, Tab maps to nothing, and no key maps to two actions. Run them and confirm they fail
+- [x] 4.1 Write unit tests for the key table: every binding in `design.md` maps to its action, including the Cmd forms, Tab maps to nothing, and no key maps to two actions. Run them and confirm they fail
 - [ ] 4.2 Implement the key table, and verify the tests from 4.1 pass
 - [ ] 4.3 Write interface snapshot tests for the `app-shell` scenarios "Empty session list at 60 by 20 with colour", "Empty session list at 120 by 30 with colour", "Cursor in the empty prompt box", "Empty session list with colour off" and "Window widened to 60 columns", and the `prompt-editor` scenario "Cursor in an empty prompt box". In the same step, rename or rewrite the existing tests for the removed scenario "Cursor on the empty message" and for the "q quit" key line, so that none still asserts the old screen. Run them and confirm they fail because there is no prompt box
 - [ ] 4.4 Add the prompt box to the empty session list as `design.md` lays it out, with the "▸ Prompt" label and the cursor at the insertion point, and verify the tests from 4.3 pass. Update the existing golden files for the empty session list with `make golden`, and say in the commit that the prompt box and the new key line appear
