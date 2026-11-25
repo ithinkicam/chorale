@@ -242,6 +242,8 @@ func TestCancellingTheQuitOnTheTooSmallScreen(t *testing.T) {
 	mt.Resize(60, 20)
 
 	mt.WaitForText(emptyWords)
+	mt.Send(tea.KeyPressMsg{Code: 'q', Text: "q"})
+	waitForPrompt(t, mt, "q")
 	requireRunning(t, mt)
 }
 
