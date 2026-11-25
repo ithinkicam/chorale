@@ -254,3 +254,27 @@ func TestInsertThatCleansToNothingEndsTheUndoGroup(t *testing.T) {
 		t.Errorf("a third undo went back to %q, want only two undo groups", e.Text())
 	}
 }
+
+func TestInsertOfTextThatCleansToNothingKeepsTheSelection(t *testing.T) {
+	e := withText("run the tests", 13)
+	e.Move(MoveWordLeft, true)
+
+	e.Insert("\x1b[31m")
+
+	assertText(t, e, "run the tests")
+	assertSelection(t, e, 8, 13)
+}
+
+func TestPasteOfTextThatCleansToNothingEndsTheUndoGroupWithoutAStep(t *testing.T) {
+	e := newEditor()
+	e.Insert("ab")
+
+	e.Paste("\x1b[31m")
+	e.Insert("c")
+
+	assertText(t, e, "abc")
+	e.Undo()
+	assertText(t, e, "ab")
+	e.Undo()
+	assertText(t, e, "")
+}
