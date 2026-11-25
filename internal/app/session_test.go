@@ -267,6 +267,17 @@ func (s *session) wantCursorColumn(col int) {
 	}
 }
 
+// wantBoxRow checks the text row of the prompt box shows want, which is
+// the row the insertion point is on.
+func (s *session) wantBoxRow(want string) {
+	s.t.Helper()
+	lines := s.frame()
+	got := strings.TrimPrefix(lines[labelRow(s.t, lines)+1], "  ")
+	if got != strings.TrimRight(want, " ") {
+		s.t.Errorf("the prompt box's text row shows %q, want %q", got, want)
+	}
+}
+
 func (s *session) wantLastLine(want string) {
 	s.t.Helper()
 	lines := s.frame()

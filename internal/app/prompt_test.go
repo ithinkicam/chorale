@@ -26,6 +26,7 @@ func TestTypingAWord(t *testing.T) {
 	s.typeText("hello")
 
 	waitForPrompt(t, s.mt, "hello")
+	s.wantBoxRow("hello")
 	s.wantCursorColumn(8)
 }
 
@@ -45,6 +46,7 @@ func TestWideCharactersAndEmoji(t *testing.T) {
 	s.typeText("合唱 🎵 é")
 
 	s.wantText("合唱 🎵 é")
+	s.wantBoxRow("合唱 🎵 é")
 	s.wantCursorColumn(12)
 }
 
@@ -55,6 +57,7 @@ func TestAnAccentTypedOnItsOwnJoinsItsLetter(t *testing.T) {
 	s.typeText("́")
 
 	s.wantText("é")
+	s.wantBoxRow("e\u0301")
 	s.press(left)
 	s.wantCaret(0)
 }
@@ -78,6 +81,7 @@ func TestCursorAfterASoftWrap(t *testing.T) {
 	if row := s.state().CaretRow; row != 1 {
 		t.Errorf("the insertion point is on text row %d, want 2", row+1)
 	}
+	s.wantBoxRow("word end")
 	s.wantCursorColumn(11)
 }
 
@@ -90,11 +94,13 @@ func TestCursorAtTheEndOfAFullRow(t *testing.T) {
 	if row := s.state().CaretRow; row != 0 {
 		t.Errorf("the insertion point is on text row %d, want 1", row+1)
 	}
+	s.wantBoxRow(strings.Repeat("a", 57))
 	s.wantCursorColumn(60)
 	s.press(right)
 	if row := s.state().CaretRow; row != 1 {
 		t.Errorf("after Right, the insertion point is on text row %d, want 2", row+1)
 	}
+	s.wantBoxRow("bbb")
 	s.wantCursorColumn(4)
 }
 
@@ -117,6 +123,7 @@ func TestMovingLeftAcrossASoftWrap(t *testing.T) {
 	if row := s.state().CaretRow; row != 0 {
 		t.Errorf("the insertion point is on text row %d, want 1", row+1)
 	}
+	s.wantBoxRow(words(11))
 	s.wantCursorColumn(57)
 }
 
@@ -149,6 +156,7 @@ func TestUpMovesAcrossASoftWrap(t *testing.T) {
 	if row := s.state().CaretRow; row != 0 {
 		t.Errorf("the insertion point is on text row %d, want 1", row+1)
 	}
+	s.wantBoxRow(words(11))
 	s.wantCursorColumn(11)
 	s.wantCaret(8)
 }
@@ -338,6 +346,7 @@ func TestWrappingAtASpaceAt60Columns(t *testing.T) {
 		t.Errorf("the prompt is %q, want no new lines in it", text)
 	}
 	s.wantText(words(15))
+	s.wantBoxRow(words(4))
 }
 
 func TestALongWordIsBroken(t *testing.T) {
@@ -346,6 +355,7 @@ func TestALongWordIsBroken(t *testing.T) {
 	s.typeText(strings.Repeat("x", 100))
 
 	s.wantRows(strings.Repeat("x", 57), strings.Repeat("x", 43))
+	s.wantBoxRow(strings.Repeat("x", 43))
 }
 
 func TestWideCharactersWrapWhole(t *testing.T) {
@@ -355,6 +365,7 @@ func TestWideCharactersWrapWhole(t *testing.T) {
 
 	s.wantRows(strings.Repeat("合", 28), strings.Repeat("合", 12))
 	s.wantRowsNoWiderThan(57)
+	s.wantBoxRow(strings.Repeat("合", 12))
 }
 
 const clearedWords = "Prompt cleared. Ctrl-Z brings it back."
