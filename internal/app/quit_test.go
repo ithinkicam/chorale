@@ -40,7 +40,8 @@ func requireRunning(t *testing.T, mt *termtest.ModelTerm) {
 	}
 }
 
-func waitForNo(mt *termtest.ModelTerm, words string) {
+func waitForNo(t testing.TB, mt *termtest.ModelTerm, words string) {
+	t.Helper()
 	mt.WaitFor("the screen to stop showing "+words, func(screen string) bool {
 		return !strings.Contains(screen, words)
 	})
@@ -73,7 +74,7 @@ func TestAnotherKeyCancelsQuitting(t *testing.T) {
 	mt.Send(ctrlC())
 	mt.WaitForText(askWords)
 	mt.Send(tea.KeyPressMsg{Code: tea.KeyLeft})
-	waitForNo(mt, askWords)
+	waitForNo(t, mt, askWords)
 	mt.Send(ctrlC())
 
 	mt.WaitForText(askWords)
@@ -126,7 +127,7 @@ func TestAPasteCancelsQuitting(t *testing.T) {
 	mt.WaitForText(askWords)
 	mt.Send(tea.PasteMsg{Content: "pasted"})
 	waitForPrompt(t, mt, "pasted")
-	waitForNo(mt, askWords)
+	waitForNo(t, mt, askWords)
 	requireRunning(t, mt)
 }
 
@@ -138,7 +139,7 @@ func TestAResizeCancelsQuitting(t *testing.T) {
 	mt.WaitForText(askWords)
 	mt.Resize(70, 24)
 
-	waitForNo(mt, askWords)
+	waitForNo(t, mt, askWords)
 	requireRunning(t, mt)
 }
 
