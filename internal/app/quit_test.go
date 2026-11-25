@@ -231,3 +231,16 @@ func TestTypedTextIsCleanedLikeAPaste(t *testing.T) {
 		})
 	}
 }
+
+func TestCancellingTheQuitOnTheTooSmallScreen(t *testing.T) {
+	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 40, Height: 20})
+	mt.WaitForText(tooSmallWords)
+
+	mt.Send(ctrlC())
+	mt.Send(tea.KeyPressMsg{Code: 'q', Text: "q"})
+	mt.Send(ctrlC())
+	mt.Resize(60, 20)
+
+	mt.WaitForText(emptyWords)
+	requireRunning(t, mt)
+}
