@@ -45,3 +45,10 @@ func StateOf(m tea.Model) PromptState {
 func PendingQuit(m tea.Model) bool {
 	return StateOf(m).PendingQuit
 }
+
+// WithSend returns m, which must be a Model, with send as its send hook.
+func WithSend(m tea.Model, send func(prompt string) (status string)) tea.Model {
+	model := m.(Model)
+	model.send = send
+	return model
+}

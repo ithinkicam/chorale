@@ -5,6 +5,9 @@ import (
 	"testing"
 
 	tea "charm.land/bubbletea/v2"
+
+	"github.com/ithinkicam/chorale/internal/app"
+	"github.com/ithinkicam/chorale/internal/termtest"
 )
 
 var (
@@ -433,6 +436,23 @@ func TestSendingWithNoAgentConnected(t *testing.T) {
 	s.press(named(tea.KeyEnter, 0))
 
 	s.mt.WaitForText(noAgentWords + " Your prompt is kept.")
+	s.wantText("run the tests")
+}
+
+func TestEnterGivesTheSendHookThePrompt(t *testing.T) {
+	var sent []string
+	hook := func(prompt string) string {
+		sent = append(sent, prompt)
+		return ""
+	}
+	s := startSessionOf(t, app.WithSend(app.New(), hook), termtest.Options{Width: 60, Height: 20})
+	s.typeText("run the tests")
+
+	s.press(named(tea.KeyEnter, 0))
+
+	if len(sent) != 1 || sent[0] != "run the tests" {
+		t.Errorf("the send hook was given %q, want exactly %q once", sent, "run the tests")
+	}
 	s.wantText("run the tests")
 }
 

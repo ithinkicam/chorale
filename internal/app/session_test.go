@@ -65,8 +65,13 @@ type session struct {
 
 func startSession(t *testing.T, opts termtest.Options) *session {
 	t.Helper()
+	return startSessionOf(t, app.New(), opts)
+}
+
+func startSessionOf(t *testing.T, model tea.Model, opts termtest.Options) *session {
+	t.Helper()
 	seen := &observed{}
-	mt := termtest.StartModel(t, probe{inner: app.New(), seen: seen}, opts)
+	mt := termtest.StartModel(t, probe{inner: model, seen: seen}, opts)
 	mt.WaitForText(emptyWords)
 	return &session{t: t, mt: mt, seen: seen}
 }
