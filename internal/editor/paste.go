@@ -25,6 +25,7 @@ func cleanPaste(s string) string {
 func (e *Editor) Paste(s string) {
 	s = cleanPaste(s)
 	if s == "" {
+		e.EndGroup()
 		return
 	}
 	start, end := e.Selection()

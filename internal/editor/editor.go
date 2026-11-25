@@ -78,6 +78,7 @@ func (e *Editor) Caret() int {
 func (e *Editor) Insert(s string) {
 	s = cleanPaste(s)
 	if s == "" {
+		e.EndGroup()
 		return
 	}
 	start, end := e.Selection()
