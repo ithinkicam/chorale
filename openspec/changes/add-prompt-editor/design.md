@@ -39,7 +39,9 @@ Inserting text re-segments the graphemes around the insertion point: the graphem
 
 Graphemes and widths come from `github.com/charmbracelet/x/ansi`, which is already a direct dependency. Bubble Tea's renderer measures text one of two ways. When the terminal reports support for grapheme clustering, mode 2027, it measures whole graphemes. Otherwise it measures code point by code point, the way `wcwidth` does. The two disagree on some emoji, such as a heart followed by the variation selector that asks for emoji style, which is two columns as a grapheme and one column code point by code point. Ghostty reports mode 2027, and Terminal.app doesn't.
 
-So `Layout` takes the width method as an argument, and the app passes whichever one the renderer is using. Unit tests cover both methods on the heart with its variation selector. Task 1.1 confirms how the app learns which method is in use, and whether `cmux` reports mode 2027.
+So `Layout` takes the width method as an argument, and the app passes whichever one the renderer is using. Unit tests cover both methods on the heart with its variation selector.
+
+The app learns the method the same way the renderer does. Bubble Tea queries mode 2027 at start, and the reply reaches the model's `Update` as a `tea.ModeReportMsg`. Bubble Tea v2.1.2 switches its renderer to `ansi.GraphemeWidth` when the reply says the mode is set, reset or permanently set, and otherwise keeps `ansi.WcWidth`. The app applies the same rule to the same message. The key logger showed `cmux` replying to mode 2027 with set in one run and reset in another, so both values have to count as support.
 
 ### Words
 
@@ -82,7 +84,7 @@ Undo restores a snapshot by splitting its text into graphemes again, so it keeps
 
 ### Copy and cut
 
-Copying uses `tea.SetClipboard`, which writes an OSC 52 sequence for the system clipboard. Nothing reads the clipboard: paste always comes from the terminal's own paste command. Ghostty accepts OSC 52 writes by default, and task 1.1 checks that `cmux` does too.
+Copying uses `tea.SetClipboard`, which writes an OSC 52 sequence for the system clipboard. Nothing reads the clipboard: paste always comes from the terminal's own paste command. Ghostty accepts OSC 52 writes by default, and the key logger confirmed that `cmux` does too: text it copied with OSC 52 came back through Cmd-V.
 
 ### Keys
 
@@ -108,6 +110,16 @@ Only Ctrl-J inserts a new line in every terminal. Shift-Enter needs the Kitty ke
 Ctrl-Shift-A and Ctrl-Shift-Z only reach Chorale in terminals that speak the Kitty keyboard protocol. Elsewhere, Ctrl-Y still redoes. Select-all has no form that works in every terminal, because Ctrl-A is the long-standing key for the start of a line, and Ghostty sends it for Cmd-Left. In Terminal.app, select-all is Option-Up then Shift-Option-Down. That gap is accepted for now and written in the key help in `docs/keys.md`.
 
 Ctrl-C does three things depending on the state. That follows the editors Cami already uses, where Ctrl-C copies when there is a selection, and Claude Code, where it clears a prompt before it quits. The key line always names what Ctrl-C will do next, and the status row confirms what it did.
+
+### What reaches Chorale in cmux
+
+A throwaway key logger, built on Bubble Tea v2.1.2, ran in `cmux` on Cami's Mac. Neither Ghostty config file rebinds a key, so Ghostty's default bindings apply, with `cmux`'s own shortcuts on top.
+
+These arrive as their own keys: the four arrows, with and without Shift; Option-Up and Option-Down, as `alt+up` and `alt+down`; Shift-Option-Left and Shift-Option-Right, as `alt+shift+left` and `alt+shift+right`; Shift-Cmd-Left and Shift-Cmd-Right, as `shift+meta+left` and `shift+meta+right`; Ctrl-Shift-A; Backspace and Option-Backspace; Ctrl-U, Ctrl-K and Ctrl-Y; Ctrl-Z, Cmd-Z, Ctrl-Shift-Z and Cmd-Shift-Z; Ctrl-C, Cmd-C, Ctrl-X and Cmd-X; Enter, Shift-Enter, Option-Enter as `alt+enter`, and Ctrl-J; Tab and Esc. Cmd-V arrives as a paste.
+
+These arrive in another form. Option-Left and Option-Right arrive as `alt+b` and `alt+f`, and Cmd-Left and Cmd-Right as `ctrl+a` and `ctrl+e`, because Ghostty translates them. Cmd-Backspace arrives as `ctrl+u`.
+
+These never reach Chorale in `cmux`, because Ghostty or `cmux` takes them first: Cmd-Up and Cmd-Down, which jump between shell prompts; Cmd-A, which selects the terminal's text; Cmd-K, which clears the screen; Cmd-semicolon, Cmd-Y, Cmd-W and Cmd-J, which are `cmux` shortcuts.
 
 ### Quitting asks first
 
