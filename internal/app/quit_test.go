@@ -204,3 +204,29 @@ func TestKeysThatDoNothingClearTheRememberedColumn(t *testing.T) {
 		})
 	}
 }
+
+func TestTypedTextIsCleanedLikeAPaste(t *testing.T) {
+	tests := []struct {
+		name string
+		text string
+		want string
+	}{
+		{"control sequence", "a\u009b31mb", "ab!"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pasted := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20})
+			pasted.WaitForText(emptyWords)
+			pasted.Send(tea.PasteMsg{Content: tt.text})
+			pasted.Send(tea.PasteMsg{Content: "!"})
+			waitForPrompt(t, pasted, tt.want)
+
+			typed := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20})
+			typed.WaitForText(emptyWords)
+			typed.Send(tea.KeyPressMsg{Text: tt.text})
+			typed.Send(tea.PasteMsg{Content: "!"})
+
+			waitForPrompt(t, typed, tt.want)
+		})
+	}
+}

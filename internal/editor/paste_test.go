@@ -204,3 +204,17 @@ func TestCleanPasteHandlesOtherShapesOfEscapeSequence(t *testing.T) {
 		}
 	}
 }
+
+func TestInsertCleansTextLikePaste(t *testing.T) {
+	for _, text := range []string{"a\u009b31mb", "a\u001b[31mb", "\u0007", "a\tb", "a\r\nb"} {
+		t.Run(text, func(t *testing.T) {
+			pasted := newEditor()
+			pasted.Paste(text)
+			typed := newEditor()
+
+			typed.Insert(text)
+
+			assertText(t, typed, pasted.Text())
+		})
+	}
+}
