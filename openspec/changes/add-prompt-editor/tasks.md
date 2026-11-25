@@ -56,7 +56,7 @@ Every scenario has a test named after it, as `docs/testing.md` describes, and th
 - [ ] 5.4 Wire copy and cut to `tea.SetClipboard`, and fix whatever the paste tests show. Verify the tests from 5.3 pass
 - [ ] 5.5 Write a terminal-level test for "Keyboard enhancements requested and released". Bubble Tea already sends and releases the request, so this test records existing behaviour and passes at once. To show it can fail, first write a unit test for its byte-matching helper, fed bytes with no request in them, and confirm the helper reports the request missing
 - [ ] 5.6 Write a terminal-level test for "Shift-Enter in the Kitty keyboard form". Run it and confirm it fails, then fix whatever it shows and verify it passes
-- [ ] 5.7 Write the key help in `docs/keys.md`: every binding, that Ctrl-J is the new line key that works everywhere, that Shift-Enter needs the Kitty keyboard protocol and Option-Enter needs Option sent as Alt, which keys need a terminal that passes Cmd through, the select-all gap in Terminal.app, and that copy needs OSC 52 allowed. Link it from `README.md`. Verify every key it names is in the key table test from 4.1
+- [ ] 5.7 Write the key help in `docs/keys.md`: every binding, that Ctrl-J is the new line key that works everywhere, that Shift-Enter needs the Kitty keyboard protocol and Option-Enter needs Option sent as Alt, which keys need a terminal that passes Cmd through, that `cmux` keeps Cmd-Up, Cmd-Down and Cmd-A for itself and what to press instead, the select-all gap in Terminal.app, and that copy needs OSC 52 allowed. Link it from `README.md`. Verify every key it names is in the key table test from 4.1
 
 ## 6. Finish
 

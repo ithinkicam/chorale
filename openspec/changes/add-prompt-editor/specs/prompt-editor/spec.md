@@ -432,7 +432,7 @@ The prompt box SHALL show one text row when empty and grow with its text, up to 
 
 ### Requirement: Cmd keys where the terminal passes them
 
-Where the terminal passes the Cmd key through to Chorale, Cmd-Z SHALL undo, Cmd-Shift-Z SHALL redo, Cmd-A SHALL select the whole prompt, Cmd-C SHALL copy, Cmd-X SHALL cut, Cmd-Left and Cmd-Right SHALL move to the start and end of the row, and Cmd-Up and Cmd-Down to the start and end of the prompt.
+Where the terminal passes the Cmd key through to Chorale, Cmd-Z SHALL undo, Cmd-Shift-Z SHALL redo, Cmd-A SHALL select the whole prompt, Cmd-C SHALL copy, Cmd-X SHALL cut, Cmd-Left and Cmd-Right SHALL move to the start and end of the row, and Cmd-Up and Cmd-Down to the start and end of the prompt. Shift-Cmd-Left and Shift-Cmd-Right SHALL select to the start and end of the row.
 
 #### Scenario: Cmd-Z undoes
 
@@ -445,6 +445,13 @@ Where the terminal passes the Cmd key through to Chorale, Cmd-Z SHALL undo, Cmd-
 - **GIVEN** a terminal 60 columns wide and 20 rows tall, in the default theme, with colour on, that passes Cmd keys through, and the prompt is "one\ntwo"
 - **WHEN** Cmd-A is pressed
 - **THEN** "one\ntwo" is selected
+
+#### Scenario: Shift-Cmd-Left selects to the start of the row
+
+- **GIVEN** a terminal 60 columns wide and 20 rows tall, in the default theme, with colour on, that passes Cmd keys through, and the prompt is "run the tests" with the insertion point at the end
+- **WHEN** Shift-Cmd-Left is pressed
+- **THEN** "run the tests" is selected
+- **AND** the terminal cursor sits on screen column 3 of the prompt's first row
 
 ### Requirement: Telling Shift-Enter apart from Enter
 

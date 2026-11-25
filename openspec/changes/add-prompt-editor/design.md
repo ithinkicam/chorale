@@ -95,7 +95,7 @@ All bindings live in one table in `internal/editor`, mapping a key, as Bubble Te
 3. Up and Down move by row on screen.
 4. Home and End, Ctrl-A and Ctrl-E, and Cmd-Left and Cmd-Right, move to the start and end of the row.
 5. Option-Up and Option-Down, Ctrl-Home and Ctrl-End, and Cmd-Up and Cmd-Down, move to the start and end of the prompt.
-6. Shift with any of these extends the selection. Ctrl-Shift-A and Cmd-A select everything.
+6. Shift with any of these extends the selection. Shift-Cmd-Left and Shift-Cmd-Right arrive as their own keys, not as Shift with Ctrl-A or Ctrl-E, so the table names them separately. Ctrl-Shift-A and Cmd-A select everything.
 7. Backspace and Delete, or Ctrl-H and Ctrl-D, delete a character.
 8. Option-Backspace and Ctrl-W delete the word before. Option-Delete and Alt-D delete the word after.
 9. Ctrl-U and Ctrl-K delete to the start and end of the row.
@@ -119,7 +119,7 @@ These arrive as their own keys: the four arrows, with and without Shift; Option-
 
 These arrive in another form. Option-Left and Option-Right arrive as `alt+b` and `alt+f`, and Cmd-Left and Cmd-Right as `ctrl+a` and `ctrl+e`, because Ghostty translates them. Cmd-Backspace arrives as `ctrl+u`.
 
-These never reach Chorale in `cmux`, because Ghostty or `cmux` takes them first: Cmd-Up and Cmd-Down, which jump between shell prompts; Cmd-A, which selects the terminal's text; Cmd-K, which clears the screen; Cmd-semicolon, Cmd-Y, Cmd-W and Cmd-J, which are `cmux` shortcuts.
+These never reach Chorale in `cmux`, because Ghostty or `cmux` takes them first: Cmd-Up and Cmd-Down, which jump between shell prompts; Cmd-A, which selects the terminal's text; Cmd-K, which clears the screen; Cmd-semicolon, Cmd-Y, Cmd-W and Cmd-J, which are `cmux` shortcuts. Cmd-Up, Cmd-Down and Cmd-A stay in the table, because other terminals pass them through. In `cmux`, Option-Up, Option-Down and Ctrl-Shift-A do the same jobs, and the key help says so.
 
 ### Quitting asks first
 
