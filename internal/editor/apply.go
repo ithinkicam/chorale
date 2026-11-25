@@ -28,5 +28,7 @@ func (e *Editor) Apply(a Action) {
 		e.Redo()
 	case ActionNewLine:
 		e.Insert("\n")
+	case ActionCopy, ActionCut, ActionInterrupt, ActionSend:
+		e.EndGroup()
 	}
 }
