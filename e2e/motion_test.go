@@ -32,7 +32,7 @@ func TestCursorDoesNotBlink(t *testing.T) {
 		t.Errorf("cursor style is %d, set %v; want a steady style that chorale set", style, set)
 	}
 
-	term.Send("q")
+	term.Send(ctrlCTwice)
 	term.Wait()
 	if style, _ := screen.CursorStyle(); style != 0 {
 		t.Errorf("cursor style after quitting is %d, want 0, the terminal's default", style)

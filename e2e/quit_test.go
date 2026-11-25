@@ -6,6 +6,8 @@ import (
 	"github.com/ithinkicam/chorale/internal/termtest"
 )
 
+const ctrlCTwice = "\x03\x03"
+
 func TestQuittingRestoresTheTerminal(t *testing.T) {
 	term := termtest.Start(t, chorale, termtest.Options{Width: 60, Height: 20})
 	screen := term.Screen()
@@ -15,7 +17,7 @@ func TestQuittingRestoresTheTerminal(t *testing.T) {
 		t.Fatal("the session list is showing, but not on the alternate screen")
 	}
 
-	term.Send("q")
+	term.Send(ctrlCTwice)
 	defer func() { t.Logf("modes turned on during the run: %v", screen.ModesTurnedOn()) }()
 
 	if code := term.Wait(); code != 0 {

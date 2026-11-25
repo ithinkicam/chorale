@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -25,7 +26,7 @@ func TestQuittingFromTheTooSmallScreen(t *testing.T) {
 	screen := term.Screen()
 	term.WaitForText(tooSmallWords)
 
-	term.Send("q")
+	term.Send(ctrlCTwice)
 
 	if code := term.Wait(); code != 0 {
 		t.Errorf("exit status %d, want 0", code)
@@ -36,4 +37,22 @@ func TestQuittingFromTheTooSmallScreen(t *testing.T) {
 	if _, _, visible := screen.Cursor(); !visible {
 		t.Error("the cursor is hidden after quitting")
 	}
+}
+
+func TestQDoesNothingOnTheTooSmallScreen(t *testing.T) {
+	term := termtest.Start(t, chorale, termtest.Options{Width: 40, Height: 20})
+	screen := term.Screen()
+	term.WaitForText(tooSmallWords)
+
+	term.Send("q")
+	term.WaitQuiet(200 * time.Millisecond)
+
+	if !screen.ModeOn(termtest.ModeAltScreen) {
+		t.Errorf("chorale left the alternate screen after q, so it has ended. The screen shows:\n%s", screen.Text())
+	}
+	if !strings.Contains(screen.Text(), tooSmallWords) {
+		t.Errorf("the screen no longer shows %q:\n%s", tooSmallWords, screen.Text())
+	}
+	term.Resize(60, 20)
+	term.WaitForText("No sessions yet.")
 }
