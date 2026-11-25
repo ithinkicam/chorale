@@ -218,3 +218,39 @@ func TestInsertCleansTextLikePaste(t *testing.T) {
 		})
 	}
 }
+
+func TestTextThatCleansToNothingStillCountsAsAKey(t *testing.T) {
+	tests := []struct {
+		name string
+		do   func(e *Editor)
+	}{
+		{"insert", func(e *Editor) { e.Insert("\u0007") }},
+		{"paste", func(e *Editor) { e.Paste("\x1b[31m") }},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := withText("abcdef\nab\nabcdef", 5)
+			e.Move(MoveDown, false)
+
+			tt.do(e)
+			e.Move(MoveDown, false)
+
+			assertCaret(t, e, 9+3)
+		})
+	}
+}
+
+func TestInsertThatCleansToNothingEndsTheUndoGroup(t *testing.T) {
+	e := newEditor()
+	e.Insert("ab")
+	e.Insert("\u0007")
+	e.Insert("c")
+
+	e.Undo()
+	assertText(t, e, "ab")
+	e.Undo()
+	assertText(t, e, "")
+	if e.Undo() {
+		t.Errorf("a third undo went back to %q, want only two undo groups", e.Text())
+	}
+}
