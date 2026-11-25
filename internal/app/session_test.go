@@ -17,10 +17,13 @@ import (
 type syncMsg int
 
 type observed struct {
-	mu     sync.Mutex
-	state  app.PromptState
-	view   string
-	synced int
+	mu        sync.Mutex
+	state     app.PromptState
+	view      string
+	cursorX   int
+	cursorY   int
+	cursorSet bool
+	synced    int
 }
 
 // probe wraps the app's model and records its state and view after every
@@ -38,7 +41,12 @@ func (p probe) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	p.seen.mu.Lock()
 	defer p.seen.mu.Unlock()
 	p.seen.state = app.StateOf(next)
-	p.seen.view = ansi.Strip(next.View().Content)
+	view := next.View()
+	p.seen.view = ansi.Strip(view.Content)
+	p.seen.cursorSet = view.Cursor != nil
+	if view.Cursor != nil {
+		p.seen.cursorX, p.seen.cursorY = view.Cursor.X, view.Cursor.Y
+	}
 	if s, ok := msg.(syncMsg); ok {
 		p.seen.synced = int(s)
 	}
@@ -208,31 +216,63 @@ func (s *session) wantRowsNoWiderThan(width int) {
 	}
 }
 
-// wantCursorColumn waits until the terminal's cursor is visible on the
-// given screen column, counted from 1, in the prompt box's text row.
-func (s *session) wantCursorColumn(col int) {
+// frame waits until the terminal's screen and cursor match the view the
+// model drew after the last message it handled, so a check never reads an
+// earlier frame, and returns the screen's rows.
+func (s *session) frame() []string {
 	s.t.Helper()
-	label := labelRow(s.t, s.mt.Lines())
+	s.settle()
+	s.seen.mu.Lock()
+	wantRows := strings.Split(s.seen.view, "\n")
+	wantX, wantY, wantSet := s.seen.cursorX, s.seen.cursorY, s.seen.cursorSet
+	s.seen.mu.Unlock()
 	deadline := time.Now().Add(termtest.DefaultTimeout)
 	for {
+		rows := s.mt.Lines()
 		x, y, visible := s.mt.Screen().Cursor()
-		if visible && x+1 == col && y == label+1 {
-			return
+		if sameRows(rows, wantRows) && visible == wantSet && (!wantSet || x == wantX && y == wantY) {
+			return rows
 		}
 		if time.Now().After(deadline) {
-			s.t.Fatalf("the cursor is at column %d, row %d, visible %v; want column %d, row %d, the prompt box's text row. The screen shows:\n%s",
-				x+1, y+1, visible, col, label+2, s.mt.Text())
+			s.t.Fatalf("the screen never showed the model's latest frame, with the cursor at column %d, row %d, visible %v. It shows the cursor at column %d, row %d, visible %v:\n%s\nwant:\n%s",
+				wantX+1, wantY+1, wantSet, x+1, y+1, visible, strings.Join(rows, "\n"), strings.Join(wantRows, "\n"))
 		}
 		time.Sleep(5 * time.Millisecond)
 	}
 }
 
+func sameRows(screen, view []string) bool {
+	for i, row := range screen {
+		want := ""
+		if i < len(view) {
+			want = strings.TrimRight(view[i], " ")
+		}
+		if row != want {
+			return false
+		}
+	}
+	return len(view) <= len(screen)
+}
+
+// wantCursorColumn checks the terminal's cursor is on the given screen
+// column, counted from 1, in the prompt box's text row.
+func (s *session) wantCursorColumn(col int) {
+	s.t.Helper()
+	lines := s.frame()
+	label := labelRow(s.t, lines)
+	x, y, visible := s.mt.Screen().Cursor()
+	if !visible || x+1 != col || y != label+1 {
+		s.t.Fatalf("the cursor is at column %d, row %d, visible %v; want column %d, row %d, the prompt box's text row. The screen shows:\n%s",
+			x+1, y+1, visible, col, label+2, strings.Join(lines, "\n"))
+	}
+}
+
 func (s *session) wantLastLine(want string) {
 	s.t.Helper()
-	s.mt.WaitFor("the last line to show "+want, func(string) bool {
-		lines := s.mt.Lines()
-		return strings.Contains(lines[len(lines)-1], want)
-	})
+	lines := s.frame()
+	if last := lines[len(lines)-1]; !strings.Contains(last, want) {
+		s.t.Errorf("the last line is %q, want it to show %q", last, want)
+	}
 }
 
 func (s *session) wantViewWithout(words string) {
