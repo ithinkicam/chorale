@@ -139,7 +139,7 @@ The empty session list stacks, from the top: the "♪ chorale" line, a blank lin
 
 The prompt box is a label row, its text rows, and a status row:
 
-1. The label row reads "▸ Prompt". The triangle is the focus marker, there for when the session screen adds a second area. When rows are out of sight, the label row adds the counts, such as "▸ Prompt · 3 lines above · 2 lines below". Both counts sit on the label row so that they never compete with a message for the status row's width.
+1. The label row reads "▸ Prompt". The triangle is the focus marker, there for when the session screen adds a second area. When rows are out of sight, the label row adds the counts, such as "▸ Prompt · 3 lines above · 2 lines below". Both counts sit on the label row so that they never compete with a message for the status row's width. Each count is of rows on screen, not of lines ended by a line break, because rows are what you scroll through to see the text. A line that wraps onto three rows counts as three. The label still says "lines", because that reads more naturally aloud than "rows".
 2. The text rows are indented by two columns, so the text lines up under the "P" of "Prompt".
 3. The status row shows one message at a time. While text is selected and no other message is showing, it says how many characters are selected. The other messages are "Copied.", "Cut.", "Prompt cleared. Ctrl-Z brings it back.", "No agent is connected yet. Your prompt is kept." and "Press Ctrl-C again to quit." Each one stays until the next key or paste. The longest is 47 characters, which fits at 60 columns. The status row is empty when there is nothing to say, so the box's height stays steady while typing.
 
