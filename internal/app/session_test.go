@@ -1,6 +1,7 @@
 package app_test
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 	"testing"
@@ -221,9 +222,8 @@ func (s *session) wantRowsNoWiderThan(width int) {
 	}
 }
 
-// frame waits until the terminal's screen and cursor match the view the
-// model drew after the last message it handled, so a check never reads an
-// earlier frame, and returns the screen's rows.
+// frame waits until the terminal's screen and cursor match the model's latest
+// view, and returns the screen's rows.
 func (s *session) frame() []string {
 	s.t.Helper()
 	s.settle()
@@ -239,8 +239,12 @@ func (s *session) frame() []string {
 			return rows
 		}
 		if time.Now().After(deadline) {
-			s.t.Fatalf("the screen never showed the model's latest frame, with the cursor at column %d, row %d, visible %v. It shows the cursor at column %d, row %d, visible %v:\n%s\nwant:\n%s",
-				wantX+1, wantY+1, wantSet, x+1, y+1, visible, strings.Join(rows, "\n"), strings.Join(wantRows, "\n"))
+			wantCursor := "with the cursor hidden"
+			if wantSet {
+				wantCursor = fmt.Sprintf("with the cursor at column %d, row %d", wantX+1, wantY+1)
+			}
+			s.t.Fatalf("the screen shows the cursor at column %d, row %d, visible %v:\n%s\nwant the model's latest frame, %s:\n%s",
+				x+1, y+1, visible, strings.Join(rows, "\n"), wantCursor, strings.Join(wantRows, "\n"))
 		}
 		time.Sleep(5 * time.Millisecond)
 	}
