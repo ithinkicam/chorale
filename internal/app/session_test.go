@@ -313,13 +313,14 @@ func (s *session) wantBoxRows(want ...string) {
 	}
 }
 
-// wantScreenNoWiderThan checks no row the terminal's screen shows is wider
-// than width columns.
-func (s *session) wantScreenNoWiderThan(width int) {
+// wantBoxRowsNoWiderThan checks no text row of the prompt box, with its
+// indent, is wider than width columns on the terminal's screen.
+func (s *session) wantBoxRowsNoWiderThan(width int) {
 	s.t.Helper()
-	for i, row := range s.frame() {
+	lines := s.frame()
+	for i, row := range lines[labelRow(s.t, lines)+1 : len(lines)-2] {
 		if w := ansi.StringWidth(row); w > width {
-			s.t.Errorf("screen row %d is %d columns wide, wider than %d: %q", i+1, w, width, row)
+			s.t.Errorf("the prompt box's text row %d is %d columns wide, wider than %d: %q", i+1, w, width, row)
 		}
 	}
 }

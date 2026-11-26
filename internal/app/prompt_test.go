@@ -362,7 +362,7 @@ func TestWrappingAtASpaceAt60Columns(t *testing.T) {
 		}
 	}
 	s.wantBoxRows(words(11), words(4))
-	s.wantScreenNoWiderThan(60)
+	s.wantBoxRowsNoWiderThan(59)
 	s.wantViewFits(60, 20)
 }
 
@@ -383,7 +383,7 @@ func TestWideCharactersWrapWhole(t *testing.T) {
 	s.wantRows(strings.Repeat("合", 28), strings.Repeat("合", 12))
 	s.wantRowsNoWiderThan(57)
 	s.wantBoxRows(strings.Repeat("合", 28), strings.Repeat("合", 12))
-	s.wantScreenNoWiderThan(60)
+	s.wantBoxRowsNoWiderThan(59)
 	s.wantViewFits(60, 20)
 }
 
