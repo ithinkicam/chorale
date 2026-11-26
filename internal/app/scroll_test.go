@@ -200,3 +200,18 @@ func TestShrinkingTheWindowKeepsTheInsertionPointInView(t *testing.T) {
 	s.wantScreenWith("12 lines above")
 	s.wantCursorAt(8, 10)
 }
+
+func TestAWrappedLineOutOfSightCountsByItsRows(t *testing.T) {
+	s := startPromptSession(t)
+
+	s.paste(strings.Repeat("x", 150) + "\n" + strings.TrimPrefix(numberedLines(9), "line 1\n"))
+
+	rows := s.boxRows()
+	if len(rows) != 8 {
+		t.Errorf("the prompt box shows %d text rows, %q, want 8", len(rows), rows)
+	} else if rows[0] != "line 2" || rows[7] != "line 9" {
+		t.Errorf("the text rows run from %q to %q, want %q to %q", rows[0], rows[7], "line 2", "line 9")
+	}
+	s.wantScreenWith("3 lines above")
+	s.wantScreenWithout("1 line above")
+}
