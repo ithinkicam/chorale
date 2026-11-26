@@ -148,3 +148,55 @@ func TestASelectionSnapshotAt60By20(t *testing.T) {
 	s.wantSelected("word word word word word")
 	s.mt.RequireGolden()
 }
+
+func TestDeletingLinesKeepsTheBoxFull(t *testing.T) {
+	s := startPromptSession(t)
+	s.givenAtEnd(numberedLines(20))
+
+	for range len("\nline 20") {
+		s.press(backspace)
+	}
+
+	rows := s.boxRows()
+	if len(rows) != 8 {
+		t.Errorf("the prompt box shows %d text rows, %q, want 8", len(rows), rows)
+	} else if rows[7] != "line 19" {
+		t.Errorf("the last text row is %q, want %q", rows[7], "line 19")
+	}
+	s.wantScreenWith("11 lines above")
+	s.wantCursorAt(8, 10)
+}
+
+func TestGrowingTheWindowShowsMoreOfAScrolledPrompt(t *testing.T) {
+	s := startPromptSession(t)
+	s.givenAtEnd(numberedLines(20))
+
+	s.mt.Resize(60, 24)
+	s.settle()
+
+	rows := s.boxRows()
+	if len(rows) != 12 {
+		t.Errorf("the prompt box shows %d text rows, %q, want 12", len(rows), rows)
+	} else if rows[11] != "line 20" {
+		t.Errorf("the last text row is %q, want %q", rows[11], "line 20")
+	}
+	s.wantScreenWith("8 lines above")
+	s.wantCursorAt(12, 10)
+}
+
+func TestShrinkingTheWindowKeepsTheInsertionPointInView(t *testing.T) {
+	s := startSession(t, termtest.Options{Width: 60, Height: 24})
+	s.givenAtEnd(numberedLines(20))
+
+	s.mt.Resize(60, 20)
+	s.settle()
+
+	rows := s.boxRows()
+	if len(rows) != 8 {
+		t.Errorf("the prompt box shows %d text rows, %q, want 8", len(rows), rows)
+	} else if rows[7] != "line 20" {
+		t.Errorf("the last text row is %q, want %q", rows[7], "line 20")
+	}
+	s.wantScreenWith("12 lines above")
+	s.wantCursorAt(8, 10)
+}
