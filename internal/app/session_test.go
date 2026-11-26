@@ -263,27 +263,86 @@ func sameRows(screen, view []string) bool {
 	return len(view) <= len(screen)
 }
 
-// wantCursorColumn checks the terminal's cursor is on the given screen
-// column, counted from 1, in the prompt box's text row.
-func (s *session) wantCursorColumn(col int) {
+// boxRows returns the prompt box's text rows as the terminal's screen shows
+// them, without the indent or the spaces after the text.
+func (s *session) boxRows() []string {
+	s.t.Helper()
+	lines := s.frame()
+	rows := lines[labelRow(s.t, lines)+1 : len(lines)-2]
+	out := make([]string, len(rows))
+	for i, row := range rows {
+		out[i] = strings.TrimRight(strings.TrimPrefix(row, "  "), " ")
+	}
+	return out
+}
+
+// wantCursorAt checks the terminal's cursor is on the given text row of the
+// prompt box and the given screen column, both counted from 1.
+func (s *session) wantCursorAt(row, col int) {
 	s.t.Helper()
 	lines := s.frame()
 	label := labelRow(s.t, lines)
 	x, y, visible := s.mt.Screen().Cursor()
-	if !visible || x+1 != col || y != label+1 {
-		s.t.Fatalf("the cursor is at column %d, row %d, visible %v; want column %d, row %d, the prompt box's text row. The screen shows:\n%s",
-			x+1, y+1, visible, col, label+2, strings.Join(lines, "\n"))
+	if !visible || x+1 != col || y != label+row {
+		s.t.Fatalf("the cursor is at column %d, row %d, visible %v; want column %d on text row %d of the prompt box, screen row %d. The screen shows:\n%s",
+			x+1, y+1, visible, col, row, label+row+1, strings.Join(lines, "\n"))
 	}
 }
 
-// wantBoxRow checks the text row of the prompt box shows want, which is
-// the row the insertion point is on.
-func (s *session) wantBoxRow(want string) {
+// wantCursorColumn checks the terminal's cursor is on the given screen
+// column, counted from 1, in the prompt box's first text row.
+func (s *session) wantCursorColumn(col int) {
 	s.t.Helper()
-	lines := s.frame()
-	got := strings.TrimPrefix(lines[labelRow(s.t, lines)+1], "  ")
-	if got != strings.TrimRight(want, " ") {
-		s.t.Errorf("the prompt box's text row shows %q, want %q", got, want)
+	s.wantCursorAt(1, col)
+}
+
+// wantBoxRows checks the first text rows of the prompt box on the screen
+// show want, one string for each row.
+func (s *session) wantBoxRows(want ...string) {
+	s.t.Helper()
+	got := s.boxRows()
+	if len(got) < len(want) {
+		s.t.Errorf("the prompt box shows %d text rows, %q, want at least %d, starting %q", len(got), got, len(want), want)
+		return
+	}
+	for i, row := range want {
+		if got[i] != strings.TrimRight(row, " ") {
+			s.t.Errorf("the prompt box shows text rows %q, want them to start with %q", got, want)
+			return
+		}
+	}
+}
+
+// wantScreenNoWiderThan checks no row the terminal's screen shows is wider
+// than width columns.
+func (s *session) wantScreenNoWiderThan(width int) {
+	s.t.Helper()
+	for i, row := range s.frame() {
+		if w := ansi.StringWidth(row); w > width {
+			s.t.Errorf("screen row %d is %d columns wide, wider than %d: %q", i+1, w, width, row)
+		}
+	}
+}
+
+// wantViewFits checks the view the model draws has no more rows than
+// height and none wider than width.
+func (s *session) wantViewFits(width, height int) {
+	s.t.Helper()
+	rows := strings.Split(s.view(), "\n")
+	if len(rows) > height {
+		s.t.Errorf("the view has %d rows, more than the window's %d", len(rows), height)
+	}
+	for i, row := range rows {
+		if w := ansi.StringWidth(row); w > width {
+			s.t.Errorf("view row %d is %d columns wide, wider than the window's %d: %q", i+1, w, width, row)
+		}
+	}
+}
+
+func (s *session) wantScreenWith(words string) {
+	s.t.Helper()
+	if screen := strings.Join(s.frame(), "\n"); !strings.Contains(screen, words) {
+		s.t.Errorf("the terminal's screen doesn't show %q:\n%s", words, screen)
 	}
 }
 

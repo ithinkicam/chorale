@@ -186,7 +186,7 @@ func TestKeysThatDoNothingClearTheRememberedColumn(t *testing.T) {
 			mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20})
 			mt.WaitForText(emptyWords)
 			mt.Send(tea.PasteMsg{Content: "abcdef\nab\nabcdef"})
-			waitForPrompt(t, mt, "abcdef")
+			waitForPrompt(t, mt, "abcdef\nab\nabcdef")
 			mt.Send(tea.KeyPressMsg{Code: tea.KeyHome, Mod: tea.ModCtrl})
 			for range 5 {
 				mt.Send(tea.KeyPressMsg{Code: tea.KeyRight})
@@ -197,7 +197,7 @@ func TestKeysThatDoNothingClearTheRememberedColumn(t *testing.T) {
 			mt.Send(tea.KeyPressMsg{Code: tea.KeyDown})
 			mt.Send(tea.KeyPressMsg{Code: 'X', Text: "X"})
 
-			waitForPrompt(t, mt, "abXcdef")
+			waitForPrompt(t, mt, "abcdef\nab\nabXcdef")
 		})
 	}
 }
@@ -247,7 +247,7 @@ func TestCtrlCClearsTheRememberedColumnOnTheSessionList(t *testing.T) {
 	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20})
 	mt.WaitForText(emptyWords)
 	mt.Send(tea.PasteMsg{Content: "abcdef\nab\nabcdef"})
-	waitForPrompt(t, mt, "abcdef")
+	waitForPrompt(t, mt, "abcdef\nab\nabcdef")
 	mt.Send(tea.KeyPressMsg{Code: tea.KeyHome, Mod: tea.ModCtrl})
 	for range 5 {
 		mt.Send(tea.KeyPressMsg{Code: tea.KeyRight})
@@ -258,14 +258,14 @@ func TestCtrlCClearsTheRememberedColumnOnTheSessionList(t *testing.T) {
 	mt.Send(tea.KeyPressMsg{Code: tea.KeyDown})
 	mt.Send(tea.KeyPressMsg{Code: 'X', Text: "X"})
 
-	waitForPrompt(t, mt, "abXcdef")
+	waitForPrompt(t, mt, "abcdef\nab\nabXcdef")
 }
 
 func TestCtrlCOnTheTooSmallScreenKeepsTheRememberedColumn(t *testing.T) {
 	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20})
 	mt.WaitForText(emptyWords)
 	mt.Send(tea.PasteMsg{Content: "abcdef\nab\nabcdef"})
-	waitForPrompt(t, mt, "abcdef")
+	waitForPrompt(t, mt, "abcdef\nab\nabcdef")
 	mt.Send(tea.KeyPressMsg{Code: tea.KeyHome, Mod: tea.ModCtrl})
 	for range 5 {
 		mt.Send(tea.KeyPressMsg{Code: tea.KeyRight})
@@ -281,7 +281,7 @@ func TestCtrlCOnTheTooSmallScreenKeepsTheRememberedColumn(t *testing.T) {
 	mt.Send(tea.KeyPressMsg{Code: tea.KeyDown})
 	mt.Send(tea.KeyPressMsg{Code: 'X', Text: "X"})
 
-	waitForPrompt(t, mt, "abcdeXf")
+	waitForPrompt(t, mt, "abcdef\nab\nabcdeXf")
 }
 
 func TestEnterEndsTheUndoGroup(t *testing.T) {
