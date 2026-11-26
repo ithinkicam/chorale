@@ -6,7 +6,7 @@ The prompt editor is the box where Cami writes what she asks an agent. It behave
 
 Every scenario that types into the prompt box starts from the empty session list, where the prompt box has focus. Key names follow macOS: Option is the Alt key, and Cmd is the Command key. "The prompt is" gives the prompt's whole text, with a new line written as `\n`.
 
-The prompt box has a label row, then its text rows, then a status row. The label row reads "▸ Prompt", followed by how many rows are out of sight when there are any, counted as lines. The text rows are indented by two columns, and the last column of the window is kept free, so at 60 columns each text row holds 57 columns of text. Screen columns are counted from 1 at the left edge, so the first text column is the third column of the screen.
+The prompt box has a label row, then its text rows, then a status row. The label row reads "▸ Prompt", followed by how many rows are out of sight when there are any. The label calls them lines. The text rows are indented by two columns, and the last column of the window is kept free, so at 60 columns each text row holds 57 columns of text. Screen columns are counted from 1 at the left edge, so the first text column is the third column of the screen.
 
 ## ADDED Requirements
 

@@ -18,7 +18,7 @@ This is the first of three changes that make up milestone 1, "one Claude session
   - It accepts bracketed paste as one block, which one undo removes.
   - It copies and cuts the selection to the Mac clipboard through OSC 52.
   - It shows the selection in the accent colour and in inverse video, and says how many characters are selected, so the selection is never colour alone.
-  - It grows with the prompt up to a limit, then scrolls to keep the cursor in view, saying in words how many lines are out of sight.
+  - It grows with the prompt up to a limit, then scrolls to keep the cursor in view, saying in words how many rows are out of sight.
   - A status row confirms in words what just happened, such as "Copied." or "Prompt cleared. Ctrl-Z brings it back."
 - Every editor action has a Ctrl or Option key, which works in every terminal. In Ghostty, which `cmux` is built on, the usual Cmd keys work too where the terminal passes them through. Tab does nothing for now.
 - Enter sends the prompt, and Shift-Enter, Option-Enter or Ctrl-J starts a new line. Ctrl-J is the one that works in every terminal. With no agent connected yet, sending keeps the prompt in the box and says that no agent is connected. The third change replaces this with a real send.
