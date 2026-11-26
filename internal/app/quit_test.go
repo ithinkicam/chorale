@@ -159,19 +159,15 @@ func TestWidthMethodFollowsTheModeReport(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20})
-			mt.WaitForText(emptyWords)
+			s := startPromptSession(t)
 			if tt.report != nil {
-				mt.Send(*tt.report)
+				s.mt.Send(*tt.report)
 			}
 
-			mt.Type("a❤️")
+			s.typeText("a❤️")
 
-			waitForPrompt(t, mt, "a❤️")
-			x, _, _ := mt.Screen().Cursor()
-			if want := 2 + 1 + tt.wantWidth; x != want {
-				t.Errorf("cursor at column %d, want column %d, after a heart %d columns wide", x+1, want+1, tt.wantWidth)
-			}
+			waitForPrompt(t, s.mt, "a❤️")
+			s.wantCursorColumn(3 + 1 + tt.wantWidth)
 		})
 	}
 }

@@ -66,11 +66,10 @@ func TestEmptySessionListSnapshotWithColourOff(t *testing.T) {
 }
 
 func TestCursorInTheEmptyPromptBox(t *testing.T) {
-	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20})
-	mt.WaitForText(emptyWords)
+	s := startPromptSession(t)
 
-	label := labelRow(t, mt.Lines())
-	x, y, visible := mt.Screen().Cursor()
+	label := labelRow(t, s.frame())
+	x, y, visible := s.mt.Screen().Cursor()
 	if !visible {
 		t.Error("the cursor is hidden")
 	}
@@ -80,10 +79,10 @@ func TestCursorInTheEmptyPromptBox(t *testing.T) {
 }
 
 func TestCursorInAnEmptyPromptBox(t *testing.T) {
-	mt := termtest.StartModel(t, app.New(), termtest.Options{Width: 60, Height: 20})
-	mt.WaitForText(emptyWords)
+	s := startPromptSession(t)
 
-	screen := mt.Screen()
+	lines := s.frame()
+	screen := s.mt.Screen()
 	x, y, visible := screen.Cursor()
 	if !visible {
 		t.Error("the cursor is hidden")
@@ -91,7 +90,7 @@ func TestCursorInAnEmptyPromptBox(t *testing.T) {
 	if style, set := screen.CursorStyle(); !set || screen.CursorBlinks() {
 		t.Errorf("cursor style is %d, set %v; want a steady style that chorale set", style, set)
 	}
-	if want := labelRow(t, mt.Lines()) + 1; x != 2 || y != want {
+	if want := labelRow(t, lines) + 1; x != 2 || y != want {
 		t.Errorf("cursor at column %d, row %d; want column 3, row %d, the prompt box's first text row", x+1, y+1, want+1)
 	}
 }
