@@ -26,6 +26,7 @@ type Model struct {
 	method        ansi.Method
 	pendingQuit   bool
 	status        string
+	top           int
 	send          func(prompt string) (status string)
 }
 
@@ -35,7 +36,11 @@ const (
 	noAgentMessage = "No agent is connected yet. Your prompt is kept."
 )
 
-const textInset = 3
+const (
+	textInset  = 3
+	boxChrome  = 12
+	maxBoxRows = 12
+)
 
 // New returns the model Chorale starts with.
 func New() Model {
@@ -49,6 +54,13 @@ func (m Model) Init() tea.Cmd { return nil }
 
 // Update implements tea.Model.
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	next, cmd := m.handle(msg)
+	model := next.(Model)
+	model.top = model.scrolledTop()
+	return model, cmd
+}
+
+func (m Model) handle(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
@@ -144,12 +156,39 @@ func (m Model) View() tea.View {
 	return view
 }
 
+func (m Model) boxRows(total int) int {
+	return max(1, min(total, maxBoxRows, m.height-boxChrome))
+}
+
+func (m Model) scrolledTop() int {
+	if m.tooSmall() {
+		return m.top
+	}
+	total := len(m.prompt.Rows())
+	shown := m.boxRows(total)
+	caretRow, _ := m.prompt.CursorPos()
+	top := m.top
+	if caretRow < top {
+		top = caretRow
+	}
+	if caretRow >= top+shown {
+		top = caretRow - shown + 1
+	}
+	return max(0, min(top, total-shown))
+}
+
 func (m Model) promptBox() sessionlist.Prompt {
-	row, col := m.prompt.CursorPos()
-	r := m.prompt.Rows()[row]
+	caretRow, col := m.prompt.CursorPos()
+	all := m.prompt.Rows()
+	shown := m.boxRows(len(all))
 	prompt := sessionlist.Prompt{
-		Text:      strings.Join(m.prompt.Chars()[r.Start:r.End], ""),
+		CursorRow: caretRow - m.top,
 		CursorCol: col,
+		Above:     m.top,
+		Below:     len(all) - m.top - shown,
+	}
+	for _, r := range all[m.top : m.top+shown] {
+		prompt.Rows = append(prompt.Rows, strings.Join(m.prompt.Chars()[r.Start:r.End], ""))
 	}
 	switch {
 	case m.prompt.HasSelection():
