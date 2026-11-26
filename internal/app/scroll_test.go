@@ -56,6 +56,7 @@ func TestScrollingFollowsTheInsertionPoint(t *testing.T) {
 
 	s.wantBoxRows("line 1")
 	s.wantScreenWith("12 lines below")
+	s.wantLabel("▸ Prompt · 12 lines below")
 	s.wantScreenWithout("lines above")
 }
 
@@ -119,6 +120,7 @@ func TestScrollingMovesByTheLeastAmount(t *testing.T) {
 	s.press(up, up, up, up, up)
 	s.wantBoxRows("line 12")
 	s.wantScreenWith("11 lines above · 1 line below")
+	s.wantLabel("▸ Prompt · 11 lines above · 1 line below")
 	s.wantCursorAt(1, 10)
 }
 
@@ -131,6 +133,7 @@ func TestTheCountsSayHowManyRowsAreOutOfSightOnBothSides(t *testing.T) {
 
 	s.wantBoxRows("line 3")
 	s.wantScreenWith("▸ Prompt · 2 lines above · 10 lines below")
+	s.wantLabel("▸ Prompt · 2 lines above · 10 lines below")
 }
 
 func TestAWrappedPromptSnapshotAt60By20(t *testing.T) {
