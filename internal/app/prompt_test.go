@@ -61,6 +61,7 @@ func TestAnAccentTypedOnItsOwnJoinsItsLetter(t *testing.T) {
 
 	s.wantText("é")
 	s.wantBoxRow("e\u0301")
+	s.wantCursorColumn(4)
 	s.press(left)
 	s.wantCaret(0)
 }
