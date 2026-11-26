@@ -276,6 +276,15 @@ func (s *session) boxRows() []string {
 	return out
 }
 
+// wantLabel checks the prompt box's label row on the screen reads exactly want.
+func (s *session) wantLabel(want string) {
+	s.t.Helper()
+	lines := s.frame()
+	if got := strings.TrimRight(lines[labelRow(s.t, lines)], " "); got != want {
+		s.t.Errorf("the label row reads %q, want %q", got, want)
+	}
+}
+
 // wantCursorAt checks the terminal's cursor is on the given text row of the
 // prompt box and the given screen column, both counted from 1.
 func (s *session) wantCursorAt(row, col int) {

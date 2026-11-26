@@ -42,6 +42,7 @@ func TestALongPromptScrollsAt60By20(t *testing.T) {
 		t.Errorf("the last text row is %q, want %q", rows[7], "line 20")
 	}
 	s.wantScreenWith("12 lines above")
+	s.wantLabel("▸ Prompt · 12 lines above")
 	s.wantCursorAt(8, 10)
 	s.wantViewFits(60, 20)
 	s.mt.RequireGolden()
@@ -108,10 +109,12 @@ func TestScrollingMovesByTheLeastAmount(t *testing.T) {
 	s.givenAtEnd(numberedLines(20))
 	s.wantBoxRows("line 13")
 	s.wantScreenWith("12 lines above")
+	s.wantLabel("▸ Prompt · 12 lines above")
 
 	s.press(up, up, up)
 	s.wantBoxRows("line 13")
 	s.wantScreenWith("12 lines above")
+	s.wantLabel("▸ Prompt · 12 lines above")
 
 	s.press(up, up, up, up, up)
 	s.wantBoxRows("line 12")
@@ -164,6 +167,7 @@ func TestDeletingLinesKeepsTheBoxFull(t *testing.T) {
 		t.Errorf("the last text row is %q, want %q", rows[7], "line 19")
 	}
 	s.wantScreenWith("11 lines above")
+	s.wantLabel("▸ Prompt · 11 lines above")
 	s.wantCursorAt(8, 10)
 }
 
@@ -181,6 +185,7 @@ func TestGrowingTheWindowShowsMoreOfAScrolledPrompt(t *testing.T) {
 		t.Errorf("the last text row is %q, want %q", rows[11], "line 20")
 	}
 	s.wantScreenWith("8 lines above")
+	s.wantLabel("▸ Prompt · 8 lines above")
 	s.wantCursorAt(12, 10)
 }
 
@@ -198,6 +203,7 @@ func TestShrinkingTheWindowKeepsTheInsertionPointInView(t *testing.T) {
 		t.Errorf("the last text row is %q, want %q", rows[7], "line 20")
 	}
 	s.wantScreenWith("12 lines above")
+	s.wantLabel("▸ Prompt · 12 lines above")
 	s.wantCursorAt(8, 10)
 }
 
@@ -213,5 +219,6 @@ func TestAWrappedLineOutOfSightCountsByItsRows(t *testing.T) {
 		t.Errorf("the text rows run from %q to %q, want %q to %q", rows[0], rows[7], "line 2", "line 9")
 	}
 	s.wantScreenWith("3 lines above")
+	s.wantLabel("▸ Prompt · 3 lines above")
 	s.wantScreenWithout("1 line above")
 }
